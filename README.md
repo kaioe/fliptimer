@@ -1,5 +1,9 @@
 # Flip Clock (`flipClock.html`)
 
+## Repository
+
+- **GitHub (private):** [https://github.com/kaioe/flipclock](https://github.com/kaioe/flipclock) — `origin` remote, default branch **`main`**.
+
 ## Features
 
 - **Responsive & touch:** `flipClock.html` includes **`viewport`** (`width=device-width`, `initial-scale=1`, `viewport-fit=cover`) and **`theme-color`**. **`.container`** and **`.preset-modal`** use **`env(safe-area-inset-*)`** padding; **`html`/`body`** use **`min-height: 100dvh`** where supported and **`overflow: hidden`** so the main viewport shows **no scrollbars** and clips overflow. **`body`:** **`touch-action: manipulation`**, subtle tap highlight. **`.countdown`** height uses **`min(100dvw,100dvh)`** inside **`@supports (width: 1dvw)`** (falls back to **`vw`/`vh`**). **`visualViewport`** **`resize`** calls **`setDimensions`** when the mobile chrome resizes. **Coarse pointers** (`pointer: coarse`): toolbar icon buttons **44×44**, preset table action icons **44×44**, triple-slider **`--thumb-size`** **32px**, preset **Name** input **16px** (reduces iOS focus-zoom). **Touch preset reorder:** touch on a row (not on a control), move past a short threshold, release on another row — same persistence as drag-and-drop (`touchstart` / `touchmove` / `touchend` in `flipClock.js`).
@@ -84,4 +88,4 @@ npx playwright install chromium
 | `bs-config.js`                | Browser-sync: port, `/flipClock` → `flipClock.html`, **`POST /__flipclock__/save-preset-timers`** → `preset-timers.json`; watches CSS/HTML/JS only (not **`preset-timers.json`**) |
 | `scripts/browser-console.mjs` | Playwright: print console/errors from URL                                                                                              |
 
-Last doc update: 2026-03-29 03:41:36 — **Chrome dim idle + keyboard:** **`FLIPCLOCK_CHROME_IDLE_MS`** **3s** re-dim after last **`mousemove`** / **`touchstart`** / **`touchmove`** / **`keydown`**; **`keydown`** reveals chrome. Earlier: **bs-config** preset JSON watch, **preset form** submit, **countdown chrome dimming**, **Timer settings on Add/Save**.
+Last doc update: 2026-03-29 03:44:16 +10:00 — **Git:** local repo initialized, **`origin`** → private GitHub **`flipclock`**, initial push to **`main`**. Earlier: **Chrome dim idle + keyboard:** **`FLIPCLOCK_CHROME_IDLE_MS`** **3s** re-dim after last **`mousemove`** / **`touchstart`** / **`touchmove`** / **`keydown`**; **`keydown`** reveals chrome. Earlier: **bs-config** preset JSON watch, **preset form** submit, **countdown chrome dimming**, **Timer settings on Add/Save**.
