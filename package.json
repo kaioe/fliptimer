@@ -1,0 +1,20 @@
+{
+  "name": "flipclock",
+  "private": true,
+  "scripts": {
+    "build:css": "sass flipClock.scss flipClock.css --no-source-map",
+    "dev": "concurrently -k -n sass,bs -c cyan,magenta \"npm run dev:sass\" \"npm run dev:serve\"",
+    "dev:sass": "sass --watch --poll flipClock.scss flipClock.css --no-source-map",
+    "dev:serve": "browser-sync start --config bs-config.js",
+    "browser:console": "node scripts/browser-console.mjs"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.3",
+    "concurrently": "^9.1.2",
+    "playwright": "^1.58.2",
+    "sass": "^1.77.0"
+  },
+  "dependencies": {
+    "jquery": "^3.7.1"
+  }
+}
