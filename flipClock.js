@@ -14,6 +14,22 @@
 		return parseInt(String(timeStr).replace(/:/g, ""), 10);
 	}
 
+	/** Inverse of {@link timeStringToComparableInt} for 4-digit MM:SS faces (pads to 4 digits). */
+	function comparableIntToMmSsString(t) {
+		var n = Math.max(0, Math.min(5959, parseInt(String(t), 10) || 0));
+		var s = String(n);
+		while (s.length < 4) {
+			s = "0" + s;
+		}
+		return s.slice(0, 2) + ":" + s.slice(2, 4);
+	}
+
+	/** Prep step 5…1 → `00:05`…`00:01` on the flip clock. */
+	function prepStepToMmSs(seconds) {
+		var sec = Math.max(1, Math.min(5, seconds | 0));
+		return "00:" + (sec < 10 ? "0" + sec : String(sec));
+	}
+
 	var transitionSupportComputed = false;
 	var transitionSupport = false;
 
@@ -37,6 +53,8 @@
 	 */
 	function FlipClock(options) {
 		this.tickInterval = false;
+		/** True while the 5s prep countdown runs (before the main interval starts). */
+		this.prepCountdownActive = false;
 		this.digitSelectors = [];
 		this.options = this.createConfig(options);
 		this.init();
@@ -421,7 +439,7 @@
 	window.FlipClock = FlipClock;
 
 	// -------------------------------------------------------------------------
-	// Preset timers (CRUD + optional sync of preset-timers.json via dev server)
+	// Preset timers (CRUD + optional sync of flipClock.json via dev server)
 	// -------------------------------------------------------------------------
 
 	var PRESET_STORAGE_KEY = "flipclock-preset-timers-v1";
@@ -431,8 +449,13 @@
 	var FLIPCLOCK_COUNTER_PCT_KEY = "flipclock-counter-pct-v1";
 	var FLIPCLOCK_SOUNDS_KEY = "flipclock-sounds-v1";
 	var FLIPCLOCK_SOUND_NAMES_KEY = "flipclock-sound-filenames-v1";
+	var FLIPCLOCK_SOUND_SOURCE_KEY = "flipclock-sound-source-v1";
+	var FLIPCLOCK_SOUND_PRELOADED_KEY = "flipclock-sound-preloaded-v1";
+	var SOUNDS_MANIFEST_URL = "sounds/manifest.json";
 	var FLIPCLOCK_APP_BG_KEY = "flipclock-app-bg-v1";
-	var PRESET_JSON_FILE = "preset-timers.json";
+	var PRESET_JSON_FILE = "flipClock.json";
+	/** Keys for Timer settings → Sounds (must match `data-sound-kind` in HTML). */
+	var PRESET_SOUND_KINDS = ["start", "pause", "finish"];
 
 	var TRACK_MAX_MIN = 10;
 	var TRACK_MAX_MAX = 60;
@@ -509,10 +532,7 @@
 		var rw = rail.getBoundingClientRect().width;
 		var span = max - min;
 		var t = span > 0 ? (v - min) / span : 0;
-		var thumbCenter =
-			COUNTER_SIZE_RAIL_PAD_PX +
-			COUNTER_SIZE_THUMB_PX / 2 +
-			t * (rw - 2 * COUNTER_SIZE_RAIL_PAD_PX - COUNTER_SIZE_THUMB_PX);
+		var thumbCenter = COUNTER_SIZE_RAIL_PAD_PX + COUNTER_SIZE_THUMB_PX / 2 + t * (rw - 2 * COUNTER_SIZE_RAIL_PAD_PX - COUNTER_SIZE_THUMB_PX);
 		var fillW = Math.max(0, thumbCenter - COUNTER_SIZE_RAIL_PAD_PX);
 		rail.style.setProperty("--preset-counter-fill-width", fillW + "px");
 	}
@@ -690,6 +710,133 @@
 		}
 	}
 
+	function loadSoundSourceFromStorage() {
+		try {
+			var raw = localStorage.getItem(FLIPCLOCK_SOUND_SOURCE_KEY);
+			if (raw === "preloaded" || raw === "upload") {
+				return raw;
+			}
+		} catch (e) {
+			/* ignore */
+		}
+		return "upload";
+	}
+
+	function saveSoundSourceToStorage(mode) {
+		try {
+			if (mode === "preloaded" || mode === "upload") {
+				localStorage.setItem(FLIPCLOCK_SOUND_SOURCE_KEY, mode);
+			}
+		} catch (e) {
+			/* ignore */
+		}
+	}
+
+	function emptyPreloadedSoundSelections() {
+		var o = {};
+		for (var i = 0; i < PRESET_SOUND_KINDS.length; i++) {
+			o[PRESET_SOUND_KINDS[i]] = "";
+		}
+		return o;
+	}
+
+	function loadPreloadedSoundSelectionsFromStorage() {
+		var empty = emptyPreloadedSoundSelections();
+		try {
+			var raw = localStorage.getItem(FLIPCLOCK_SOUND_PRELOADED_KEY);
+			if (raw === null || raw === "") {
+				return empty;
+			}
+			var data = JSON.parse(raw);
+			if (!data || typeof data !== "object") {
+				return empty;
+			}
+			for (var j = 0; j < PRESET_SOUND_KINDS.length; j++) {
+				var k = PRESET_SOUND_KINDS[j];
+				if (typeof data[k] === "string") {
+					empty[k] = data[k];
+				}
+			}
+			return empty;
+		} catch (e) {
+			return empty;
+		}
+	}
+
+	function savePreloadedSoundSelectionsToStorage(obj) {
+		try {
+			localStorage.setItem(FLIPCLOCK_SOUND_PRELOADED_KEY, JSON.stringify(obj));
+		} catch (e) {
+			/* ignore */
+		}
+	}
+
+	/**
+	 * Base URL for resolving `sounds/...` paths. Strips a trailing slash from the path so
+	 * `http://host/flipClock/` does not resolve `sounds/x` to `http://host/flipClock/sounds/x` (404);
+	 * without the slash, resolution matches `flipClock.html` + sibling `sounds/` → `/sounds/x`.
+	 */
+	function baseHrefForSoundRelativeUrl() {
+		if (typeof URL === "undefined" || typeof location === "undefined" || !location.href) {
+			return typeof location !== "undefined" ? location.href : "";
+		}
+		try {
+			var u = new URL(location.href);
+			if (u.pathname.length > 1 && /\/$/.test(u.pathname)) {
+				u.pathname = u.pathname.replace(/\/+$/, "") || "/";
+			}
+			return u.href;
+		} catch (e) {
+			return location.href;
+		}
+	}
+
+	/** URL for a file under `sounds/` (path segments encoded). */
+	function preloadedFilenameToSoundUrl(filename) {
+		if (typeof filename !== "string" || filename.length === 0) {
+			return null;
+		}
+		var raw = filename.trim();
+		if (raw.length === 0) {
+			return null;
+		}
+		if (typeof raw.normalize === "function") {
+			try {
+				raw = raw.normalize("NFC");
+			} catch (e) {
+				/* ignore */
+			}
+		}
+		var parts = raw.split("/").filter(function (p) {
+			return p.length > 0;
+		});
+		if (parts.length === 0) {
+			return null;
+		}
+		var enc = parts.map(encodeURIComponent).join("/");
+		var rel = "sounds/" + enc;
+		try {
+			if (typeof URL !== "undefined" && typeof location !== "undefined" && location.href) {
+				return new URL(rel, baseHrefForSoundRelativeUrl()).href;
+			}
+		} catch (e2) {
+			/* ignore */
+		}
+		return rel;
+	}
+
+	function resolveSoundUrlForKind(kind) {
+		var src = loadSoundSourceFromStorage();
+		if (src === "preloaded") {
+			var sel = loadPreloadedSoundSelectionsFromStorage();
+			var fn = sel[kind];
+			return preloadedFilenameToSoundUrl(fn);
+		}
+		var sounds = loadSoundsFromStorage();
+		var url = sounds[kind];
+		return typeof url === "string" && url.length > 0 ? url : null;
+	}
+
 	function assignFileToInput(input, file) {
 		if (!input || !file) {
 			return false;
@@ -745,15 +892,126 @@
 		});
 	}
 
+	/** Tiny silent WAV — played once after user gesture so browsers allow later HTMLAudio playback (e.g. finish sound without a click). */
+	var FLIPCLOCK_SILENT_WAV =
+		"data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAA=";
+
+	var flipClockAudioUnlockDone = false;
+	/** Shared Web Audio context (prep beeps + unlock). */
+	var flipClockSharedAudioContext = null;
+
+	function getFlipClockSharedAudioContext() {
+		if (flipClockSharedAudioContext) {
+			return flipClockSharedAudioContext;
+		}
+		try {
+			var Ctx = window.AudioContext || window.webkitAudioContext;
+			if (!Ctx) {
+				return null;
+			}
+			flipClockSharedAudioContext = new Ctx();
+			return flipClockSharedAudioContext;
+		} catch (e) {
+			return null;
+		}
+	}
+
+	/** Short sine beep for prep countdown (one per second). */
+	function playPrepCountdownBeep() {
+		var ctx = getFlipClockSharedAudioContext();
+		if (!ctx) {
+			return;
+		}
+		if (ctx.state === "suspended" && typeof ctx.resume === "function") {
+			ctx.resume().catch(function () {});
+		}
+		try {
+			var t0 = ctx.currentTime;
+			var osc = ctx.createOscillator();
+			var gain = ctx.createGain();
+			osc.type = "sine";
+			osc.frequency.setValueAtTime(880, t0);
+			gain.gain.setValueAtTime(0.0001, t0);
+			gain.gain.linearRampToValueAtTime(0.2, t0 + 0.01);
+			gain.gain.linearRampToValueAtTime(0.0001, t0 + 0.09);
+			osc.connect(gain);
+			gain.connect(ctx.destination);
+			osc.start(t0);
+			osc.stop(t0 + 0.1);
+		} catch (e) {
+			/* ignore */
+		}
+	}
+
+	function flipClockUnlockHtmlAudioIfNeeded() {
+		if (flipClockAudioUnlockDone) {
+			return;
+		}
+		flipClockAudioUnlockDone = true;
+		try {
+			var a = new Audio(FLIPCLOCK_SILENT_WAV);
+			a.volume = 0;
+			var p = a.play();
+			if (p && typeof p.catch === "function") {
+				p.catch(function () {});
+			}
+		} catch (e) {
+			/* ignore */
+		}
+		try {
+			var ctx = getFlipClockSharedAudioContext();
+			if (ctx && ctx.state === "suspended" && typeof ctx.resume === "function") {
+				ctx.resume().catch(function () {});
+			}
+		} catch (e2) {
+			/* ignore */
+		}
+	}
+
 	function playFlipClockSound(kind) {
-		var sounds = loadSoundsFromStorage();
-		var url = sounds[kind];
+		var url = resolveSoundUrlForKind(kind);
 		if (!url || typeof url !== "string") {
 			return;
 		}
 		try {
-			var a = new Audio(url);
-			a.play().catch(function () {});
+			var a = new Audio();
+			if ("playsInline" in a) {
+				a.playsInline = true;
+			}
+			try {
+				a.setAttribute("playsinline", "");
+			} catch (eAttr) {
+				/* ignore */
+			}
+			a.preload = "auto";
+			a.volume = 1;
+			var run = function () {
+				var p = a.play();
+				if (p && typeof p.catch === "function") {
+					p.catch(function () {});
+				}
+			};
+			var done = false;
+			var tryPlay = function () {
+				if (done) {
+					return;
+				}
+				done = true;
+				run();
+			};
+			a.addEventListener("canplay", tryPlay, { once: true });
+			a.addEventListener(
+				"error",
+				function () {
+					done = true;
+				},
+				{ once: true },
+			);
+			a.src = url;
+			a.load();
+			if (typeof a.readyState === "number" && a.readyState >= 2) {
+				tryPlay();
+			}
 		} catch (e) {
 			/* ignore */
 		}
@@ -1082,7 +1340,7 @@
 		}
 	}
 
-	/** Loads preset-timers.json: presets plus optional appBackgroundDataUrl (base64 data URL). */
+	/** Loads flipClock.json: presets, optional app background, optional sounds (see `applySoundsFromJsonRoot`). */
 	function fetchPresetTimersDocument() {
 		return $.getJSON(PRESET_JSON_FILE)
 			.then(function (data) {
@@ -1094,11 +1352,72 @@
 				if (data && typeof data.appBackgroundDataUrl === "string" && data.appBackgroundDataUrl.indexOf("data:image/") === 0) {
 					bg = data.appBackgroundDataUrl;
 				}
-				return { presets: presets, appBackgroundDataUrl: bg };
+				return { presets: presets, appBackgroundDataUrl: bg, jsonRoot: data || null };
 			})
 			.fail(function () {
-				return { presets: [], appBackgroundDataUrl: null };
+				return { presets: [], appBackgroundDataUrl: null, jsonRoot: null };
 			});
+	}
+
+	function normalizeSoundDataUrlFromDoc(s) {
+		if (typeof s !== "string" || s.indexOf("data:audio/") !== 0) {
+			return null;
+		}
+		return s;
+	}
+
+	/** Reads optional sound mode, preloaded filenames, and `sounds` / `soundFileNames` from flipClock.json (first-run seed). */
+	function applySoundsFromJsonRoot(root) {
+		if (!root || typeof root !== "object") {
+			return;
+		}
+		if (root.soundSource === "preloaded" || root.soundSource === "upload") {
+			saveSoundSourceToStorage(root.soundSource);
+		}
+		if (root.soundPreloaded && typeof root.soundPreloaded === "object") {
+			var merged = loadPreloadedSoundSelectionsFromStorage();
+			for (var pi = 0; pi < PRESET_SOUND_KINDS.length; pi++) {
+				var pk = PRESET_SOUND_KINDS[pi];
+				var pfn = root.soundPreloaded[pk];
+				if (typeof pfn === "string") {
+					merged[pk] = pfn;
+				}
+			}
+			savePreloadedSoundSelectionsToStorage(merged);
+		}
+		if (loadSoundSourceFromStorage() === "preloaded") {
+			return;
+		}
+		var sounds = {};
+		if (root.sounds && typeof root.sounds === "object") {
+			for (var i = 0; i < PRESET_SOUND_KINDS.length; i++) {
+				var k = PRESET_SOUND_KINDS[i];
+				var u = normalizeSoundDataUrlFromDoc(root.sounds[k]);
+				if (u) {
+					sounds[k] = u;
+				}
+			}
+		}
+		if (Object.keys(sounds).length === 0) {
+			return;
+		}
+		saveSoundsToStorage(sounds);
+		var names = {};
+		if (root.soundFileNames && typeof root.soundFileNames === "object") {
+			for (var j = 0; j < PRESET_SOUND_KINDS.length; j++) {
+				var kk = PRESET_SOUND_KINDS[j];
+				if (!sounds[kk]) {
+					continue;
+				}
+				var fn = root.soundFileNames[kk];
+				if (typeof fn === "string" && fn.length > 0) {
+					names[kk] = fn;
+				}
+			}
+		}
+		if (Object.keys(names).length > 0) {
+			saveSoundNamesToStorage(names);
+		}
 	}
 
 	var warnedPresetSave404 = false;
@@ -1148,24 +1467,28 @@
 			callback(dataUrlToBlob(du));
 			return;
 		}
-		canvas.toBlob(function (webpBlob) {
-			if (webpBlob && webpBlob.size > 0) {
-				callback(webpBlob);
-				return;
-			}
-			canvas.toBlob(
-				function (jpegBlob) {
-					if (jpegBlob && jpegBlob.size > 0) {
-						callback(jpegBlob);
-						return;
-					}
-					var du2 = canvas.toDataURL("image/jpeg", jpegQ);
-					callback(dataUrlToBlob(du2));
-				},
-				"image/jpeg",
-				jpegQ,
-			);
-		}, "image/webp", webpQ);
+		canvas.toBlob(
+			function (webpBlob) {
+				if (webpBlob && webpBlob.size > 0) {
+					callback(webpBlob);
+					return;
+				}
+				canvas.toBlob(
+					function (jpegBlob) {
+						if (jpegBlob && jpegBlob.size > 0) {
+							callback(jpegBlob);
+							return;
+						}
+						var du2 = canvas.toDataURL("image/jpeg", jpegQ);
+						callback(dataUrlToBlob(du2));
+					},
+					"image/jpeg",
+					jpegQ,
+				);
+			},
+			"image/webp",
+			webpQ,
+		);
 	}
 
 	/**
@@ -1335,12 +1658,36 @@
 		}
 	}
 
-	/** Writes preset-timers.json in the app root when served via `npm run dev` (BrowserSync middleware). Includes optional appBackgroundDataUrl (base64). No-op if fetch fails (e.g. file:// or static host without the endpoint). */
+	/** Writes flipClock.json in the app root when served via `npm run dev` (BrowserSync middleware). Includes optional appBackgroundDataUrl; sounds as data URLs when source is Upload, else soundPreloaded paths. No-op if fetch fails (e.g. file:// or static host without the endpoint). */
 	function syncPresetJsonToProjectFile(presets) {
 		var doc = { version: 1, presets: presets };
 		var bg = getAppBackgroundDataUrlForSync();
 		if (bg) {
 			doc.appBackgroundDataUrl = bg;
+		}
+		var soundSource = loadSoundSourceFromStorage();
+		doc.soundSource = soundSource;
+		if (soundSource === "preloaded") {
+			var pre = loadPreloadedSoundSelectionsFromStorage();
+			var preOut = {};
+			for (var si = 0; si < PRESET_SOUND_KINDS.length; si++) {
+				var sk = PRESET_SOUND_KINDS[si];
+				if (typeof pre[sk] === "string" && pre[sk].length > 0) {
+					preOut[sk] = pre[sk];
+				}
+			}
+			if (Object.keys(preOut).length > 0) {
+				doc.soundPreloaded = preOut;
+			}
+		} else {
+			var sounds = loadSoundsFromStorage();
+			if (sounds && typeof sounds === "object" && Object.keys(sounds).length > 0) {
+				doc.sounds = sounds;
+			}
+			var soundNames = loadSoundNamesFromStorage();
+			if (soundNames && typeof soundNames === "object" && Object.keys(soundNames).length > 0) {
+				doc.soundFileNames = soundNames;
+			}
 		}
 		var payload = JSON.stringify(doc, null, 2);
 		if (typeof fetch !== "function") {
@@ -1355,11 +1702,7 @@
 			.then(function (res) {
 				if (res && res.status === 404 && !warnedPresetSave404) {
 					warnedPresetSave404 = true;
-					console.warn(
-						"[FlipClock] preset-timers.json sync failed (404). Page origin: " +
-							(typeof location !== "undefined" ? location.origin : "?") +
-							". Use the exact Local: URL from npm run dev (BrowserSync + bs-config.js). If port 3000 is busy, BrowserSync uses 3001, 3002, … — a bookmark to :3000 may hit a different app without POST /__flipclock__/save-preset-timers."
-					);
+					console.warn("[FlipClock] flipClock.json sync failed (404). Page origin: " + (typeof location !== "undefined" ? location.origin : "?") + ". Use the exact Local: URL from npm run dev (BrowserSync + bs-config.js). If port 3000 is busy, BrowserSync uses 3001, 3002, … — a bookmark to :3000 may hit a different app without POST /__flipclock__/save-preset-timers.");
 				}
 			})
 			.catch(function () {});
@@ -1401,6 +1744,10 @@
 		var $toolbar = $(".flipclock-toolbar");
 		var $activePreset = $("#active-preset");
 
+		function clockIsActiveForChromeDim() {
+			return clock.tickInterval !== false || clock.prepCountdownActive === true;
+		}
+
 		function clearChromeIdleTimer() {
 			if (chromeIdleTimer !== null) {
 				window.clearTimeout(chromeIdleTimer);
@@ -1412,7 +1759,7 @@
 			clearChromeIdleTimer();
 			chromeIdleTimer = window.setTimeout(function () {
 				chromeIdleTimer = null;
-				if (clock.tickInterval === false) {
+				if (!clockIsActiveForChromeDim()) {
 					return;
 				}
 				userRevealedChrome = false;
@@ -1421,7 +1768,7 @@
 		}
 
 		function applyChromeDim() {
-			var running = clock.tickInterval !== false;
+			var running = clockIsActiveForChromeDim();
 			if (!running) {
 				clearChromeIdleTimer();
 				userRevealedChrome = false;
@@ -1432,7 +1779,7 @@
 		}
 
 		function onInteractionRevealChrome() {
-			if (clock.tickInterval === false) {
+			if (!clockIsActiveForChromeDim()) {
 				return;
 			}
 			userRevealedChrome = true;
@@ -1446,14 +1793,14 @@
 			function flipclockTouchRevealChrome() {
 				onInteractionRevealChrome();
 			},
-			{ passive: true, capture: true }
+			{ passive: true, capture: true },
 		);
 		document.addEventListener(
 			"touchmove",
 			function flipclockTouchMoveRevealChrome() {
 				onInteractionRevealChrome();
 			},
-			{ passive: true, capture: true }
+			{ passive: true, capture: true },
 		);
 
 		$(".countdown").on("flipclock:countdown-complete.flipclockChromeDim", function () {
@@ -1469,15 +1816,194 @@
 	 * @param {FlipClock} clock
 	 * @param {function(): void} [onAfterToolbarRefresh] — e.g. sync toolbar/active-preset dimming
 	 */
+	/** Ms after which a paused/stopped timer shows local wall time (HH:MM) and hides the toolbar. */
+	var FLIPCLOCK_IDLE_WALL_CLOCK_MS = 10000;
+
 	function initFlipClockToolbar(clock, onAfterToolbarRefresh) {
 		var $playPause = $("#clock-play-pause-btn");
 		var $reset = $("#clock-reset-btn");
+		var $toolbar = $(".flipclock-toolbar");
+		var prepTimeoutId = null;
+		/** Snapshot of `MM:SS` to restore after prep (or if prep is cancelled). */
+		var prepResumeTimeStr = null;
+
+		var becameInactiveAt = null;
+		var idleWallClockActive = false;
+		var idleWallClockTickId = null;
+		/** Last pointer time while wall-clock idle (toolbar revealed); after {@link FLIPCLOCK_IDLE_WALL_CLOCK_MS} with no activity, toolbar fades off again. */
+		var lastIdleToolbarPointerAt = null;
+		/** Snapshot of round time when entering idle wall-clock mode (restored on Play / Presets unless cleared). */
+		var pausedTimeBeforeIdleWallClock = null;
+
+		function getLocalTimeHhMmString() {
+			var d = new Date();
+			var h = d.getHours();
+			var m = d.getMinutes();
+			return (h < 10 ? "0" + h : String(h)) + ":" + (m < 10 ? "0" + m : String(m));
+		}
+
+		function exitIdleWallClockMode(restorePausedFace) {
+			if (!idleWallClockActive) {
+				return;
+			}
+			if (idleWallClockTickId !== null) {
+				window.clearInterval(idleWallClockTickId);
+				idleWallClockTickId = null;
+			}
+			$toolbar.removeClass("flipclock-idle-clock");
+			lastIdleToolbarPointerAt = null;
+			var snap = pausedTimeBeforeIdleWallClock;
+			pausedTimeBeforeIdleWallClock = null;
+			idleWallClockActive = false;
+			if (restorePausedFace !== false && snap !== null) {
+				clock.setToTime(snap);
+			}
+		}
+
+		function enterIdleWallClockMode() {
+			if (clock.tickInterval !== false || clock.prepCountdownActive) {
+				return;
+			}
+			if (idleWallClockActive) {
+				return;
+			}
+			pausedTimeBeforeIdleWallClock = comparableIntToMmSsString(clock.getCurrentTime());
+			idleWallClockActive = true;
+			lastIdleToolbarPointerAt = null;
+			clock.setToTime(getLocalTimeHhMmString());
+			$toolbar.addClass("flipclock-idle-clock");
+			idleWallClockTickId = window.setInterval(function () {
+				if (clock.tickInterval !== false || clock.prepCountdownActive) {
+					exitIdleWallClockMode(false);
+					return;
+				}
+				if (!idleWallClockActive) {
+					return;
+				}
+				clock.setToTime(getLocalTimeHhMmString());
+			}, 60000);
+		}
+
+		function pollIdleWallClock() {
+			if (clock.tickInterval !== false || clock.prepCountdownActive) {
+				becameInactiveAt = null;
+				exitIdleWallClockMode(false);
+				return;
+			}
+			if (idleWallClockActive) {
+				if (
+					!$toolbar.hasClass("flipclock-idle-clock") &&
+					lastIdleToolbarPointerAt !== null &&
+					Date.now() - lastIdleToolbarPointerAt >= FLIPCLOCK_IDLE_WALL_CLOCK_MS
+				) {
+					$toolbar.addClass("flipclock-idle-clock");
+				}
+				return;
+			}
+			if (becameInactiveAt === null) {
+				return;
+			}
+			if (Date.now() - becameInactiveAt < FLIPCLOCK_IDLE_WALL_CLOCK_MS) {
+				return;
+			}
+			enterIdleWallClockMode();
+		}
+
+		clock.exitIdleWallClockMode = exitIdleWallClockMode;
+
+		/**
+		 * While wall-clock idle, pointer motion sets full toolbar opacity and records activity so the toolbar
+		 * can fade off again after {@link FLIPCLOCK_IDLE_WALL_CLOCK_MS} with no further pointer input.
+		 */
+		function onIdleWallClockPointerActivity() {
+			if (!idleWallClockActive) {
+				return;
+			}
+			lastIdleToolbarPointerAt = Date.now();
+			$toolbar.removeClass("flipclock-idle-clock");
+		}
+
+		$(document).on("mousemove.flipclockIdleToolbarReveal", onIdleWallClockPointerActivity);
+		document.addEventListener(
+			"touchstart",
+			function flipclockIdleToolbarTouchReveal() {
+				onIdleWallClockPointerActivity();
+			},
+			{ passive: true, capture: true },
+		);
+		document.addEventListener(
+			"touchmove",
+			function flipclockIdleToolbarTouchMoveReveal() {
+				onIdleWallClockPointerActivity();
+			},
+			{ passive: true, capture: true },
+		);
+
+		function clearPrepSchedule() {
+			if (prepTimeoutId !== null) {
+				window.clearTimeout(prepTimeoutId);
+				prepTimeoutId = null;
+			}
+		}
+
+		function cancelPrepCountdown() {
+			if (!clock.prepCountdownActive) {
+				return;
+			}
+			clearPrepSchedule();
+			clock.prepCountdownActive = false;
+			if (prepResumeTimeStr) {
+				clock.setToTime(prepResumeTimeStr);
+				prepResumeTimeStr = null;
+			}
+		}
+
+		/** Exposed so preset apply / reset paths can clear prep without duplicating logic. */
+		clock.cancelPrepCountdown = cancelPrepCountdown;
+
+		function finishPrepAndStartTimer() {
+			clearPrepSchedule();
+			clock.prepCountdownActive = false;
+			var resume = prepResumeTimeStr;
+			prepResumeTimeStr = null;
+			if (resume) {
+				clock.setToTime(resume);
+			}
+			clock.start(true);
+			playFlipClockSound("start");
+			refresh();
+		}
+
+		function beginPrepCountdown() {
+			cancelPrepCountdown();
+			prepResumeTimeStr = comparableIntToMmSsString(clock.getCurrentTime());
+			clock.prepCountdownActive = true;
+			var step = 0;
+			function runStep() {
+				if (!clock.prepCountdownActive) {
+					return;
+				}
+				if (step >= 5) {
+					finishPrepAndStartTimer();
+					return;
+				}
+				var n = 5 - step;
+				playPrepCountdownBeep();
+				clock.setToTime(prepStepToMmSs(n));
+				step++;
+				prepTimeoutId = window.setTimeout(runStep, 1000);
+			}
+			runStep();
+		}
 
 		function refresh() {
-			var running = clock.tickInterval !== false;
+			var running = clock.tickInterval !== false || clock.prepCountdownActive === true;
 			if (running) {
+				becameInactiveAt = null;
+				exitIdleWallClockMode(false);
 				$playPause.html(TOOLBAR_ICON_PAUSE).attr("aria-label", "Pause").addClass("is-playing");
 			} else {
+				becameInactiveAt = Date.now();
 				$playPause.html(TOOLBAR_ICON_PLAY).attr("aria-label", "Play").removeClass("is-playing");
 			}
 			if (typeof onAfterToolbarRefresh === "function") {
@@ -1488,18 +2014,26 @@
 		clock.stop();
 		refresh();
 
+		window.setInterval(pollIdleWallClock, 1000);
+
 		$playPause.on("click", function () {
+			flipClockUnlockHtmlAudioIfNeeded();
+			exitIdleWallClockMode(true);
 			if (clock.tickInterval !== false) {
 				clock.stop();
 				playFlipClockSound("pause");
+			} else if (clock.prepCountdownActive) {
+				cancelPrepCountdown();
+				playFlipClockSound("pause");
 			} else {
-				clock.start(true);
-				playFlipClockSound("start");
+				beginPrepCountdown();
 			}
 			refresh();
 		});
 
 		$reset.on("click", function () {
+			cancelPrepCountdown();
+			exitIdleWallClockMode(false);
 			clock.stop();
 			clock.setToTime(clock.options.startTime);
 			refresh();
@@ -1557,6 +2091,8 @@
 		}
 
 		var $modal = $("#preset-modal");
+		var $panel = $modal.find(".preset-modal__panel");
+		var $presetModalHeader = $modal.find(".preset-modal__header");
 		var $list = $("#preset-list-body");
 		var $form = $("#preset-form");
 		var $name = $("#preset-name");
@@ -1958,6 +2494,7 @@
 				}, 0);
 			}
 			setCounterRangeFillPct($counterSize[0], $counterSize.val());
+			refreshTimerSoundSettingsUi();
 		}
 
 		function togglePresetSettings() {
@@ -2038,6 +2575,7 @@
 					saveSoundNamesToStorage(names);
 					input.value = "";
 					syncPresetFileDropFromInput(input);
+					syncPresetJsonToProjectFile(presets);
 				};
 				reader.readAsDataURL(file);
 				return;
@@ -2099,6 +2637,7 @@
 					saveSoundNamesToStorage(namesDel);
 					input.value = "";
 					syncPresetFileDropFromInput(input);
+					syncPresetJsonToProjectFile(presets);
 				} else {
 					persistAppBgState(null);
 					applyAppBackgroundState(null);
@@ -2153,7 +2692,102 @@
 				$(input).trigger("change");
 			}
 		});
+
+		function applyTimerSoundSourceUi() {
+			var mode = loadSoundSourceFromStorage();
+			var $pre = $("#preset-sound-source-preloaded-btn");
+			var $up = $("#preset-sound-source-upload-btn");
+			var $panelPre = $("#preset-settings-sounds-preloaded-panel");
+			var $panelUp = $("#preset-settings-sounds-upload-panel");
+			if (!$pre.length || !$up.length || !$panelPre.length || !$panelUp.length) {
+				return;
+			}
+			var isPre = mode === "preloaded";
+			$pre.attr("aria-selected", isPre ? "true" : "false");
+			$up.attr("aria-selected", isPre ? "false" : "true");
+			$pre.attr("tabindex", isPre ? "0" : "-1");
+			$up.attr("tabindex", isPre ? "-1" : "0");
+			if (isPre) {
+				$panelPre.removeAttr("hidden");
+				$panelUp.attr("hidden", "hidden");
+			} else {
+				$panelPre.attr("hidden", "hidden");
+				$panelUp.removeAttr("hidden");
+			}
+		}
+
+		function populatePreloadedSoundSelects(fileList) {
+			var files = Array.isArray(fileList) ? fileList.slice() : [];
+			var cur = loadPreloadedSoundSelectionsFromStorage();
+			for (var psi = 0; psi < PRESET_SOUND_KINDS.length; psi++) {
+				var skind = PRESET_SOUND_KINDS[psi];
+				var $sel = $("#preset-sound-preloaded-" + skind);
+				if (!$sel.length) {
+					continue;
+				}
+				$sel.empty();
+				$sel.append($("<option>", { value: "", text: "— None —" }));
+				for (var fi = 0; fi < files.length; fi++) {
+					var fn = files[fi];
+					$sel.append($("<option>", { value: fn, text: fn }));
+				}
+				var val = cur[skind];
+				if (val && files.indexOf(val) >= 0) {
+					$sel.val(val);
+				} else {
+					$sel.val("");
+				}
+			}
+		}
+
+		function fetchSoundsManifestAndPopulate() {
+			$.ajax({
+				url: SOUNDS_MANIFEST_URL,
+				dataType: "json",
+				cache: false,
+			})
+				.done(function (data) {
+					var files = data && Array.isArray(data.files) ? data.files : [];
+					populatePreloadedSoundSelects(files);
+				})
+				.fail(function () {
+					populatePreloadedSoundSelects([]);
+				});
+		}
+
+		function refreshTimerSoundSettingsUi() {
+			applyTimerSoundSourceUi();
+			fetchSoundsManifestAndPopulate();
+		}
+
+		function initTimerSoundSettingsUi() {
+			applyTimerSoundSourceUi();
+			fetchSoundsManifestAndPopulate();
+			$("#preset-sound-source-preloaded-btn").on("click", function () {
+				saveSoundSourceToStorage("preloaded");
+				refreshTimerSoundSettingsUi();
+				syncPresetJsonToProjectFile(presets);
+			});
+			$("#preset-sound-source-upload-btn").on("click", function () {
+				saveSoundSourceToStorage("upload");
+				applyTimerSoundSourceUi();
+				syncAllPresetFileDrops();
+				syncPresetJsonToProjectFile(presets);
+			});
+			$settingsFrame.on("change", ".preset-settings-sound-preloaded-select", function () {
+				var pkind = $(this).attr("data-sound-kind");
+				if (!pkind) {
+					return;
+				}
+				var nextSel = loadPreloadedSoundSelectionsFromStorage();
+				nextSel[pkind] = String($(this).val() || "");
+				savePreloadedSoundSelectionsToStorage(nextSel);
+				syncPresetJsonToProjectFile(presets);
+			});
+		}
+
 		syncAllPresetFileDrops();
+		initTimerSoundSettingsUi();
 		$counterSize.on("input", function () {
 			var raw = Number($(this).val());
 			var v = snapCounterSizePct(raw);
@@ -2357,6 +2991,160 @@
 			syncActivePresetFromList();
 		}
 
+		var PRESET_PANEL_DRAG_PAD = 16;
+
+		function clampPresetPanelPosition(left, top) {
+			var el = $panel[0];
+			var w = el.offsetWidth;
+			var h = el.offsetHeight;
+			var vw = window.innerWidth;
+			var vh = window.innerHeight;
+			var pad = PRESET_PANEL_DRAG_PAD;
+			var maxL = vw - w - pad;
+			var maxT = vh - h - pad;
+			if (maxL < pad) {
+				maxL = pad;
+			}
+			if (maxT < pad) {
+				maxT = pad;
+			}
+			left = Math.min(Math.max(pad, left), maxL);
+			top = Math.min(Math.max(pad, top), maxT);
+			return { left: Math.round(left), top: Math.round(top) };
+		}
+
+		function centerPresetModalPanel() {
+			var el = $panel[0];
+			var w = el.offsetWidth;
+			var vw = window.innerWidth;
+			var pad = PRESET_PANEL_DRAG_PAD;
+			var left = (vw - w) / 2;
+			var top = pad;
+			var c = clampPresetPanelPosition(left, top);
+			$panel.css({
+				left: c.left + "px",
+				top: c.top + "px",
+				right: "auto",
+				bottom: "auto",
+				margin: "0",
+				transform: "none",
+			});
+		}
+
+		var presetModalPanelDrag = null;
+
+		function applyPresetModalPanelDrag(clientX, clientY) {
+			if (!presetModalPanelDrag) {
+				return;
+			}
+			var dx = clientX - presetModalPanelDrag.startX;
+			var dy = clientY - presetModalPanelDrag.startY;
+			var left = presetModalPanelDrag.origLeft + dx;
+			var top = presetModalPanelDrag.origTop + dy;
+			var c = clampPresetPanelPosition(left, top);
+			$panel.css({ left: c.left + "px", top: c.top + "px" });
+		}
+
+		function endPresetModalPanelDrag() {
+			if (!presetModalPanelDrag) {
+				return;
+			}
+			presetModalPanelDrag = null;
+			$presetModalHeader.removeClass("preset-modal__header--dragging");
+			$(document).off(".presetModalPanelDrag");
+			document.removeEventListener("touchmove", onPresetModalPanelTouchMove, { passive: false });
+			document.removeEventListener("touchend", onPresetModalPanelTouchEnd);
+			document.removeEventListener("touchcancel", onPresetModalPanelTouchEnd);
+		}
+
+		function onPresetModalPanelTouchMove(e) {
+			if (!presetModalPanelDrag || presetModalPanelDrag.touchId === undefined) {
+				return;
+			}
+			var t = null;
+			for (var i = 0; i < e.touches.length; i++) {
+				if (e.touches[i].identifier === presetModalPanelDrag.touchId) {
+					t = e.touches[i];
+					break;
+				}
+			}
+			if (!t) {
+				return;
+			}
+			e.preventDefault();
+			applyPresetModalPanelDrag(t.clientX, t.clientY);
+		}
+
+		function onPresetModalPanelTouchEnd(e) {
+			if (!presetModalPanelDrag || presetModalPanelDrag.touchId === undefined) {
+				return;
+			}
+			var ended = false;
+			for (var j = 0; j < e.changedTouches.length; j++) {
+				if (e.changedTouches[j].identifier === presetModalPanelDrag.touchId) {
+					ended = true;
+					break;
+				}
+			}
+			if (!ended) {
+				return;
+			}
+			endPresetModalPanelDrag();
+		}
+
+		$presetModalHeader.on("mousedown.presetModalPanelDrag", function (e) {
+			if (e.button !== 0) {
+				return;
+			}
+			if ($(e.target).closest("button, a, input, select, textarea, label").length) {
+				return;
+			}
+			e.preventDefault();
+			var rect = $panel[0].getBoundingClientRect();
+			presetModalPanelDrag = {
+				startX: e.clientX,
+				startY: e.clientY,
+				origLeft: rect.left,
+				origTop: rect.top,
+			};
+			$presetModalHeader.addClass("preset-modal__header--dragging");
+			$(document).on("mousemove.presetModalPanelDrag", function (ev) {
+				applyPresetModalPanelDrag(ev.clientX, ev.clientY);
+			});
+			$(document).on("mouseup.presetModalPanelDrag", endPresetModalPanelDrag);
+		});
+
+		$presetModalHeader.on("touchstart.presetModalPanelDrag", function (e) {
+			if ($(e.target).closest("button, a, input, select, textarea, label").length) {
+				return;
+			}
+			if (e.touches.length !== 1) {
+				return;
+			}
+			var t = e.touches[0];
+			var rect = $panel[0].getBoundingClientRect();
+			presetModalPanelDrag = {
+				startX: t.clientX,
+				startY: t.clientY,
+				origLeft: rect.left,
+				origTop: rect.top,
+				touchId: t.identifier,
+			};
+			$presetModalHeader.addClass("preset-modal__header--dragging");
+			document.addEventListener("touchmove", onPresetModalPanelTouchMove, { passive: false });
+			document.addEventListener("touchend", onPresetModalPanelTouchEnd);
+			document.addEventListener("touchcancel", onPresetModalPanelTouchEnd);
+		});
+
+		$(window).on("resize.presetModalPanel", function () {
+			if ($modal.is("[hidden]")) {
+				return;
+			}
+			var cur = $panel[0].getBoundingClientRect();
+			var c = clampPresetPanelPosition(cur.left, cur.top);
+			$panel.css({ left: c.left + "px", top: c.top + "px" });
+		});
+
 		function openModal() {
 			closeColorPopover();
 			$modal.removeAttr("hidden").attr("aria-hidden", "false");
@@ -2366,6 +3154,7 @@
 				$name.trigger("focus");
 			}, 0);
 			requestAnimationFrame(function () {
+				centerPresetModalPanel();
 				refreshPresetCounterSizeRangeFills();
 			});
 		}
@@ -2416,6 +3205,10 @@
 		}
 
 		function applyPreset(p) {
+			if (typeof clock.exitIdleWallClockMode === "function") {
+				clock.exitIdleWallClockMode(false);
+			}
+			clock.cancelPrepCountdown();
 			var mmss = minutesToStartTime(p.minutes);
 			clock.stop();
 			clock.options.startTime = mmss;
@@ -2440,7 +3233,7 @@
 			setActivePresetUi(null);
 		}
 
-		// Initial load: localStorage wins if key exists; else seed from preset-timers.json
+		// Initial load: localStorage wins if key exists; else seed from flipClock.json
 		var stored = loadPresetsFromStorage();
 		if (stored !== null) {
 			presets = stored;
@@ -2454,19 +3247,31 @@
 					persistAppBgState({ dataUrl: doc.appBackgroundDataUrl });
 					applyAppBackgroundState({ dataUrl: doc.appBackgroundDataUrl });
 				}
+				if (doc.jsonRoot) {
+					applySoundsFromJsonRoot(doc.jsonRoot);
+				}
 				syncPresetJsonToProjectFile(presets);
 				renderList();
 				tryRestoreActivePresetFromStorage();
 				syncAllPresetFileDrops();
+				refreshTimerSoundSettingsUi();
 			});
 		}
 
 		$("#active-preset-clear").on("click", function () {
+			clock.cancelPrepCountdown();
+			if (typeof clock.exitIdleWallClockMode === "function") {
+				clock.exitIdleWallClockMode(true);
+			}
 			setActivePresetUi(null);
 			refreshToolbar();
 		});
 
 		$openBtn.on("click", function () {
+			if (typeof clock.exitIdleWallClockMode === "function") {
+				clock.exitIdleWallClockMode(true);
+			}
+			refreshToolbar();
 			openModal();
 		});
 
@@ -2589,6 +3394,10 @@
 	}
 
 	$(function () {
+		document.addEventListener("click", flipClockUnlockHtmlAudioIfNeeded, { once: true, capture: true });
+		document.addEventListener("touchstart", flipClockUnlockHtmlAudioIfNeeded, { once: true, capture: true, passive: true });
+		document.addEventListener("keydown", flipClockUnlockHtmlAudioIfNeeded, { once: true, capture: true });
+
 		initPresetCounterSizeTicks();
 		applyAppBackgroundState(loadAppBgStateFromStorage());
 		var pct0 = loadCounterSizePct();
@@ -2604,9 +3413,6 @@
 		});
 		window.flipClockInstance = clock;
 		clock.setDimensions();
-		$(".countdown").on("flipclock:countdown-complete", function () {
-			playFlipClockSound("finish");
-		});
 		$(window).on("resize.flipclockCounter", function () {
 			if (window.flipClockInstance && typeof window.flipClockInstance.setDimensions === "function") {
 				window.flipClockInstance.setDimensions();
@@ -2623,6 +3429,10 @@
 		}
 		var applyChromeDim = initFlipClockChromeDimming(clock);
 		var refreshToolbar = initFlipClockToolbar(clock, applyChromeDim);
+		$(".countdown").on("flipclock:countdown-complete", function () {
+			playFlipClockSound("finish");
+			refreshToolbar();
+		});
 		initPresetTimers(clock, refreshToolbar);
 		var $counterSizeInit = $("#flipclock-counter-size");
 		var $counterSizeOutInit = $("#flipclock-counter-size-out");
