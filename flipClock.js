@@ -900,6 +900,12 @@
 	/** Shared Web Audio context (prep beeps + unlock). */
 	var flipClockSharedAudioContext = null;
 
+	/**
+	 * Wall time for one full digit flip (ms). Must match `flipClock.scss` stacked halves:
+	 * `$anim-delay-stack` + `$anim-flip` → 0.5s + 0.5s. Used only for prep beep timing (not in `doTick`).
+	 */
+	var FLIPCLOCK_PREP_FLIP_MS = 1000;
+
 	function getFlipClockSharedAudioContext() {
 		if (flipClockSharedAudioContext) {
 			return flipClockSharedAudioContext;
@@ -1988,10 +1994,15 @@
 					return;
 				}
 				var n = 5 - step;
-				playPrepCountdownBeep();
 				clock.setToTime(prepStepToMmSs(n));
 				step++;
-				prepTimeoutId = window.setTimeout(runStep, 1000);
+				prepTimeoutId = window.setTimeout(function () {
+					if (!clock.prepCountdownActive) {
+						return;
+					}
+					playPrepCountdownBeep();
+					runStep();
+				}, FLIPCLOCK_PREP_FLIP_MS);
 			}
 			runStep();
 		}

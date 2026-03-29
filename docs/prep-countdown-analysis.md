@@ -4,7 +4,9 @@ This document describes the **5-second prep** behavior in `flipClock.js` as of t
 
 ## Purpose
 
-When the user presses **Play** while the main interval is stopped, the app does **not** start the round timer immediately. It runs a **prep phase**: the flip face shows **`00:05` → `00:01`**, with one **Web Audio** beep per step **after** each digit’s **CSS flip** finishes (**`FLIPCLOCK_FLIP_ANIMATION_MS`**, **1s**, aligned with **`flipClock.scss`**), then restores the **saved round time** and calls **`start(true)`** so the main countdown runs (**Start** sound also **after** that transition’s flip).
+When the user presses **Play** while the main interval is stopped, the app does **not** start the round timer immediately. It runs a **prep phase**: the flip face shows **`00:05` → `00:01`**, then restores the **saved round time** and calls **`start(true)`** so the main countdown runs.
+
+**Audio:** Prep uses **`setToTime`** first for each step, then **`setTimeout(..., FLIPCLOCK_PREP_FLIP_MS)`** (1000 ms — same order of magnitude as the stacked CSS flip in `flipClock.scss`) before **`playPrepCountdownBeep()`** and the next **`runStep()`**. That keeps the beep **after** the flip motion without changing **`FlipClock.prototype.doTick`** (the main timer animation is unchanged).
 
 ## State and data
 
@@ -12,7 +14,7 @@ When the user presses **Play** while the main interval is stopped, the app does 
 |--------|------|
 | `clock.prepCountdownActive` | `true` from prep start until cancel or handoff to `start(true)`. |
 | `prepResumeTimeStr` (closure in `initFlipClockToolbar`) | **`MM:SS`** snapshot from **`comparableIntToMmSsString(clock.getCurrentTime())`** taken **once** when prep **begins** (the paused round time). |
-| `prepTimeoutId` | After each **`setToTime`**, **`setTimeout(..., FLIPCLOCK_FLIP_ANIMATION_MS)`** then beep and chain **`runStep`**. |
+| `prepTimeoutId` | After each **`setToTime`**, **`setTimeout(..., FLIPCLOCK_PREP_FLIP_MS)`**, then **`playPrepCountdownBeep()`** + **`runStep()`**. |
 
 ## Timeline (ideal)
 
@@ -20,10 +22,10 @@ When the user presses **Play** while the main interval is stopped, the app does 
 
 Each **`runStep()`**:
 
-1. If `step >= 5` → **`finishPrepAndStartTimer()`**: clear timers, clear `prepCountdownActive`, **`setToTime(resume)`**, **`start(true)`**, **Start** sound **after** **`FLIPCLOCK_FLIP_ANIMATION_MS`**, **toolbar refresh**.
-2. Else: **`n = 5 - step`**, **`setToTime(prepStepToMmSs(n))`** → `00:05` … `00:01`, increment `step`, **`setTimeout`**: **`playPrepCountdownBeep()`** then **`runStep()`** after **`FLIPCLOCK_FLIP_ANIMATION_MS`** (still **1 s** between digit changes).
+1. If `step >= 5` → **`finishPrepAndStartTimer()`**: clear timers, clear `prepCountdownActive`, **`setToTime(resume)`**, **`start(true)`**, **Start** sound, **toolbar refresh**.
+2. Else: **`n = 5 - step`**, **`setToTime(prepStepToMmSs(n))`** → `00:05` … `00:01`, increment `step`, **`setTimeout`**: **`playPrepCountdownBeep()`** then **`runStep()`** after **`FLIPCLOCK_PREP_FLIP_MS`**.
 
-So there are **five** visible prep frames (**`00:05`** through **`00:01`**), each **1 s** apart, then on the **sixth** invocation **`step === 5`** completes prep **without** showing **`00:00`**. Total elapsed from first prep frame to **`start(true)`** is **5 seconds**.
+So there are **five** visible prep frames (**`00:05`** through **`00:01`**), then on the **sixth** invocation **`step === 5`** completes prep **without** showing **`00:00`**. Total elapsed from first prep frame to **`start(true)`** is **5 seconds** (five × **1000 ms** waits).
 
 ## Sequence (mermaid)
 
@@ -38,7 +40,7 @@ sequenceDiagram
 	Toolbar->>Clock: prepCountdownActive = true
 	loop step = 0..4
 		Toolbar->>Clock: setToTime(00:0n)
-		Note over Clock: 1s (flip), then beep, next step
+		Note over Clock: 1s then beep + next step
 	end
 	Toolbar->>Clock: setToTime(prepResumeTimeStr)
 	Toolbar->>Clock: start(true)
