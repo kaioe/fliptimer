@@ -6,7 +6,7 @@ This document describes the **5-second prep** behavior in `flipClock.js` as of t
 
 When the user presses **Play** while the main interval is stopped, the app does **not** start the round timer immediately. It runs a **prep phase**: the flip face shows **`00:05` → `00:01`**, then restores the **saved round time** and calls **`start(true)`** so the main countdown runs.
 
-**Audio:** Prep uses **`setToTime`** first for each step, then **`setTimeout(..., FLIPCLOCK_PREP_FLIP_MS)`** (1000 ms — same order of magnitude as the stacked CSS flip in `flipClock.scss`) before **`playPrepCountdownBeep()`** and the next **`runStep()`**. That keeps the beep **after** the flip motion without changing **`FlipClock.prototype.doTick`** (the main timer animation is unchanged).
+**Audio / animation:** After each **`setToTime`**, prep listens for **`animationend`** whose name **contains** **`flip-turn-down`** (last phase of the stacked flip), then **double `requestAnimationFrame`** before **`playPrepCountdownBeep()`** and the next **`runStep()`**. A **fallback** timer (**`FLIPCLOCK_PREP_FLIP_MS + 400`**) covers reduced-motion or environments without events. The toolbar **`FlipClock`** uses **`tickDuration: 1050`** so the **main** round **`doTick`** does not fire **`removeClass("play")`** while a **~1000 ms** flip is still running. E2E: **`prepAdvanceMs` 1400** per step and **`flushDoubleRaf()`** after **`page.clock.fastForward`** — Playwright’s fake clock advances **`setTimeout`** but not **`requestAnimationFrame`** in one shot.
 
 ## State and data
 
@@ -14,7 +14,7 @@ When the user presses **Play** while the main interval is stopped, the app does 
 |--------|------|
 | `clock.prepCountdownActive` | `true` from prep start until cancel or handoff to `start(true)`. |
 | `prepResumeTimeStr` (closure in `initFlipClockToolbar`) | **`MM:SS`** snapshot from **`comparableIntToMmSsString(clock.getCurrentTime())`** taken **once** when prep **begins** (the paused round time). |
-| `prepTimeoutId` | After each **`setToTime`**, **`setTimeout(..., FLIPCLOCK_PREP_FLIP_MS)`**, then **`playPrepCountdownBeep()`** + **`runStep()`**. |
+| `prepTimeoutId` | After each **`setToTime`**, fallback **`setTimeout(..., FLIPCLOCK_PREP_FLIP_MS + 400)`** if **`animationend`** never fires; normal path uses **`animationend`** + debounced **double rAF** → **`prepChainDone()`** (beep + **`runStep()`**). |
 
 ## Timeline (ideal)
 

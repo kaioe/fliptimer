@@ -2,7 +2,9 @@
   "name": "flipclock",
   "private": true,
   "scripts": {
+    "build": "npm run build:css",
     "build:css": "sass flipClock.scss flipClock.css --no-source-map",
+    "build:dist": "node scripts/build-dist.mjs",
     "dev": "concurrently -k -n sass,bs -c cyan,magenta \"npm run dev:sass\" \"npm run dev:serve\"",
     "dev:sass": "sass --watch --poll flipClock.scss flipClock.css --no-source-map",
     "dev:serve": "browser-sync start --config bs-config.js",

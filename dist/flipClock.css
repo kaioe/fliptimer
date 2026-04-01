@@ -501,30 +501,6 @@ body.flipclock-custom-bg {
   box-sizing: border-box;
 }
 
-@media only screen and (max-width: 767px) and (orientation: portrait) {
-  .preset-modal {
-    padding: 0;
-    overflow: hidden;
-  }
-  .preset-modal__panel {
-    inset: 0;
-    width: 100%;
-    max-width: 100%;
-    height: 100dvh;
-    max-height: 100dvh;
-    border-radius: 0;
-    border-width: 0;
-    box-shadow: none;
-    padding: 0;
-  }
-  .preset-modal__body {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .preset-modal__header {
-    cursor: default;
-  }
-}
 .preset-modal__header {
   display: flex;
   align-items: center;
@@ -1269,18 +1245,15 @@ body.flipclock-custom-bg {
   height: auto;
   min-height: min-content;
   margin: 0 14px 14px;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: visible;
   max-height: none;
   border: 1px solid #444;
   border-radius: 4px;
   touch-action: manipulation;
-  -webkit-overflow-scrolling: touch;
 }
 
 .preset-table {
   width: 100%;
-  min-width: 460px;
   height: auto;
   table-layout: auto;
   border-collapse: separate;
@@ -1326,11 +1299,6 @@ body.flipclock-custom-bg {
 }
 .preset-table__actions {
   white-space: nowrap;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
 }
 .preset-table__row {
   cursor: grab;
@@ -1353,61 +1321,15 @@ body.flipclock-custom-bg {
   z-index: 1;
 }
 
-@media only screen and (max-width: 767px) {
-  .preset-table-wrap,
-  .preset-form {
-    margin-left: 8px;
-    margin-right: 8px;
-  }
-  .preset-table {
-    min-width: 0;
-    table-layout: fixed;
-  }
-  .preset-table th,
-  .preset-table td {
-    padding: 4px 5px;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-  }
-  .preset-table th:nth-child(2),
-  .preset-table th:nth-child(3),
-  .preset-table th:nth-child(4),
-  .preset-table td:nth-child(2),
-  .preset-table td:nth-child(3),
-  .preset-table td:nth-child(4) {
-    width: 44px;
-    font-size: 10px;
-    padding-left: 3px;
-    padding-right: 3px;
-  }
-  .preset-table th:nth-child(1),
-  .preset-table td:nth-child(1) {
-    width: 92px;
-  }
-  .preset-table td:nth-child(1) {
-    white-space: normal;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    line-height: 1.2;
-    max-height: 2.4em;
-    overflow: hidden;
-  }
-  .preset-table th:nth-child(5),
-  .preset-table td:nth-child(5) {
-    width: 88px;
-    overflow-wrap: normal;
-    word-break: normal;
-  }
-}
 .preset-icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 22px;
-  min-width: 24px;
-  min-height: 22px;
-  margin-right: 0;
+  width: 30px;
+  height: 26px;
+  min-width: 30px;
+  min-height: 26px;
+  margin-right: 4px;
   padding: 0;
   cursor: pointer;
   vertical-align: middle;
@@ -1446,10 +1368,10 @@ body.flipclock-custom-bg {
 }
 @media (pointer: coarse) {
   .preset-icon-btn {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    min-height: 34px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 .preset-icon-btn svg {

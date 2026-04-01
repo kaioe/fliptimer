@@ -44,9 +44,23 @@ try {
 	let cur = await page.evaluate(() => window.flipClockInstance.getCurrentTime());
 	assert(cur === 5, `first prep frame 00:05 -> getCurrentTime 5, got ${cur}`);
 
+	/** Prep waits for `animationend` or fallback (1000ms + 400ms); fake clock must advance past fallback. */
+	const prepAdvanceMs = 1400;
+
+	/** `fastForward` runs timers but not `requestAnimationFrame`; prep schedules `prepChainDone` after double rAF. */
+	async function flushDoubleRaf() {
+		await page.evaluate(() =>
+			new Promise((resolve) => {
+				const raf = window.requestAnimationFrame.bind(window);
+				raf(() => raf(resolve));
+			}),
+		);
+	}
+
 	const expectedAfterEachSecond = [4, 3, 2, 1];
 	for (let i = 0; i < expectedAfterEachSecond.length; i++) {
-		await page.clock.fastForward(1000);
+		await page.clock.fastForward(prepAdvanceMs);
+		await flushDoubleRaf();
 		cur = await page.evaluate(() => window.flipClockInstance.getCurrentTime());
 		assert(
 			cur === expectedAfterEachSecond[i],
@@ -54,7 +68,8 @@ try {
 		);
 	}
 
-	await page.clock.fastForward(1000);
+	await page.clock.fastForward(prepAdvanceMs);
+	await flushDoubleRaf();
 	const running = await page.evaluate(() => window.flipClockInstance.tickInterval !== false);
 	const afterPrep = await page.evaluate(() => window.flipClockInstance.getCurrentTime());
 	const prepOff = await page.evaluate(() => window.flipClockInstance.prepCountdownActive === false);
