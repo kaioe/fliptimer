@@ -662,6 +662,7 @@ body {
 	}
 
 	.preset-modal__body {
+		overflow-x: auto;
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
 	}
@@ -762,7 +763,8 @@ body {
 	position: relative;
 	flex: 1 1 auto;
 	min-height: 0;
-	overflow-x: hidden;
+	// Never clip wide preset table content horizontally (actions / headers must stay fully visible).
+	overflow-x: auto;
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
 }
@@ -1415,20 +1417,34 @@ $preset-counter-tick-diameter: 12px;
 	display: block;
 	height: auto;
 	min-height: min-content;
+	min-width: 0;
 	margin: 0 14px 14px;
 	overflow-x: auto;
 	overflow-y: hidden;
 	max-height: none;
-	border: 1px solid #444;
+	border: 1px solid #3a3a3a;
 	border-radius: 4px;
+	background: #1a1a1a;
 	touch-action: manipulation;
 	-webkit-overflow-scrolling: touch;
 }
 
+.preset-table-wrap__title {
+	margin: 0;
+	padding: 8px 10px 6px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #d0d0d0;
+	letter-spacing: 0.02em;
+	border-bottom: 1px solid #333;
+	background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
+}
+
 .preset-table {
 	width: 100%;
-	min-width: 460px;
+	min-width: 0;
 	height: auto;
+	// Auto layout: name capped so it wraps normally; actions get a hard min-width so buttons are never clipped.
 	table-layout: auto;
 	border-collapse: separate;
 	border-spacing: 0;
@@ -1441,24 +1457,68 @@ $preset-counter-tick-diameter: 12px;
 		vertical-align: middle;
 	}
 
+	th:nth-child(1),
+	td:nth-child(1) {
+		max-width: 11rem;
+		min-width: 0;
+	}
+
+	th:nth-child(1) {
+		white-space: normal;
+		overflow-wrap: break-word;
+		word-break: normal;
+		line-height: 1.2;
+	}
+
+	td:nth-child(1) {
+		white-space: normal;
+		overflow-wrap: break-word;
+		word-break: normal;
+		line-height: 1.25;
+		vertical-align: top;
+	}
+
 	th:nth-child(2),
 	th:nth-child(3),
-	th:nth-child(4),
-	tbody td:nth-child(2),
-	tbody td:nth-child(3),
-	tbody td:nth-child(4) {
+	th:nth-child(4) {
+		white-space: normal;
+		overflow-wrap: break-word;
+		word-break: normal;
+		line-height: 1.2;
+		min-width: 3.25rem;
+		text-align: center;
+	}
+
+	td:nth-child(2),
+	td:nth-child(3),
+	td:nth-child(4) {
 		text-align: center;
 		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+		min-width: 2rem;
+	}
+
+	// Shrink-to-fit last column + floor width for three icon buttons (coarse pointers need ~34px each).
+	th:nth-child(5),
+	td:nth-child(5) {
+		width: 0.01%;
+		min-width: 7.75rem;
+		white-space: nowrap;
+		box-sizing: border-box;
 	}
 
 	th {
 		text-align: left;
 		color: #aaa;
 		font-weight: 600;
-		background: #323232;
+		background: #2a2a2a;
 		position: sticky;
 		top: 0;
 		z-index: 1;
+	}
+
+	th:nth-child(5) {
+		text-align: right;
 	}
 
 	th:first-child {
@@ -1514,21 +1574,14 @@ $preset-counter-tick-diameter: 12px;
 
 @include respond-to(false, 767) {
 	.preset-table-wrap,
-	.preset-form {
+	.preset-form-container {
 		margin-left: 8px;
 		margin-right: 8px;
-	}
-
-	.preset-table {
-		min-width: 0;
-		table-layout: fixed;
 	}
 
 	.preset-table th,
 	.preset-table td {
 		padding: 4px 5px;
-		overflow-wrap: anywhere;
-		word-break: break-word;
 	}
 
 	.preset-table th:nth-child(2),
@@ -1537,29 +1590,13 @@ $preset-counter-tick-diameter: 12px;
 	.preset-table td:nth-child(2),
 	.preset-table td:nth-child(3),
 	.preset-table td:nth-child(4) {
-		width: 44px;
 		font-size: 10px;
 		padding-left: 3px;
 		padding-right: 3px;
 	}
 
-	.preset-table th:nth-child(1),
-	.preset-table td:nth-child(1) {
-		width: 92px;
-	}
-
-	.preset-table td:nth-child(1) {
-		white-space: normal;
-		overflow-wrap: anywhere;
-		word-break: break-word;
-		line-height: 1.2;
-		max-height: 2.4em;
-		overflow: hidden;
-	}
-
 	.preset-table th:nth-child(5),
 	.preset-table td:nth-child(5) {
-		width: 88px;
 		overflow-wrap: normal;
 		word-break: normal;
 	}
@@ -1641,10 +1678,24 @@ $preset-counter-tick-diameter: 12px;
 	}
 }
 
-.preset-form {
+.preset-form-container {
 	margin: 0 14px;
 	padding-top: 12px;
 	border-top: 1px solid #444;
+}
+
+.preset-form-container__title {
+	margin: 0 0 10px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #d0d0d0;
+	letter-spacing: 0.02em;
+}
+
+.preset-form {
+	margin: 0;
+	padding: 0;
+	border: none;
 
 	label {
 		display: block;
@@ -1684,9 +1735,6 @@ $preset-counter-tick-diameter: 12px;
 	align-items: end;
 	margin-bottom: 12px;
 
-	@include respond-to(false, 480) {
-		grid-template-columns: 1fr;
-	}
 }
 
 .preset-form__field--color {
@@ -1911,6 +1959,13 @@ $preset-counter-tick-diameter: 12px;
 	gap: 12px;
 	flex-wrap: wrap;
 	margin-bottom: 6px;
+
+	// Must stay below base `flex-wrap` / gaps — earlier max-width blocks were overridden by these rules.
+	@include respond-to(false, 767) {
+		flex-wrap: nowrap;
+		gap: 2px;
+		margin-bottom: 4px;
+	}
 }
 
 .preset-form__duration-labels .preset-form__count-label {
@@ -1928,15 +1983,34 @@ $preset-counter-tick-diameter: 12px;
 	font-weight: 600;
 	letter-spacing: 0.02em;
 	color: #c4c4c4;
+
+	@include respond-to(false, 767) {
+		font-size: 8px;
+		gap: 1px;
+		flex-wrap: nowrap;
+		flex-shrink: 1;
+		min-width: 0;
+		font-weight: 600;
+	}
 }
 
 .preset-form__count-heading {
 	color: #e0e0e0;
+
+	@include respond-to(false, 767) {
+		font-size: 8px;
+		letter-spacing: 0;
+		text-transform: uppercase;
+	}
 }
 
 .preset-form__count-sep {
 	color: #888;
 	margin: 0 1px 0 0;
+
+	@include respond-to(false, 767) {
+		margin: 0;
+	}
 }
 
 .preset-thumb-legend {
@@ -1956,6 +2030,16 @@ $preset-counter-tick-diameter: 12px;
 		0 1px 4px rgba(0, 0, 0, 0.45),
 		inset 0 1px 0 rgba(255, 255, 255, 0.22);
 	border: 1px solid rgba(0, 0, 0, 0.2);
+
+	@include respond-to(false, 767) {
+		font-size: 8px;
+		padding: 1px 4px;
+		min-width: 1.35em;
+		line-height: 1.1;
+		box-shadow:
+			0 1px 2px rgba(0, 0, 0, 0.4),
+			inset 0 1px 0 rgba(255, 255, 255, 0.2);
+	}
 }
 
 .preset-thumb-legend__value {

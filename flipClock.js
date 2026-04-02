@@ -2543,6 +2543,7 @@
 		applyTrackMaxToSliders();
 		var $editId = $("#preset-edit-id");
 		var $saveBtn = $("#preset-save-btn");
+		var $presetFormHeading = $("#preset-form-heading");
 		var $resetEdit = $("#preset-form-reset");
 		var $openBtn = $("#preset-open-btn");
 		var $settingsFrame = $("#preset-settings-frame");
@@ -3309,7 +3310,8 @@
 			syncPresetMultiSlider();
 			setPresetColorUi("#ffffff");
 			closeColorPopover();
-			$saveBtn.text("Add preset");
+			$presetFormHeading.text("New Timer");
+			$saveBtn.text("Save timer");
 			$resetEdit.attr("hidden", "hidden");
 		}
 
@@ -3332,7 +3334,8 @@
 			$interval.val(p.intervalMinutes);
 			$rounds.val(p.rounds);
 			syncPresetMultiSlider();
-			$saveBtn.text("Save changes");
+			$presetFormHeading.text("Edit Timer");
+			$saveBtn.text("Save timer");
 			$resetEdit.removeAttr("hidden");
 		}
 

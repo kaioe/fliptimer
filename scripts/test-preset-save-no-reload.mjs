@@ -32,12 +32,9 @@ try {
 
 	await page.waitForTimeout(1200);
 
-	// "Save changes" path (same commit + sync as Add preset)
+	// Edit path (same commit + sync as new preset save)
 	await page.locator('button[data-action="edit"]').first().click();
-	await page.waitForFunction(() => {
-		const btn = document.getElementById("preset-save-btn");
-		return btn && btn.textContent && btn.textContent.includes("Save changes");
-	});
+	await page.waitForSelector("#preset-form-reset:not([hidden])", { timeout: 5000 });
 	await page.fill("#preset-name", `${uniqueName}-edited`);
 	await page.click("#preset-save-btn");
 
@@ -62,7 +59,7 @@ try {
 	}
 
 	process.stdout.write(
-		`OK: no full reload on Add preset or Save changes (marker preserved, load events=${loadEventCount}).\n`,
+		`OK: no full reload on Save timer (marker preserved, load events=${loadEventCount}).\n`,
 	);
 	process.exitCode = 0;
 } catch (e) {
