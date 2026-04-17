@@ -2,7 +2,7 @@
  * Browser-sync: static server.
  * POST /__fliptimer__/save-preset-timers writes the request body to ./fliptimer.json (dev only).
  * GET /sounds/manifest.json returns a live { files: [...] } from ./sounds (audio only) for the Preloaded dropdown.
- * The JSON may include presets and optional appBackgroundDataUrl (base64 data URL).
+ * The JSON may include presets, optional appBackgroundFile (file path), or optional appBackgroundDataUrl (base64 data URL for user uploads).
  */
 const fs = require("fs");
 const path = require("path");

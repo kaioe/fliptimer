@@ -90,6 +90,8 @@ function main() {
 	fs.copyFileSync(JQUERY_SRC, JQUERY_DEST);
 
 	copyDirRecursive(path.join(root, "sounds"), path.join(dist, "sounds"));
+	copyDirRecursive(path.join(root, "imgs"), path.join(dist, "imgs"));
+	copyDirRecursive(path.join(root, "src"), path.join(dist, "src"));
 
 	console.log("dist/ ready:", dist);
 }
