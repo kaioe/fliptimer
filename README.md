@@ -1,119 +1,165 @@
-# FlipTimer (`index.html`)
+# FlipTimer
 
-## Repository
+> A beautiful, responsive flip-clock timer with customizable presets
 
-- **GitHub (private):** [https://github.com/kaioe/fliptimer](https://github.com/kaioe/fliptimer) — `origin` remote, default branch **`main`**.
+FlipTimer is an elegant, web-based countdown timer featuring a classic flip-clock design with smooth 3D animations. Designed for both desktop and mobile, it's perfect for workouts, cooking, focus sessions, or any activity where you need a stylish and reliable timer.
 
-## Features
+[**Live Demo**](index.html) | [**GitHub Repository**](https://github.com/kaioe/fliptimer)
 
-- **Responsive & touch:** `index.html` includes **`viewport`** (`width=device-width`, `initial-scale=1`, `viewport-fit=cover`) and **`theme-color`**. **`.container`** and **`.preset-modal`** use **`env(safe-area-inset-*)`** padding; **`html`/`body`** use **`min-height: 100dvh`** where supported and **`overflow: hidden`** so the main viewport shows **no scrollbars** and clips overflow. **`body`:** **`touch-action: manipulation`**, subtle tap highlight. **`.countdown`** height uses **`min(100dvw,100dvh)`** inside **`@supports (width: 1dvw)`** (falls back to **`vw`/`vh`**). **`visualViewport`** **`resize`** calls **`setDimensions`** when the mobile chrome resizes. **Coarse pointers** (`pointer: coarse`): toolbar icon buttons **44×44**, preset table action icons **44×44**, triple-slider **`--thumb-size`** **32px**, preset **Name** input **16px** (reduces iOS focus-zoom). **Touch preset reorder:** touch on a row (not on a control), move past a short threshold, release on another row — same persistence as drag-and-drop (`touchstart` / `touchmove` / `touchend` in `fliptimer.js`).
-- **Favicon:** `favicon.svg` — round watch face with CI green (`#127c02`) hands, subtle horizontal “flip” seam, and crown; linked from `index.html` as `rel="icon"` (`image/svg+xml`).
-- **Toolbar:** Centered icon buttons — **Play/Pause** (one control toggles run state; clock loads **paused**). **Play** starts a **5-second prep**: the **fliptimer** shows **`00:05`**→**`00:01`** via **`setToTime`** (**`prepStepToMmSs`** / **`comparableIntToMmSsString`** in **`fliptimer.js`**). Prep waits for **`animationend`** (name contains **`flip-turn-down`**) after each **`setToTime`**, then **double `requestAnimationFrame`** and **`playPrepCountdownBeep`** + next step; fallback **`FLIPTIMER_PREP_FLIP_MS + 400` ms** if no event. That avoids tearing down **`.play`** mid-flip on prep. The toolbar **`FlipClock`** instance uses **`tickDuration: 1050`** (**~1 s** stacked flip + **50 ms** buffer) so the **main** countdown **`doTick`** does not remove **`.play`** mid-flip either. Then the face is restored to the paused round time and **`start(true)`** runs with the **Start** sound — **resume** without resetting the face to **`startTime`**. **Pause** during prep cancels prep and restores the saved time; **Reset**, **Apply preset**, and **Clear active preset (×)** cancel prep if active. **`setToTime`** clears **`current` / `previous` / `countdownFix` / `clockFix`** in each digit column before applying digits (keeps flip animations consistent). **Reset** (stops and jumps back to `startTime`), **Presets** (opens the preset modal). Labels are `aria-label` only; icons are inline SVG. Optional **sounds** (see below): **Start** and **Pause** on Play/Pause; **Finish** when the countdown reaches zero. Preloaded **`sounds/…`** URLs are built with **`new URL`** against **`baseHrefForSoundRelativeUrl()`** (strips a **trailing slash** on the document path so **`http://host/fliptimer/`** resolves to **`/sounds/…`**, not **`/fliptimer/sounds/…`**, which **404**s); **`file://`** still works. Playback waits for **`canplay`** before **`play()`**, and runs a **one-time audio unlock** on first click/touch/keydown (plus Play) so **Finish** is not blocked by autoplay policy after the user has interacted with the page. **Focus mode while running or in prep:** once the countdown is **running** or a **prep** countdown is active, **`.fliptimer-toolbar`** and **`.active-preset`** use class **`fliptimer-chrome-dimmed`** (**`opacity: 0.05`**, CSS transition). **Reveal:** **`mousemove`**, **`touchstart`** / **`touchmove`** (passive capture), or **`keydown`** (any key) sets full opacity and starts a **3s** idle timer (**`FLIPTIMER_CHROME_IDLE_MS`** in **`fliptimer.js`**). **Re-dim:** if there is **no** further interaction for **3s** while the timer still runs, chrome fades dim again; repeat. **`fliptimer:countdown-complete`** or stopping the clock clears the idle timeout and dim state (**Pause** / **Reset** / **Apply preset** via toolbar **`refresh`**). **Idle wall clock:** if the timer is **not** running and **not** in prep for more than **10s** (**`FLIPTIMER_IDLE_WALL_CLOCK_MS`** in **`fliptimer.js`**), the face shows **local time** as **HH:MM** (same four-digit layout as the round timer); **`.fliptimer-toolbar`** and **`.active-preset`** get **`fliptimer-idle-clock`** (**`opacity: 0`** in **`fliptimer.scss`** / **`fliptimer.css`**; same transitions as the toolbar). The display updates every **60s** while idle. **`mousemove`** or **`touchstart`** / **`touchmove`** (passive capture) runs **`onIdleWallClockPointerActivity`**: removes **`fliptimer-idle-clock`** from both so they return to **opacity 1** and records **`lastIdleToolbarPointerAt`**. If there is **no** further pointer activity for another **10s** (same **`FLIPTIMER_IDLE_WALL_CLOCK_MS`**), **`pollIdleWallClock`** adds **`fliptimer-idle-clock`** again on both so they fade off while the wall-clock face keeps running (when no preset is active, **`#active-preset`** is **`hidden`** — the class is still toggled for consistency). **Play** (restores the paused round time from before idle), **Reset**, **Apply preset**, **Clear active preset (×)**, or **Presets** exits via **`exitIdleWallClockMode`**; **`fliptimer:countdown-complete`** calls **`refreshToolbar`** so the **10s** idle window restarts. Documented **2026-03-29** (local system time).
-- **Active preset** (below the `.countdown`, inside `.container`): Shown only when a preset is active (`hidden` until then). **Name** plus labeled **Duration** / **Interval** / **Rounds** (same `min` wording as the slider). The card uses **`width: 100%`** / **`max-width: 100%`** and **`align-self: stretch`** so it fills the flex row inside **`.container`’s padding** (same idea as the toolbar). Top-right **×** (`#active-preset-clear`) clears the active preset (none selected, digits back to default grey). The **selected preset id** persists in **`localStorage`** (`fliptimer-active-preset-id-v1`); on load the clock and banner **restore** from that id if the preset still exists. Updates when you **Apply** a preset, when the list is re-rendered (edit/delete), and clears if the active preset is removed or **×** is used.
-- **Preset modal — Timer settings (inline):** The modal **header** title is **Settings** (**`#preset-modal-title`**, **`h2`**). The header **cog** (`#preset-settings-open-btn`, **`aria-expanded`**, **`aria-controls="preset-settings-frame"`**) toggles **`#preset-settings-frame`** (**.preset-settings-inline**), whose background is a **slightly darker** vertical gradient (**`#323232` → `#222222`**) than **`.preset-modal__panel`** (**`#3a3a3a` → `#2a2a2a`**) for visual separation; it includes the **Timer settings** title (**`h3`**) and the body (**track range**, **sounds**, **app background**, **counter size**; **`.preset-settings-inline__scroll`** uses **`overflow: visible`** — no inner scrollbar on that block; **`.preset-modal__panel`** is **`position: fixed`** with **`max-height`** tied to the viewport; long content scrolls in **`.preset-modal__body`**, which uses **`overflow-x: auto`** (not **`hidden`**) so the preset table row (headers, name wrap, action icons) is never clipped horizontally — **`.preset-table-wrap`** can scroll if needed. **Saved presets** block: **`h3`** **Preset Timers** (**`.preset-table-wrap__title`**, **`#preset-table-heading`**) sits above **`.preset-table`** (**`aria-labelledby`**); **`.preset-table-wrap`** uses a **darker** background (**`#1a1a1a`**) and slightly darker sticky header cells (**`#2a2a2a`**) than before. **Drag** the **Settings** header (**h2** strip — not the **cog** or **×**) to move the dialog; **centered** placement is restored each time you **open** the modal). Default is **collapsed** (`hidden` on the frame). Opening or closing the main preset modal does **not** collapse Timer settings — expanded/collapsed state persists until you toggle the header **cog** (or **Escape**, see below). **Timer settings hints:** former **`preset-settings-hint`** paragraphs (**track range**, **counter size**, **sounds**, **app background** extras) are **`preset-settings-info-btn--hint`** tooltips next to section labels (**`data-tooltip`**, **`aria-describedby`** sr-only). **Track range:** **`#fliptimer-preset-track-max`** is the same **`.preset-counter-size-*`** component as counter size, with **`preset-counter-size-wrap--track-max`** for tick positions (**10–60** min, step **5**); **`setCounterRangeFillPct`** reads **`min`/`max`** from the range input; stored as **`fliptimer-preset-track-max-v1`**. **`syncPresetMultiSlider`** sets **`--min`**, **`--max`**, **`--step`** (**0.5** min if track max **≤30**, **5** min if **&gt;30**), and **`--rounds-min` / `--rounds-max`** on the slider wrapper so **tick marks** and **min/max labels** follow the minute range; **rounds** thumb math uses **0–10** separately from **`--max`**. **Sounds:** **Source** segmented control (**Preloaded** \| **Upload**) — **`fliptimer-sound-source-v1`** (`preloaded` \| `upload`). **Preloaded:** lists files from **`GET /sounds/manifest.json`** (under **`npm run dev`**, built from the **`sounds/`** folder; avoids stale browser cache via **`cache: false`** and refresh when opening Timer settings); per-slot **`<select>`**s (**Start** / **Pause** / **Finish**) under **`#preset-settings-sounds-preloaded`**; chosen filenames persist in **`fliptimer-sound-preloaded-v1`**; playback uses URLs under **`sounds/`** (encoded filenames). **Upload:** existing **`#preset-settings-sounds-upload`** UI — **`preset-settings-sounds--three`** columns from **`min-width: 720px`**; **`preset-settings-upload-row--sound`** with **drop-zone** (paperclip, filename, **Upload**/**Clear**), hidden **`input[type=file]`** (`accept="audio/*"`), **drag-and-drop**; filenames **`fliptimer-sound-filenames-v1`**, audio data URLs **`fliptimer-sounds-v1`**. Only **Start**, **Pause**, and **Finish** are wired (Finish on countdown complete). **`fliptimer.json`** sync: **`soundSource`** plus **`soundPreloaded`** when Preloaded, else **`sounds`** / **`soundFileNames`** when Upload. **App background:** same pattern for **`#preset-bg-upload`** (`accept` JPEG/PNG/GIF/WebP): **resized** (max **1920px** long edge) and **recompressed** (**WebP** preferred, else **JPEG**). **`localStorage`** stores **`dataUrl`** plus optional **`fileName`**; dev sync writes **`appBackgroundDataUrl`** to **`fliptimer.json`**. Timer sounds in that file follow **`soundSource`** (see **Sounds** above). Long explanation and drag-and-drop note are on hover/focus of the **`i`** next to **App background** (**`data-tooltip`**, **`aria-describedby`**). **Clear** clears background and drops **`appBackgroundDataUrl`** from the next JSON write. Full-page: **`body.fliptimer-custom-bg`** + **`--fliptimer-bg-image`**. **Counter size:** Range **5–95%** of the viewport’s **smaller** dimension (`min(100vw,100vh)`), persisted as **`fliptimer-counter-pct-v1`**; **`.countdown`** height uses that percentage. **Snaps** to **5, 10, …, 95** (`**snapCounterSizePct**`, **`COUNTER_SIZE_STEP`** **5**); **`#fliptimer-counter-size`** uses **`step="5"`**. **`initPresetCounterSizeTicks`** fills every **`.preset-counter-size-ticks`** from its rail’s **`input`** **`min`/`max`/`step`**. Percent ticks use **`.preset-counter-size-wrap:not(.preset-counter-size-wrap--track-max)`**; track max uses **`--track-max`** for **10–60** positions. Each tick uses **`calc(2×pad + t×(100% − 4×pad))`**; **`setCounterRangeFillPct`** matches thumb travel. **`refreshPresetCounterSizeRangeFills`** runs on **`resize`** / **`visualViewport`** / modal open. Native **range** tracks are **transparent** (thumb only). Thumb **`opacity: 0.45`** (temporary, for alignment checks). Tick markers use **`$preset-counter-rail`**. With timer settings **open**, the header **cog** uses **inverted** light styling (`[aria-expanded="true"]`). **`setDimensions`** sets **`--fc-flip-h`** / **`--fc-flip-w`** on **`.countdown`**; colons and spacing use **`em`** relative to **`ul.flip`** font size (set by JS) so the **whole clock block** (digits, colons, gaps) scales together; digit **`span`** **`perspective`** is **`calc(var(--fc-flip-h) * 2)`** so the **rotateX** flip does not look warped at large counter sizes (a fixed px distance distorted the 3D effect when digits grew); narrow-viewport **`!important`** overrides on digit width were removed so the slider-driven size is not fighting breakpoints. **Large sizes:** **`.container`** uses **`width: max-content`** (absolutely positioned **`width: auto`** was shrink-to-fit and capped the row, so **floated** digits wrapped above ~30%); **`.countdown`** is **`display: flex`**, **`flex-wrap: nowrap`**, **`ul.flip`** **`flex: 0 0 auto`** (no floats). **`html`/`body { overflow: hidden }`** on the main screen (wide clocks clip at the edges). **Escape** closes the settings panel first (if open), then the color popover, then the main preset modal. The modal **close** (**×**) is **flex-centered** in a **32×32** hit target in the header.
-- **Preset timers (CRUD):** Modal lists presets with icon actions (apply checkmark, edit pencil, delete trash). Rows are **draggable** (desktop) or **slid on touch** to reorder (order is saved with presets). Each row’s **background** uses a **linear gradient** from the preset color at the **bottom** to **transparent** at the top (no separate color column). The form sits in **`.preset-form-container`** with **`h3`** **New Timer** / **Edit Timer** (**`#preset-form-heading`**, **`preset-form-container__title`**; **`#preset-form`** uses **`aria-labelledby`**). **Name** and **Color** share one **two-column** row at all viewport widths (**`.preset-form__row--name-color`**); **`.preset-color-trigger`** uses the same vertical **padding**, **font-size**, and **coarse-pointer** rules as the **Name** text field so the color control’s box height matches the name field; the color popover uses the OS **color picker**, **hex**, and **preset swatches** (default **white**). **Duration**, **interval**, and **rounds** share one **triple-thumb** range track ([CodePen mdEJMLv](https://codepen.io/vsync/pen/mdEJMLv)–style): **duration** / **interval** use **0–max** minutes (max from **Timer settings**; **0.5** min steps when max **≤30**, **5** min steps when max **&gt;30**); **rounds** **1–10** integers on a **0–10** tick track). Above the track, each control shows **Duration:** / **Interval:** / **Rounds:** with the **live value** inside a **colored pill** (`#preset-legend-minutes`, `#preset-legend-interval`, `#preset-legend-rounds`; updated in `syncPresetMultiSlider`). On **viewports ≤767px**, **`.preset-form__duration-labels`**, **`.preset-form__count-label--with-pill`**, **`.preset-form__count-heading`**, and **`.preset-thumb-legend`** each nest **`@include respond-to(false, 767)`** (declared **after** their base rules) so **smaller** type (**8px**), **uppercase** headings, and tighter pills **win the cascade**; the label row uses **`nowrap`** so **Duration** / **Interval** / **Rounds** stay on **one line**. **Rounds** uses **`min=0` `max=10`** on the range (same scale as tick marks so value **1** sits on tick **1**); **`snapRoundsToWhole`** clamps to **1–10**. **`aria-valuemin="1"`**; **Home** jumps to **1**; **ArrowLeft / ArrowDown / PageDown** are blocked when value is **1** so the thumb does not move to tick **0**. Slider markup includes **`preset-minutes-slider__input`**, **`__output`**, **`#preset-slider-cluster`** (merged value when thumbs overlap), **`__progress`** classes. **Overlapping thumbs** (pairwise distance under **5%** of the track, same idea as `--thumbs-too-close`): each thumb in the cluster is **clipped** to a **left / right half** (two thumbs) or **thirds** (three thumbs); the usual per-thumb **floating values** are hidden and **`#preset-slider-cluster`** shows **one number** (the **leftmost** thumb on the track after sorting) plus summed-RGB **background**; **`aria-label`** still lists every overlapped value (`syncPresetMultiSlider`). Track corner radius **`--progress-radius: 3px`**. Table columns **Duration**, **Interval**, and **Rounds** are **centered** with tabular numerals. The saved-presets **`.preset-table`** uses **`table-layout: auto`**: **Name** has **`max-width: 11rem`** with normal wrapping; **Duration** / **Interval** / **Rounds** headers may wrap; numeric cells stay **`nowrap`**; **Actions** uses **`min-width: 7.75rem`** (three icon buttons) and a shrink-to-fit last column so controls are not clipped. Layout (top to bottom): **row labels + pills**, **current value** above each thumb, **track**, **tick marks** under the track, **min / max** at the ends below the ticks; triple thumbs use a **raised** look (light gradient + soft shadows, **hover** / **active** states), with each thumb’s hue preserved via **`color.mix`** against `#f4f1ee` / `#fff` (and pressed tones) in `fliptimer.scss` (`preset-thumb-raised*`). The **track** is drawn by `.range-slider__progress` with **inset `box-shadow`** on that element; **native** `::-webkit-slider-runnable-track` / `::-moz-range-track` / `::-ms-track` are **transparent** so they do not paint over the custom track. The **segment between thumbs is not highlighted** (neutral track only). Stored **minutes** / **intervalMinutes** clamp **0–max** (max from track settings); **rounds** **1–10**. Each preset stores **name**, **color** (digit panels via `--flip-digit-bg`), **minutes**, **intervalMinutes**, and **rounds**. **Apply** loads the preset onto the clock **without** starting the timer (use **Play** when ready). **Save timer** keeps **`#preset-settings-frame`** open when it was open before save (**`openPresetSettings({ focus: false })`** after **`setTimeout(0)`**; **`data-settings-expanded`** + **`hidden`** fallback). Save uses **`commitPresetForm()`** from **`#preset-save-btn`** (**`type="button"`**), form **`onsubmit="return false"`**, and **Enter** on the name field — no full-page navigation. The form does not use **`HTMLFormElement.reset()`** (explicit field clear). Preset list data is saved in **`localStorage`** (`fliptimer-preset-timers-v1`) on each change. While using **`npm run dev`** (BrowserSync), the app **POSTs** the same JSON to **`/__fliptimer__/save-preset-timers`**, and **`bs-config.js`** writes **`fliptimer.json`** in the project root in the background (no browser download); **`watchOptions.ignored`** must exclude that file or BrowserSync would **full-reload** on every save. Opening the page as **`file://`** or from a host without that route only updates **`localStorage`**. On first visit with no saved data, presets (and optional app background and **sounds** from **`fliptimer.json`**) load from **`fliptimer.json`** next to the page. **Last triple-slider positions** (duration / interval / rounds) persist under **`fliptimer-preset-slider-thumbs-v1`** and reload on page load.
-- Countdown flip-clock UI (minutes + seconds by default in `fliptimer.js`)
-- jQuery-based `FlipClock` that sizes digits from the `.countdown` height (jQuery is loaded from **`node_modules/jquery`** so the page works under strict **Content-Security-Policy** `default-src 'self'` — no CDN scripts)
-- Styles: gray radial background, **dark grey** (`#2d2d2d`) digit panels when **no preset** is active, **preset color** on the digits after **Apply** (via `--flip-digit-bg`). **Light** preset colors get **`--flip-digit-fg`** black and matching colon vars via **`applyCounterContrastFromPresetColor`** in **`fliptimer.js`** (WCAG luminance above ~0.55). Colon separators, CSS 3D flip animations.
-- **`fliptimer.js`:** `FlipClock` lives in an IIFE (`jQuery`, `window`); only `window.FlipClock` is exported. Transition support is cached module-wide; `maxTime` / `minTime` comparisons use one time-string helper; feature and empty-selection checks are corrected for reliable behavior.
-- **`fliptimer.scss`** is organized in order: variables (colors, sizes, animation timing), mixins (`respond-to`, shadow gradients), page/chrome (`.container`), flip skeleton (`.countdown`), play-state rules, then keyframes. Legacy duplicate vendor prefixes and IE gradient filters were removed in favor of modern unprefixed properties; keyframe names are descriptive (`flip-z-bump`, `flip-turn-down`, `flip-turn-up`, shadow show/hide).
+## ✨ Features
 
-## Rules / requirements
+- **⏱️ Flip-Clock Design** - Elegant animated flip-clock interface with smooth 3D transitions and customizable digit colors.
+- **📱 Responsive & Touch-Friendly** - Works perfectly on desktop and mobile with touch gestures, safe-area support, and adaptive sizing.
+- **🎨 Customizable Presets** - Create unlimited timer presets with custom names, colors, durations, intervals, and rounds.
+- **🔊 Sound Effects** - Optional audio feedback for start, pause, and finish events with preloaded or custom sounds.
+- **🌙 Dark Theme** - Beautiful dark theme with subtle gradients and customizable background images.
+- **⚡ Fast & Lightweight** - No dependencies beyond jQuery, CSS animations for smooth performance, and localStorage persistence.
 
-- **Stylesheet:** The page loads **`./fliptimer.css`** (with a `?v=` cache-bust query so the browser picks up recompiles), not `fliptimer.scss`. Browsers do not compile Sass/SCSS. If you edit `fliptimer.scss`, run **`npm run build`** or **`npm run build:css`** (or use the Sass watcher in **`npm run dev`**) or the page will look unchanged / unstyled.
+## 🚀 Installation
 
-## Development (`npm run dev`)
+FlipTimer is easy to set up and run locally:
 
-From this folder, after `npm install`:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/kaioe/fliptimer.git
+   cd fliptimer
+   ```
 
-```bash
-npm run dev
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-This runs in parallel:
+3. **Start development server**
+   ```bash
+   npm run dev
+   ```
+   This will start BrowserSync on port 3000 (or the next available port) and open the timer in your browser.
 
-- **Sass** — `fliptimer.scss` is watched and compiled to `fliptimer.css` on save. The watch uses **`--poll`** so changes are picked up reliably on **Windows** (native file events can miss edits from some editors or synced folders).
-- **BrowserSync** — configured in **`bs-config.js`**: port **3000**, **`snippet: true`** so the page gets a small injected client script and **reloads (or injects CSS) when watched files change**. **`/fliptimer`** and **`/fliptimer/`** are rewritten to **`index.html`**, so **`http://localhost:3000/fliptimer`** matches **`http://localhost:3000/index.html`**. **`POST /__fliptimer__/save-preset-timers`** writes **`fliptimer.json`** in the project root (**`version`**, **`presets`**, optional **`appBackgroundDataUrl`**, optional Timer settings: **`soundSource`** + **`soundPreloaded`** or **`sounds`** / **`soundFileNames`**). Watched **`files`** include **`sounds/manifest.json`**. With **`watch: true`**, BrowserSync also watches the server **`baseDir`** (not only the explicit **`files`** list), so **`watchOptions.ignored`** includes **`fliptimer.json`** — otherwise each preset save would **full-reload the app**. Edits to **`fliptimer.scss`** flow through Sass first; when **`fliptimer.css`** updates, BrowserSync picks that up. The dev server opens **`/fliptimer`** by default.
+> [!TIP]
+> **Development Mode:** The dev server automatically watches for changes to your SCSS files and reloads the browser. It also provides preset synchronization to `fliptimer.json`.
 
-Stop with `Ctrl+C` (both processes stop).
+## 🛠️ Usage
 
-**Regression check (preset save vs. full reload):** With BrowserSync running, **`npm run test:preset-save`** opens the preset modal, adds a preset, and asserts the page does not perform a full document reload (a window marker survives). If port **3000** is in use, BrowserSync picks another port — set the URL explicitly, for example: **`set FLIPTIMER_TEST_URL=http://127.0.0.1:3004/fliptimer`** (PowerShell: **`$env:FLIPTIMER_TEST_URL=...`**) before **`npm run test:preset-save`**.
+### Basic Controls
+- **Play/Pause:** Start or pause the timer with a 5-second countdown preparation.
+- **Reset:** Return to the original time setting.
+- **Presets:** Open the preset modal to manage timer configurations.
 
-**`POST /__fliptimer__/save-preset-timers` returns 404:** The browser is talking to a server that is **not** this project’s BrowserSync with **`bs-config.js`**. Very often **`http://localhost:3000`** is a *different* process (IDE static server, old dev server, another app) while **`npm run dev`** printed **`Local: http://localhost:3002/...`** (or **3001**, …) because **3000** was already in use. **Always open the exact “Local:” URL** from the terminal after starting **`npm run dev`**; do not assume port **3000**. Presets still save to **`localStorage`** either way; only writing **`fliptimer.json`** needs this route.
+### Creating Presets
+1. Click the **Presets** button (list icon).
+2. Fill in the timer details:
+   - **Name:** Custom label for your timer.
+   - **Color:** Choose a color that will be applied to the clock digits.
+   - **Duration:** Main countdown time (using the blue slider).
+   - **Interval:** Break or interval time (using the orange slider).
+   - **Rounds:** Number of repetitions (using the purple slider).
+3. Click **Save timer** to add it to your presets.
+4. Use the **checkmark icon** to apply a preset to the main timer.
 
-### CSP / console errors
+### Timer Settings
+Access advanced options by clicking the **gear icon** in the preset modal header:
+- **Track Range:** Set maximum duration for sliders (10-60 minutes).
+- **Sounds:** Choose preloaded sounds or upload custom audio files.
+- **App Background:** Upload a custom background image.
+- **Counter Size:** Adjust the clock size as a percentage of viewport.
 
-`index.html` does not set **Content-Security-Policy** by default, so BrowserSync’s live-reload snippet is allowed. If you add a **strict CSP** later and the browser blocks the injected script, set **`snippet: false`** in **`bs-config.js`** and refresh manually, or relax **`script-src`** for development only. If you see **external script** CSP errors, ensure you are not using a CDN for jQuery — this project uses the local `jquery` package under `node_modules`.
+## 🏗️ Building for Production
 
-## Production build (`npm run build`)
-
-Compiles **`fliptimer.scss`** → **`fliptimer.css`** (no source map). Same as **`npm run build:css`**:
-
+### Compile CSS
 ```bash
 npm run build
 ```
+This compiles `fliptimer.scss` to `fliptimer.css`.
 
-Underlying Sass command: `npx sass fliptimer.scss fliptimer.css --no-source-map`
-
-## Deploy bundle (`npm run build:dist`)
-
-Produces a **`dist/`** folder you can upload to any static file host (no Node.js required on the server).
-
-1. From the project root (after **`npm install`** so jQuery exists under **`node_modules`**):
-
+### Create Distribution Bundle
 ```bash
 npm run build:dist
 ```
+This creates a `dist/` folder with all files needed for static hosting:
+- `index.html`
+- `fliptimer.css` and `fliptimer.js`
+- Vendored jQuery (`vendor/jquery.min.js`)
+- `sounds/` directory with all audio files
+- `favicon.svg` and optional `fliptimer.json`
 
-2. The script compiles **`fliptimer.scss`** → **`fliptimer.css`**, then copies:
+> [!WARNING]
+> The `dist/` folder is self-contained and can be deployed to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) without requiring Node.js on the server.
 
-   - **`index.html`**
-   - **`fliptimer.css`**, **`fliptimer.js`**, **`favicon.svg`**, **`fliptimer.json`** (if present)
-   - **`sounds/`** (entire directory, including **`manifest.json`** and any audio files)
-   - **`vendor/jquery.min.js`** — vendored from **`node_modules/jquery`**
+## 📋 Technical Specifications
 
-3. HTML script tags are rewritten for static hosting: **`./vendor/jquery.min.js`** and **`./fliptimer.js`** instead of absolute **`/node_modules/...`** and **`/fliptimer.js`**.
+| Component | Specification |
+| :--- | :--- |
+| **Framework** | Vanilla JS + jQuery |
+| **Styling** | Sass/SCSS |
+| **Animations** | CSS 3D Transforms |
+| **Storage** | localStorage |
+| **Dev Server** | BrowserSync |
+| **Testing** | Playwright |
+| **Build Tools** | npm scripts |
+| **License** | MIT |
 
-**Static host notes:** Preset sync to **`fliptimer.json`** via **`POST /__fliptimer__/save-preset-timers`** is a **BrowserSync-only** dev feature; on a plain static server, presets still persist in **`localStorage`**. **`GET /sounds/manifest.json`** is not regenerated on the fly like dev middleware — the built **`sounds/manifest.json`** is what ships; add or remove audio files under **`sounds/`**, then run **`npm run build:dist`** again.
+## 💻 Development
 
-## Console log (headless browser CLI)
-
-Uses **Playwright** (Chromium) to load the page and print **console** messages, **uncaught page errors**, and **failed requests** to the terminal — useful when DevTools is not attached.
-
-1. Start the static server (e.g. `npm run dev` or only BrowserSync on port **3000**).
-2. Run:
-
+### Available Scripts
 ```bash
+# Start development server with hot reload
+npm run dev
+
+# Compile SCSS to CSS
+npm run build
+
+# Build distribution bundle
+npm run build:dist
+
+# Run console logging test (headless browser)
 npm run browser:console
+
+# Test preset save without full reload
+npm run test:preset-save
 ```
 
-Default URL is `http://127.0.0.1:3000/fliptimer`. If another process uses 3000, BrowserSync may choose a different port (check its “Local:” URL); pass it explicitly:
-
-```bash
-npm run browser:console -- http://localhost:3002/fliptimer
+### File Structure
+```text
+fliptimer/
+├── index.html          # Main application HTML
+├── fliptimer.scss      # Source styles (edit this)
+├── fliptimer.css       # Compiled CSS (generated)
+├── fliptimer.js        # Application logic
+├── fliptimer.json      # Presets and settings
+├── sounds/             # Audio files
+├── scripts/            # Build and test scripts
+├── tests/              # Playwright tests
+└── dist/               # Production build output
 ```
 
-First time after installing dependencies, install the browser binary:
+> [!CAUTION]
+> **CSS Compilation:** Always edit `fliptimer.scss`, not `fliptimer.css`. Browsers cannot compile Sass/SCSS directly. Run `npm run build` or use `npm run dev` for automatic compilation.
 
-```bash
-npx playwright install chromium
-```
+## 🌐 Browser Support
 
-## Files
+FlipTimer supports all modern browsers with CSS 3D transform support:
+- Chrome/Edge (latest)
+- Firefox (latest)
+- Safari (latest)
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
-| File                          | Role                                                                                                                                   |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `favicon.svg`                 | SVG favicon (watch / flip-clock motif)                                                                                                 |
-| `index.html`              | Markup, links favicon + `fliptimer.css` + `fliptimer.js`                                                                               |
-| `fliptimer.scss`              | Source styles (edit here)                                                                                                              |
-| `fliptimer.css`               | Compiled CSS (generated; commit or rebuild)                                                                                            |
-| `fliptimer.js`                | Clock logic and DOM (IIFE, sectioned methods, shared time/transition helpers); preset CRUD and `window.fliptimerInstance`              |
-| `fliptimer.json`          | Versioned JSON: **`presets`**, optional **`appBackgroundDataUrl`**, optional Timer sounds (**`soundSource`** + **`soundPreloaded`** or **`sounds`** / **`soundFileNames`**); written by dev server on sync                         |
-| `sounds/manifest.json`    | Fallback list for **`file://`** / static hosts. With **`npm run dev`**, **`GET /sounds/manifest.json`** is generated by **`bs-config.js`** from the **`sounds/`** directory (audio extensions only), **`Cache-Control: no-store`**, so the Preloaded dropdown stays current without editing this file.                          |
-| `package.json`                | `npm run dev`, `build` / `build:css`, `build:dist`, `browser:console`, deps                                                            |
-| `scripts/build-dist.mjs`    | **`npm run build:dist`**: compile SCSS, write **`dist/`** with static-host paths + vendored jQuery                                      |
-| `bs-config.js`                | Browser-sync: port, `/fliptimer` → `index.html`, **`POST /__fliptimer__/save-preset-timers`** → `fliptimer.json`, **`GET /sounds/manifest.json`** → live directory listing of **`sounds/`**; **`watchOptions.ignored`** excludes **`fliptimer.json`** so preset saves do not full-reload |
-| `scripts/browser-console.mjs` | Playwright: print console/errors from URL                                                                                              |
-| `scripts/test-preset-save-no-reload.mjs` | Playwright: assert **Save timer** does not full-reload under BrowserSync (`npm run test:preset-save`; optional **`FLIPTIMER_TEST_URL`**) |
+The app uses progressive enhancement and falls back gracefully where advanced features are not available.
 
-Last doc update: 2026-04-02 12:04:26 +10:00 — **Preset form:** **`.preset-form-container`**, dynamic **`h3`** **New Timer** / **Edit Timer**, primary button **Save timer**; duration legend compact styles nested so they override base rules. Earlier: **Preset modal:** Header **`h2`** **Settings**; **`.preset-table-wrap`** **`h3`** **Preset Timers**, darker wrap background; **Name**/**Color** stay side-by-side; mobile **Duration**/**Interval**/**Rounds** labels + pills (**≤767px**). Earlier: **Preset table / modal:** **`.preset-modal__body`** **`overflow-x: auto`**; **`.preset-table`** auto layout, name **`max-width`**, actions **`min-width`** for full buttons. Earlier: **`npm run build:dist`:** `scripts/build-dist.mjs` fills **`dist/`** for static hosting (`index.html` + `index.html`, `./vendor/jquery.min.js`, `sounds/`, optional `fliptimer.json`). Earlier: **Prep + main tick:** **`animationend`** substring match **`flip-turn-down`**; **double rAF** before beep/next step; fallback **1400 ms**; bootstrap **`tickDuration` 1050**; E2E **`prepAdvanceMs` 1400** + **`flushDoubleRaf`** after **`fastForward`** (Playwright does not run **rAF** inside **`fastForward`**). Earlier: **`npm run build`:** alias for **`build:css`** (SCSS → CSS). Earlier: **Prep:** **`animationend`** before beep/next step; earlier fallback **1200 ms**. Earlier: **Preloaded sounds:** fixed **`baseHrefForSoundRelativeUrl()`** so URLs like **`/fliptimer/`** (trailing slash) no longer resolve **`sounds/…`** under **`/fliptimer/sounds/`** (broken). Earlier: **Sounds playback:** **`URL`**, **`canplay`** + **`playsInline`**, gesture unlock for autoplay. Earlier: **Preloaded** sounds list: dev middleware builds **`/sounds/manifest.json`** from disk; client uses **`cache: false`** and refetch when opening Timer settings; BrowserSync watches **`sounds/**/*`**. Earlier: Timer settings **Sounds**: **Preloaded** / **Upload** segmented control, **`soundSource`** / **`soundPreloaded`** in **`fliptimer.json`** when Preloaded. Earlier: **`fliptimer.json`** includes **sounds** / **soundFileNames** (dev sync + first-run seed with presets). Earlier: Renamed **`preset-timers.json`** → **`fliptimer.json`**. Earlier: **Preset timers** modal: **draggable** by header (**`.preset-modal__header`**); panel **fixed** + **`.preset-modal__body`** scroll. Earlier: **`npm run test:preset-save`** (Playwright) documents **`FLIPTIMER_TEST_URL`** when BrowserSync is not on port **3000**. Earlier: **BrowserSync** **`watchOptions.ignored`** preset JSON file. Earlier: **Git:** local repo initialized. Earlier: **Chrome dim idle + keyboard**; **preset form** submit; **Timer settings on Add/Save**.
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests.
+
+### Development Guidelines
+- Follow the existing code style and conventions.
+- Edit SCSS files, not compiled CSS.
+- Test changes in both development and production builds.
+- Ensure mobile responsiveness is maintained.
+- Add comments for complex logic.
+
+## 📄 License
+
+This project is licensed under the MIT License. Feel free to use it in your own projects!
+
+---
+Built with ❤️ using vanilla JavaScript and CSS.
