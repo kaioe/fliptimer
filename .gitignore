@@ -8,6 +8,7 @@ node_modules/
 # Build artifacts
 *.css.map
 *.js.map
+dist/
 
 # OS files
 .DS_Store
