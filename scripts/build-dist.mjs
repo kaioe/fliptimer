@@ -45,10 +45,10 @@ function copyDirRecursive(srcDir, destDir) {
 function transformHtmlForDist(html) {
 	return html
 		.replace(
-			/src="\/node_modules\/jquery\/dist\/jquery\.min\.js"/g,
+			/src="https:\/\/code\.jquery\.com\/jquery-3\.7\.1\.min\.js"/g,
 			'src="./vendor/jquery.min.js"'
 		)
-		.replace(/src="\/fliptimer\.js(?:\?[^"]*)?"/g, 'src="./fliptimer.js"');
+		.replace(/src="\.\/fliptimer\.js(?:\?[^"]*)?"/g, 'src="./fliptimer.js"');
 }
 
 function main() {
