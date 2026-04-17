@@ -4,27 +4,27 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="theme-color" content="#929090" />
-		<title>Flip Clock</title>
+		<title>FlipTimer</title>
 		<link rel="icon" href="./favicon.svg?v=20260328" type="image/svg+xml" />
-		<link rel="stylesheet" href="./flipClock.css?v=20260329-28" />
-		<script src="/node_modules/jquery/dist/jquery.min.js"></script>
-		<script src="/flipClock.js?v=20260329-56"></script>
+		<link rel="stylesheet" href="./fliptimer.css?v=20260329-28" />
+		<script src="./vendor/jquery.min.js"></script>
+		<script src="./fliptimer.js"></script>
 	</head>
 	<body>
 		<div class="container">
-			<div class="flipclock-toolbar">
-				<button type="button" class="flipclock-toolbar__btn flipclock-toolbar__btn--icon" id="clock-play-pause-btn" aria-label="Play">
+			<div class="fliptimer-toolbar">
+				<button type="button" class="fliptimer-toolbar__btn fliptimer-toolbar__btn--icon" id="clock-play-pause-btn" aria-label="Play">
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
 						<polygon points="8 5 8 19 19 12 8 5" />
 					</svg>
 				</button>
-				<button type="button" class="flipclock-toolbar__btn flipclock-toolbar__btn--icon" id="clock-reset-btn" aria-label="Reset timer">
+				<button type="button" class="fliptimer-toolbar__btn fliptimer-toolbar__btn--icon" id="clock-reset-btn" aria-label="Reset timer">
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
 						<path d="M3 3v5h5" />
 					</svg>
 				</button>
-				<button type="button" class="flipclock-toolbar__btn flipclock-toolbar__btn--icon" id="preset-open-btn" aria-haspopup="dialog" aria-expanded="false" aria-label="Presets">
+				<button type="button" class="fliptimer-toolbar__btn fliptimer-toolbar__btn--icon" id="preset-open-btn" aria-haspopup="dialog" aria-expanded="false" aria-label="Presets">
 					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<line x1="4" y1="21" x2="4" y2="14" />
 						<line x1="4" y1="10" x2="4" y2="3" />
@@ -80,7 +80,7 @@
 						<div class="preset-settings-inline__scroll">
 							<section class="preset-settings-section">
 								<div class="preset-settings-section__sub-row">
-									<label class="preset-settings-section__label" for="flipclock-preset-track-max">Track range (max minutes)</label>
+									<label class="preset-settings-section__label" for="fliptimer-preset-track-max">Track range (max minutes)</label>
 									<button type="button" class="preset-settings-info-btn preset-settings-info-btn--hint" aria-label="About track range" aria-describedby="preset-track-range-hint-desc" data-tooltip="Applies to the duration and interval sliders (10–60&nbsp;min, steps of 5).">
 										<span class="preset-settings-info-icon" aria-hidden="true">i</span>
 									</button>
@@ -92,11 +92,11 @@
 											<div class="preset-counter-size-rail">
 												<div class="preset-counter-size-ticks" aria-hidden="true"></div>
 												<div class="preset-counter-size-fill" aria-hidden="true"></div>
-												<input type="range" id="flipclock-preset-track-max" class="preset-counter-size-input" min="10" max="60" step="5" value="10" aria-valuemin="10" aria-valuemax="60" aria-valuenow="10" aria-label="Maximum minutes for duration and interval sliders" />
+												<input type="range" id="fliptimer-preset-track-max" class="preset-counter-size-input" min="10" max="60" step="5" value="10" aria-valuemin="10" aria-valuemax="60" aria-valuenow="10" aria-label="Maximum minutes for duration and interval sliders" />
 											</div>
 										</div>
 									</div>
-									<output class="preset-settings-range-out" id="flipclock-preset-track-max-out" for="flipclock-preset-track-max">10 min</output>
+									<output class="preset-settings-range-out" id="fliptimer-preset-track-max-out" for="fliptimer-preset-track-max">10 min</output>
 								</div>
 							</section>
 
@@ -185,11 +185,11 @@
 							<section class="preset-settings-section">
 								<div class="preset-settings-section__sub-row">
 									<h4 class="preset-settings-section__sub" id="preset-bg-heading">App background</h4>
-									<button type="button" class="preset-settings-info-btn preset-settings-info-btn--hint" aria-label="About app background" aria-describedby="preset-bg-info-desc" data-tooltip="Optional full-page image behind the clock. Images are resized (max ~1920px long edge) and recompressed (WebP or JPEG). The image is stored as a base64 data URL in flipClock.json with your presets when using npm run dev. Without the dev server, settings stay in this browser only. Drag and drop an image onto the field or use Upload.">
+									<button type="button" class="preset-settings-info-btn preset-settings-info-btn--hint" aria-label="About app background" aria-describedby="preset-bg-info-desc" data-tooltip="Optional full-page image behind the clock. Images are resized (max ~1920px long edge) and recompressed (WebP or JPEG). The image is stored as a base64 data URL in fliptimer.json with your presets when using npm run dev. Without the dev server, settings stay in this browser only. Drag and drop an image onto the field or use Upload.">
 										<span class="preset-settings-info-icon" aria-hidden="true">i</span>
 									</button>
 								</div>
-								<p id="preset-bg-info-desc" class="preset-settings-sr-only">Optional full-page image behind the clock. Images are resized (max ~1920px long edge) and recompressed (WebP or JPEG). The image is stored as a base64 data URL in flipClock.json with your presets when using npm run dev. Without the dev server, settings stay in this browser only. Drag and drop an image onto the field or use Upload.</p>
+								<p id="preset-bg-info-desc" class="preset-settings-sr-only">Optional full-page image behind the clock. Images are resized (max ~1920px long edge) and recompressed (WebP or JPEG). The image is stored as a base64 data URL in fliptimer.json with your presets when using npm run dev. Without the dev server, settings stay in this browser only. Drag and drop an image onto the field or use Upload.</p>
 								<ul class="preset-settings-sounds">
 									<li class="preset-settings-upload-row">
 										<span class="preset-settings-upload-row__label" id="preset-bg-upload-lbl">Image</span>
@@ -211,7 +211,7 @@
 
 							<section class="preset-settings-section">
 								<div class="preset-settings-section__sub-row">
-									<label class="preset-settings-section__label" for="flipclock-counter-size">Counter size (% of viewport)</label>
+									<label class="preset-settings-section__label" for="fliptimer-counter-size">Counter size (% of viewport)</label>
 									<button type="button" class="preset-settings-info-btn preset-settings-info-btn--hint" aria-label="About counter size" aria-describedby="preset-counter-size-hint-desc" data-tooltip="Height scales with the smaller of viewport width or height.">
 										<span class="preset-settings-info-icon" aria-hidden="true">i</span>
 									</button>
@@ -223,11 +223,11 @@
 											<div class="preset-counter-size-rail">
 												<div class="preset-counter-size-ticks" aria-hidden="true"></div>
 												<div class="preset-counter-size-fill" aria-hidden="true"></div>
-												<input type="range" id="flipclock-counter-size" class="preset-counter-size-input" min="5" max="95" step="5" value="10" aria-valuemin="5" aria-valuemax="95" aria-valuenow="10" aria-label="Counter size as percent of viewport" />
+												<input type="range" id="fliptimer-counter-size" class="preset-counter-size-input" min="5" max="95" step="5" value="10" aria-valuemin="5" aria-valuemax="95" aria-valuenow="10" aria-label="Counter size as percent of viewport" />
 											</div>
 										</div>
 									</div>
-									<output class="preset-settings-range-out" id="flipclock-counter-size-out" for="flipclock-counter-size">10%</output>
+									<output class="preset-settings-range-out" id="fliptimer-counter-size-out" for="fliptimer-counter-size">10%</output>
 								</div>
 							</section>
 						</div>

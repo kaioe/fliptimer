@@ -19,7 +19,7 @@ try {
 	await page.waitForSelector("#preset-open-btn", { state: "visible", timeout: 15000 });
 
 	await page.evaluate(() => {
-		window.__flipclockNoReloadMarker = "preset-save-test";
+		window.__fliptimerNoReloadMarker = "preset-save-test";
 	});
 
 	await page.click("#preset-open-btn");
@@ -40,7 +40,7 @@ try {
 
 	await page.waitForTimeout(1200);
 
-	const marker = await page.evaluate(() => window.__flipclockNoReloadMarker);
+	const marker = await page.evaluate(() => window.__fliptimerNoReloadMarker);
 	const modalOpen = await page.evaluate(() => {
 		const m = document.getElementById("preset-modal");
 		return m && !m.hasAttribute("hidden");
@@ -48,7 +48,7 @@ try {
 
 	if (marker !== "preset-save-test") {
 		throw new Error(
-			`Full reload suspected: window.__flipclockNoReloadMarker is ${JSON.stringify(marker)} (expected "preset-save-test"). loadEventCount=${loadEventCount}`,
+			`Full reload suspected: window.__fliptimerNoReloadMarker is ${JSON.stringify(marker)} (expected "preset-save-test"). loadEventCount=${loadEventCount}`,
 		);
 	}
 	if (loadEventCount !== 1) {

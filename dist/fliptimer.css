@@ -1,6 +1,6 @@
 /** Flip digit panels: no preset uses default `--flip-digit-bg`. Active preset sets bg; light colors also set `--flip-digit-fg` / colon vars via JS. */
 :root {
-  --flipclock-counter-pct: 12;
+  --fliptimer-counter-pct: 12;
 }
 
 html {
@@ -24,9 +24,9 @@ body {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
   background: radial-gradient(ellipse at center, rgb(204, 203, 203) 0%, rgb(146, 144, 144) 100%);
 }
-body.flipclock-custom-bg {
+body.fliptimer-custom-bg {
   background-color: rgb(146, 144, 144);
-  background-image: var(--flipclock-bg-image);
+  background-image: var(--fliptimer-bg-image);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -59,7 +59,7 @@ body.flipclock-custom-bg {
   }
 }
 
-.flipclock-toolbar {
+.fliptimer-toolbar {
   width: 100%;
   align-self: stretch;
   display: flex;
@@ -70,14 +70,14 @@ body.flipclock-custom-bg {
   row-gap: 8px;
   transition: opacity 0.35s ease;
 }
-.flipclock-toolbar.flipclock-chrome-dimmed {
+.fliptimer-toolbar.fliptimer-chrome-dimmed {
   opacity: 0.05;
 }
-.flipclock-toolbar.flipclock-idle-clock {
+.fliptimer-toolbar.fliptimer-idle-clock {
   opacity: 0;
 }
 
-.flipclock-toolbar__btn {
+.fliptimer-toolbar__btn {
   font: inherit;
   font-size: 12px;
   padding: 6px 12px;
@@ -89,18 +89,18 @@ body.flipclock-custom-bg {
   border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
-.flipclock-toolbar__btn:hover:not(:disabled) {
+.fliptimer-toolbar__btn:hover:not(:disabled) {
   background: linear-gradient(to bottom, #555, #383838);
 }
-.flipclock-toolbar__btn:focus-visible {
+.fliptimer-toolbar__btn:focus-visible {
   outline: 2px solid #8fd;
   outline-offset: 2px;
 }
-.flipclock-toolbar__btn:disabled {
+.fliptimer-toolbar__btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
-.flipclock-toolbar__btn--icon {
+.fliptimer-toolbar__btn--icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -110,12 +110,12 @@ body.flipclock-custom-bg {
   line-height: 0;
   touch-action: manipulation;
 }
-.flipclock-toolbar__btn--icon svg {
+.fliptimer-toolbar__btn--icon svg {
   display: block;
   flex-shrink: 0;
 }
 @media (pointer: coarse) {
-  .flipclock-toolbar__btn--icon {
+  .fliptimer-toolbar__btn--icon {
     min-width: 44px;
     min-height: 44px;
     padding: 8px 12px;
@@ -141,10 +141,10 @@ body.flipclock-custom-bg {
   text-align: left;
   transition: opacity 0.35s ease;
 }
-.active-preset.flipclock-chrome-dimmed {
+.active-preset.fliptimer-chrome-dimmed {
   opacity: 0.05;
 }
-.active-preset.flipclock-idle-clock {
+.active-preset.fliptimer-idle-clock {
   opacity: 0;
 }
 .active-preset__clear {
@@ -247,12 +247,12 @@ body.flipclock-custom-bg {
   justify-content: center;
   width: max-content;
   max-width: none;
-  height: calc(var(--flipclock-counter-pct, 12) / 100 * min(100vw, 100vh));
+  height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100vw, 100vh));
   min-height: 72px;
 }
 @supports (width: 1dvw) {
   .countdown {
-    height: calc(var(--flipclock-counter-pct, 12) / 100 * min(100dvw, 100dvh));
+    height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100dvw, 100dvh));
   }
 }
 .countdown {

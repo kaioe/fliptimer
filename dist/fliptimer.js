@@ -1,5 +1,5 @@
 /**
- * FlipClock — jQuery flip-digit countdown / clock
+ * Fliptimer — jQuery flip-digit countdown / clock
  * Organized: bootstrap → config → features → layout → markup → time API → tick engine
  */
 (function ($, window) {
@@ -51,7 +51,7 @@
 	 * @param {Object} options — merged with defaults via createConfig
 	 * @constructor
 	 */
-	function FlipClock(options) {
+	function Fliptimer(options) {
 		this.tickInterval = false;
 		/** True while the 5s prep countdown runs (before the main interval starts). */
 		this.prepCountdownActive = false;
@@ -64,11 +64,11 @@
 	// Configuration
 	// -------------------------------------------------------------------------
 
-	FlipClock.prototype.createConfig = function (options) {
+	Fliptimer.prototype.createConfig = function (options) {
 		return $.extend({}, this.getDefaultConfig(), options);
 	};
 
-	FlipClock.prototype.getDefaultConfig = function () {
+	Fliptimer.prototype.getDefaultConfig = function () {
 		return {
 			tickDuration: 1000,
 			isCountdown: false,
@@ -76,7 +76,7 @@
 			maxTime: "23:59:59",
 			minTime: "00:00:00",
 			containerElement: $(".container"),
-			segmentSelectorPrefix: "flipclock-",
+			segmentSelectorPrefix: "fliptimer-",
 			face: {
 				hours: { maxValue: 23 },
 				minutes: { maxValue: 59 },
@@ -89,7 +89,7 @@
 	// Feature detection
 	// -------------------------------------------------------------------------
 
-	FlipClock.prototype.initFeatureDetection = function () {
+	Fliptimer.prototype.initFeatureDetection = function () {
 		if (typeof $.support === "undefined") {
 			$.support = {};
 		}
@@ -100,7 +100,7 @@
 	 * @param {string} feature — e.g. "transition"
 	 * @returns {boolean}
 	 */
-	FlipClock.prototype.isFeatureSupported = function (feature) {
+	Fliptimer.prototype.isFeatureSupported = function (feature) {
 		if (!feature || typeof $.support === "undefined") {
 			return false;
 		}
@@ -111,7 +111,7 @@
 	// Lifecycle & layout
 	// -------------------------------------------------------------------------
 
-	FlipClock.prototype.init = function () {
+	Fliptimer.prototype.init = function () {
 		var container = this.options.containerElement;
 		container.empty();
 
@@ -126,7 +126,7 @@
 		this.start();
 	};
 
-	FlipClock.prototype.setupFallbacks = function () {
+	Fliptimer.prototype.setupFallbacks = function () {
 		this.initFeatureDetection();
 		var container = this.options.containerElement;
 		var firstFlip = $("ul.flip li:first-child", container);
@@ -139,7 +139,7 @@
 		}
 	};
 
-	FlipClock.prototype.setDimensions = function () {
+	Fliptimer.prototype.setDimensions = function () {
 		var container = this.options.containerElement;
 		var el = container[0];
 		var flipHeight = container.height();
@@ -165,7 +165,7 @@
 	// Markup: segments & digits
 	// -------------------------------------------------------------------------
 
-	FlipClock.prototype.createSegment = function (faceSegmentGroupName) {
+	Fliptimer.prototype.createSegment = function (faceSegmentGroupName) {
 		var faceSegmentGroup = this.options.face[faceSegmentGroupName];
 		var addons = ["-ten", "-one"];
 		var prefix = this.options.segmentSelectorPrefix;
@@ -180,7 +180,7 @@
 		return [{ selector: prefix + faceSegmentGroupName + addons[1], ticks: 10 }];
 	};
 
-	FlipClock.prototype.appendMarkupToContainer = function () {
+	Fliptimer.prototype.appendMarkupToContainer = function () {
 		var baseZIndex = 0;
 		var container = this.options.containerElement;
 		var face = this.options.face;
@@ -205,7 +205,7 @@
 		this.digitSelectors.reverse();
 	};
 
-	FlipClock.prototype.createFaceSegment = function (faceSegment) {
+	Fliptimer.prototype.createFaceSegment = function (faceSegment) {
 		var faceElement = $("<ul>", { class: "flip " + faceSegment.selector });
 		for (var i = 0; i < faceSegment.ticks; i++) {
 			faceElement.append(this.createFaceDigit(i));
@@ -213,7 +213,7 @@
 		return faceElement;
 	};
 
-	FlipClock.prototype.createFaceDigit = function (digit) {
+	Fliptimer.prototype.createFaceDigit = function (digit) {
 		var inner = '<div class="shadow"></div><div class="inn">' + digit + "</div>";
 		var span = '<div class="up">' + inner + "</div>" + '<div class="down">' + inner + "</div>";
 		return "<li data-digit=" + digit + " ><span>" + span + "</span></li>";
@@ -226,7 +226,7 @@
 	/**
 	 * @param {boolean} [resumeOnly] — if true, keep the current face state (use after pause). If false/omitted, snap display to `startTime` (initial run / full restart).
 	 */
-	FlipClock.prototype.start = function (resumeOnly) {
+	Fliptimer.prototype.start = function (resumeOnly) {
 		if (!resumeOnly) {
 			this.setToTime(this.options.startTime);
 		}
@@ -236,12 +236,12 @@
 		}, this.options.tickDuration);
 	};
 
-	FlipClock.prototype.stop = function () {
+	Fliptimer.prototype.stop = function () {
 		clearInterval(this.tickInterval);
 		this.tickInterval = false;
 	};
 
-	FlipClock.prototype.resetDigits = function () {
+	Fliptimer.prototype.resetDigits = function () {
 		var container = this.options.containerElement;
 		container.removeClass("play");
 
@@ -261,7 +261,7 @@
 		container.addClass("play");
 	};
 
-	FlipClock.prototype.setToTime = function (time) {
+	Fliptimer.prototype.setToTime = function (time) {
 		var timeArray = time.replace(/:/g, "").split("").reverse();
 		var container = this.options.containerElement;
 
@@ -281,7 +281,7 @@
 		container.addClass("play");
 	};
 
-	FlipClock.prototype.setFaceSegmentGroupMaxValue = function (segmentGroupName) {
+	Fliptimer.prototype.setFaceSegmentGroupMaxValue = function (segmentGroupName) {
 		var self = this;
 		var container = this.options.containerElement;
 		var group = this.getFaceSegmentGroupDom(segmentGroupName);
@@ -297,7 +297,7 @@
 		});
 	};
 
-	FlipClock.prototype.tick = function () {
+	Fliptimer.prototype.tick = function () {
 		this.doTick(0);
 	};
 
@@ -305,7 +305,7 @@
 	// Time queries & selectors
 	// -------------------------------------------------------------------------
 
-	FlipClock.prototype.getCurrentTime = function () {
+	Fliptimer.prototype.getCurrentTime = function () {
 		var currentTime = [];
 		$("li.current", this.options.containerElement).each(function () {
 			currentTime.push($(this).data("digit"));
@@ -313,27 +313,27 @@
 		return parseInt(currentTime.join(""), 10);
 	};
 
-	FlipClock.prototype.getDigitSelectorByIndex = function (digitIndex) {
+	Fliptimer.prototype.getDigitSelectorByIndex = function (digitIndex) {
 		return "ul." + this.digitSelectors[digitIndex] + " li";
 	};
 
-	FlipClock.prototype.getFaceSegmentGroupNameByDigitElement = function (digitElement) {
+	Fliptimer.prototype.getFaceSegmentGroupNameByDigitElement = function (digitElement) {
 		return digitElement.parent().data("face-segment-group");
 	};
 
-	FlipClock.prototype.getFaceSegmentByDigitElement = function (digitElement) {
+	Fliptimer.prototype.getFaceSegmentByDigitElement = function (digitElement) {
 		return this.options.face[this.getFaceSegmentGroupNameByDigitElement(digitElement)];
 	};
 
-	FlipClock.prototype.getFaceSegmentGroupDom = function (segmentGroupName) {
+	Fliptimer.prototype.getFaceSegmentGroupDom = function (segmentGroupName) {
 		return $("." + segmentGroupName, this.options.containerElement);
 	};
 
-	FlipClock.prototype.getCurrentDigitDom = function (segmentGroupName) {
+	Fliptimer.prototype.getCurrentDigitDom = function (segmentGroupName) {
 		return $("." + segmentGroupName + " li.current", this.options.containerElement);
 	};
 
-	FlipClock.prototype.getCurrentFaceSegmentGroupValue = function (digitElement) {
+	Fliptimer.prototype.getCurrentFaceSegmentGroupValue = function (digitElement) {
 		var segmentGroupName = this.getFaceSegmentGroupNameByDigitElement(digitElement);
 		var values = [];
 		this.getCurrentDigitDom(segmentGroupName).each(function (idx) {
@@ -342,11 +342,11 @@
 		return values.join("");
 	};
 
-	FlipClock.prototype.isMaxTimeReached = function () {
+	Fliptimer.prototype.isMaxTimeReached = function () {
 		return this.getCurrentTime() >= timeStringToComparableInt(this.options.maxTime);
 	};
 
-	FlipClock.prototype.isMinTimeReached = function () {
+	Fliptimer.prototype.isMinTimeReached = function () {
 		return this.getCurrentTime() <= timeStringToComparableInt(this.options.minTime);
 	};
 
@@ -354,7 +354,7 @@
 	// Tick engine
 	// -------------------------------------------------------------------------
 
-	FlipClock.prototype.doTick = function (digitIndex) {
+	Fliptimer.prototype.doTick = function (digitIndex) {
 		var opts = this.options;
 		var container = opts.containerElement;
 		var isDown = opts.isCountdown === true;
@@ -385,7 +385,7 @@
 
 			if (isDown && this.isMinTimeReached()) {
 				this.stop();
-				opts.containerElement.trigger("flipclock:countdown-complete");
+				opts.containerElement.trigger("fliptimer:countdown-complete");
 				return;
 			}
 
@@ -420,7 +420,7 @@
 		this.cleanZIndexFix(activeDigit, this.digitSelectors[digitIndex]);
 	};
 
-	FlipClock.prototype.cleanZIndexFix = function (activeDigit, selector) {
+	Fliptimer.prototype.cleanZIndexFix = function (activeDigit, selector) {
 		var container = this.options.containerElement;
 		if (this.options.isCountdown === true) {
 			var fix = $("." + selector + " .countdownFix", container);
@@ -436,24 +436,24 @@
 	// Export & page bootstrap
 	// -------------------------------------------------------------------------
 
-	window.FlipClock = FlipClock;
+	window.Fliptimer = Fliptimer;
 
 	// -------------------------------------------------------------------------
-	// Preset timers (CRUD + optional sync of flipClock.json via dev server)
+	// Preset timers (CRUD + optional sync of fliptimer.json via dev server)
 	// -------------------------------------------------------------------------
 
-	var PRESET_STORAGE_KEY = "flipclock-preset-timers-v1";
-	var ACTIVE_PRESET_ID_STORAGE_KEY = "flipclock-active-preset-id-v1";
-	var PRESET_SLIDER_THUMBS_KEY = "flipclock-preset-slider-thumbs-v1";
-	var PRESET_TRACK_MAX_KEY = "flipclock-preset-track-max-v1";
-	var FLIPCLOCK_COUNTER_PCT_KEY = "flipclock-counter-pct-v1";
-	var FLIPCLOCK_SOUNDS_KEY = "flipclock-sounds-v1";
-	var FLIPCLOCK_SOUND_NAMES_KEY = "flipclock-sound-filenames-v1";
-	var FLIPCLOCK_SOUND_SOURCE_KEY = "flipclock-sound-source-v1";
-	var FLIPCLOCK_SOUND_PRELOADED_KEY = "flipclock-sound-preloaded-v1";
+	var PRESET_STORAGE_KEY = "fliptimer-preset-timers-v1";
+	var ACTIVE_PRESET_ID_STORAGE_KEY = "fliptimer-active-preset-id-v1";
+	var PRESET_SLIDER_THUMBS_KEY = "fliptimer-preset-slider-thumbs-v1";
+	var PRESET_TRACK_MAX_KEY = "fliptimer-preset-track-max-v1";
+	var FLIPTIMER_COUNTER_PCT_KEY = "fliptimer-counter-pct-v1";
+	var FLIPTIMER_SOUNDS_KEY = "fliptimer-sounds-v1";
+	var FLIPTIMER_SOUND_NAMES_KEY = "fliptimer-sound-filenames-v1";
+	var FLIPTIMER_SOUND_SOURCE_KEY = "fliptimer-sound-source-v1";
+	var FLIPTIMER_SOUND_PRELOADED_KEY = "fliptimer-sound-preloaded-v1";
 	var SOUNDS_MANIFEST_URL = "sounds/manifest.json";
-	var FLIPCLOCK_APP_BG_KEY = "flipclock-app-bg-v1";
-	var PRESET_JSON_FILE = "flipClock.json";
+	var FLIPTIMER_APP_BG_KEY = "fliptimer-app-bg-v1";
+	var PRESET_JSON_FILE = "fliptimer.json";
 	/** Keys for Timer settings → Sounds (must match `data-sound-kind` in HTML). */
 	var PRESET_SOUND_KINDS = ["start", "pause", "finish"];
 
@@ -497,7 +497,7 @@
 	var COUNTER_SIZE_MIN = 5;
 	var COUNTER_SIZE_MAX = 95;
 	var COUNTER_SIZE_STEP = 5;
-	/** Matches `$preset-counter-thumb-half` / 20px thumb in `flipClock.scss`. */
+	/** Matches `$preset-counter-thumb-half` / 20px thumb in `fliptimer.scss`. */
 	var COUNTER_SIZE_RAIL_PAD_PX = 10;
 	var COUNTER_SIZE_THUMB_PX = 20;
 
@@ -539,7 +539,7 @@
 
 	/** Refills both counter-size and track-max range inputs (same `.preset-counter-size-*` component). */
 	function refreshPresetCounterSizeRangeFills() {
-		var ids = ["flipclock-counter-size", "flipclock-preset-track-max"];
+		var ids = ["fliptimer-counter-size", "fliptimer-preset-track-max"];
 		for (var ii = 0; ii < ids.length; ii++) {
 			var el = document.getElementById(ids[ii]);
 			if (!el) {
@@ -637,7 +637,7 @@
 
 	function loadCounterSizePct() {
 		try {
-			var raw = localStorage.getItem(FLIPCLOCK_COUNTER_PCT_KEY);
+			var raw = localStorage.getItem(FLIPTIMER_COUNTER_PCT_KEY);
 			if (raw === null) {
 				return snapCounterSizePct(12);
 			}
@@ -653,7 +653,7 @@
 
 	function applyCounterSizePct(pct, clock) {
 		try {
-			document.documentElement.style.setProperty("--flipclock-counter-pct", String(pct));
+			document.documentElement.style.setProperty("--fliptimer-counter-pct", String(pct));
 		} catch (e) {
 			/* ignore */
 		}
@@ -664,7 +664,7 @@
 
 	function loadSoundsFromStorage() {
 		try {
-			var raw = localStorage.getItem(FLIPCLOCK_SOUNDS_KEY);
+			var raw = localStorage.getItem(FLIPTIMER_SOUNDS_KEY);
 			if (raw === null || raw === "") {
 				return {};
 			}
@@ -680,7 +680,7 @@
 
 	function saveSoundsToStorage(obj) {
 		try {
-			localStorage.setItem(FLIPCLOCK_SOUNDS_KEY, JSON.stringify(obj));
+			localStorage.setItem(FLIPTIMER_SOUNDS_KEY, JSON.stringify(obj));
 		} catch (e) {
 			window.alert("Could not save sounds (storage may be full). Try shorter files or clear other site data.");
 		}
@@ -688,7 +688,7 @@
 
 	function loadSoundNamesFromStorage() {
 		try {
-			var raw = localStorage.getItem(FLIPCLOCK_SOUND_NAMES_KEY);
+			var raw = localStorage.getItem(FLIPTIMER_SOUND_NAMES_KEY);
 			if (raw === null || raw === "") {
 				return {};
 			}
@@ -704,7 +704,7 @@
 
 	function saveSoundNamesToStorage(obj) {
 		try {
-			localStorage.setItem(FLIPCLOCK_SOUND_NAMES_KEY, JSON.stringify(obj));
+			localStorage.setItem(FLIPTIMER_SOUND_NAMES_KEY, JSON.stringify(obj));
 		} catch (e) {
 			/* ignore */
 		}
@@ -712,7 +712,7 @@
 
 	function loadSoundSourceFromStorage() {
 		try {
-			var raw = localStorage.getItem(FLIPCLOCK_SOUND_SOURCE_KEY);
+			var raw = localStorage.getItem(FLIPTIMER_SOUND_SOURCE_KEY);
 			if (raw === "preloaded" || raw === "upload") {
 				return raw;
 			}
@@ -725,7 +725,7 @@
 	function saveSoundSourceToStorage(mode) {
 		try {
 			if (mode === "preloaded" || mode === "upload") {
-				localStorage.setItem(FLIPCLOCK_SOUND_SOURCE_KEY, mode);
+				localStorage.setItem(FLIPTIMER_SOUND_SOURCE_KEY, mode);
 			}
 		} catch (e) {
 			/* ignore */
@@ -743,7 +743,7 @@
 	function loadPreloadedSoundSelectionsFromStorage() {
 		var empty = emptyPreloadedSoundSelections();
 		try {
-			var raw = localStorage.getItem(FLIPCLOCK_SOUND_PRELOADED_KEY);
+			var raw = localStorage.getItem(FLIPTIMER_SOUND_PRELOADED_KEY);
 			if (raw === null || raw === "") {
 				return empty;
 			}
@@ -765,7 +765,7 @@
 
 	function savePreloadedSoundSelectionsToStorage(obj) {
 		try {
-			localStorage.setItem(FLIPCLOCK_SOUND_PRELOADED_KEY, JSON.stringify(obj));
+			localStorage.setItem(FLIPTIMER_SOUND_PRELOADED_KEY, JSON.stringify(obj));
 		} catch (e) {
 			/* ignore */
 		}
@@ -773,8 +773,8 @@
 
 	/**
 	 * Base URL for resolving `sounds/...` paths. Strips a trailing slash from the path so
-	 * `http://host/flipClock/` does not resolve `sounds/x` to `http://host/flipClock/sounds/x` (404);
-	 * without the slash, resolution matches `flipClock.html` + sibling `sounds/` → `/sounds/x`.
+	 * `http://host/fliptimer/` does not resolve `sounds/x` to `http://host/fliptimer/sounds/x` (404);
+	 * without the slash, resolution matches `fliptimer.html` + sibling `sounds/` → `/sounds/x`.
 	 */
 	function baseHrefForSoundRelativeUrl() {
 		if (typeof URL === "undefined" || typeof location === "undefined" || !location.href) {
@@ -893,37 +893,37 @@
 	}
 
 	/** Tiny silent WAV — played once after user gesture so browsers allow later HTMLAudio playback (e.g. finish sound without a click). */
-	var FLIPCLOCK_SILENT_WAV =
+	var FLIPTIMER_SILENT_WAV =
 		"data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQAAAAA=";
 
-	var flipClockAudioUnlockDone = false;
+	var fliptimerAudioUnlockDone = false;
 	/** Shared Web Audio context (prep beeps + unlock). */
-	var flipClockSharedAudioContext = null;
+	var fliptimerSharedAudioContext = null;
 
 	/**
-	 * Wall time for one full digit flip (ms). Must match `flipClock.scss` stacked halves:
+	 * Wall time for one full digit flip (ms). Must match `fliptimer.scss` stacked halves:
 	 * `$anim-delay-stack` + `$anim-flip` → 0.5s + 0.5s. Used only for prep beep timing (not in `doTick`).
 	 */
-	var FLIPCLOCK_PREP_FLIP_MS = 1000;
+	var FLIPTIMER_PREP_FLIP_MS = 1000;
 	/** Extra ms after full flip duration if `animationend` never fires (slow devices, reduced motion). */
-	var FLIPCLOCK_PREP_FLIP_FALLBACK_PAD_MS = 400;
+	var FLIPTIMER_PREP_FLIP_FALLBACK_PAD_MS = 400;
 	/**
 	 * Countdown `setInterval` must tick **after** the stacked CSS flip finishes (~1000ms). 50ms buffer avoids
 	 * `removeClass("play")` mid-animation on the main timer (same torn-digit glitch as prep).
 	 */
-	var FLIPCLOCK_COUNTDOWN_TICK_BUFFER_MS = 50;
+	var FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS = 50;
 
-	function getFlipClockSharedAudioContext() {
-		if (flipClockSharedAudioContext) {
-			return flipClockSharedAudioContext;
+	function getFliptimerSharedAudioContext() {
+		if (fliptimerSharedAudioContext) {
+			return fliptimerSharedAudioContext;
 		}
 		try {
 			var Ctx = window.AudioContext || window.webkitAudioContext;
 			if (!Ctx) {
 				return null;
 			}
-			flipClockSharedAudioContext = new Ctx();
-			return flipClockSharedAudioContext;
+			fliptimerSharedAudioContext = new Ctx();
+			return fliptimerSharedAudioContext;
 		} catch (e) {
 			return null;
 		}
@@ -931,7 +931,7 @@
 
 	/** Short sine beep for prep countdown (one per second). */
 	function playPrepCountdownBeep() {
-		var ctx = getFlipClockSharedAudioContext();
+		var ctx = getFliptimerSharedAudioContext();
 		if (!ctx) {
 			return;
 		}
@@ -956,13 +956,13 @@
 		}
 	}
 
-	function flipClockUnlockHtmlAudioIfNeeded() {
-		if (flipClockAudioUnlockDone) {
+	function fliptimerUnlockHtmlAudioIfNeeded() {
+		if (fliptimerAudioUnlockDone) {
 			return;
 		}
-		flipClockAudioUnlockDone = true;
+		fliptimerAudioUnlockDone = true;
 		try {
-			var a = new Audio(FLIPCLOCK_SILENT_WAV);
+			var a = new Audio(FLIPTIMER_SILENT_WAV);
 			a.volume = 0;
 			var p = a.play();
 			if (p && typeof p.catch === "function") {
@@ -972,7 +972,7 @@
 			/* ignore */
 		}
 		try {
-			var ctx = getFlipClockSharedAudioContext();
+			var ctx = getFliptimerSharedAudioContext();
 			if (ctx && ctx.state === "suspended" && typeof ctx.resume === "function") {
 				ctx.resume().catch(function () {});
 			}
@@ -981,7 +981,7 @@
 		}
 	}
 
-	function playFlipClockSound(kind) {
+	function playFliptimerSound(kind) {
 		var url = resolveSoundUrlForKind(kind);
 		if (!url || typeof url !== "string") {
 			return;
@@ -1353,7 +1353,7 @@
 		}
 	}
 
-	/** Loads flipClock.json: presets, optional app background, optional sounds (see `applySoundsFromJsonRoot`). */
+	/** Loads fliptimer.json: presets, optional app background, optional sounds (see `applySoundsFromJsonRoot`). */
 	function fetchPresetTimersDocument() {
 		return $.getJSON(PRESET_JSON_FILE)
 			.then(function (data) {
@@ -1379,7 +1379,7 @@
 		return s;
 	}
 
-	/** Reads optional sound mode, preloaded filenames, and `sounds` / `soundFileNames` from flipClock.json (first-run seed). */
+	/** Reads optional sound mode, preloaded filenames, and `sounds` / `soundFileNames` from fliptimer.json (first-run seed). */
 	function applySoundsFromJsonRoot(root) {
 		if (!root || typeof root !== "object") {
 			return;
@@ -1594,7 +1594,7 @@
 
 	function loadAppBgStateFromStorage() {
 		try {
-			var raw = localStorage.getItem(FLIPCLOCK_APP_BG_KEY);
+			var raw = localStorage.getItem(FLIPTIMER_APP_BG_KEY);
 			if (raw === null || raw === "") {
 				return null;
 			}
@@ -1645,33 +1645,33 @@
 			return;
 		}
 		if (!state) {
-			body.classList.remove("flipclock-custom-bg");
-			body.style.removeProperty("--flipclock-bg-image");
+			body.classList.remove("fliptimer-custom-bg");
+			body.style.removeProperty("--fliptimer-bg-image");
 			return;
 		}
 		var token = cssUrlTokenForBg(state.dataUrl);
 		if (token === "none") {
-			body.classList.remove("flipclock-custom-bg");
-			body.style.removeProperty("--flipclock-bg-image");
+			body.classList.remove("fliptimer-custom-bg");
+			body.style.removeProperty("--fliptimer-bg-image");
 			return;
 		}
-		body.classList.add("flipclock-custom-bg");
-		body.style.setProperty("--flipclock-bg-image", token);
+		body.classList.add("fliptimer-custom-bg");
+		body.style.setProperty("--fliptimer-bg-image", token);
 	}
 
 	function persistAppBgState(state) {
 		try {
 			if (!state) {
-				localStorage.removeItem(FLIPCLOCK_APP_BG_KEY);
+				localStorage.removeItem(FLIPTIMER_APP_BG_KEY);
 				return;
 			}
-			localStorage.setItem(FLIPCLOCK_APP_BG_KEY, JSON.stringify(state));
+			localStorage.setItem(FLIPTIMER_APP_BG_KEY, JSON.stringify(state));
 		} catch (e) {
 			window.alert("Could not save background (storage may be full). Try a smaller image.");
 		}
 	}
 
-	/** Writes flipClock.json in the app root when served via `npm run dev` (BrowserSync middleware). Includes optional appBackgroundDataUrl; sounds as data URLs when source is Upload, else soundPreloaded paths. No-op if fetch fails (e.g. file:// or static host without the endpoint). */
+	/** Writes fliptimer.json in the app root when served via `npm run dev` (BrowserSync middleware). Includes optional appBackgroundDataUrl; sounds as data URLs when source is Upload, else soundPreloaded paths. No-op if fetch fails (e.g. file:// or static host without the endpoint). */
 	function syncPresetJsonToProjectFile(presets) {
 		var doc = { version: 1, presets: presets };
 		var bg = getAppBackgroundDataUrlForSync();
@@ -1706,7 +1706,7 @@
 		if (typeof fetch !== "function") {
 			return;
 		}
-		fetch("/__flipclock__/save-preset-timers", {
+		fetch("/__fliptimer__/save-preset-timers", {
 			method: "POST",
 			headers: { "Content-Type": "application/json; charset=utf-8" },
 			body: payload,
@@ -1715,7 +1715,7 @@
 			.then(function (res) {
 				if (res && res.status === 404 && !warnedPresetSave404) {
 					warnedPresetSave404 = true;
-					console.warn("[FlipClock] flipClock.json sync failed (404). Page origin: " + (typeof location !== "undefined" ? location.origin : "?") + ". Use the exact Local: URL from npm run dev (BrowserSync + bs-config.js). If port 3000 is busy, BrowserSync uses 3001, 3002, … — a bookmark to :3000 may hit a different app without POST /__flipclock__/save-preset-timers.");
+					console.warn("[Fliptimer] fliptimer.json sync failed (404). Page origin: " + (typeof location !== "undefined" ? location.origin : "?") + ". Use the exact Local: URL from npm run dev (BrowserSync + bs-config.js). If port 3000 is busy, BrowserSync uses 3001, 3002, … — a bookmark to :3000 may hit a different app without POST /__fliptimer__/save-preset-timers.");
 				}
 			})
 			.catch(function () {});
@@ -1735,26 +1735,26 @@
 	}
 
 	/**
-	 * @param {FlipClock} clock
+	 * @param {Fliptimer} clock
 	 * @returns {function(): void}
 	 */
 	var TOOLBAR_ICON_PLAY = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="8 5 8 19 19 12 8 5"/></svg>';
 	var TOOLBAR_ICON_PAUSE = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>';
 
 	/** Ms of no pointer/touch/keyboard activity before chrome dims again while the countdown runs. */
-	var FLIPCLOCK_CHROME_IDLE_MS = 3000;
+	var FLIPTIMER_CHROME_IDLE_MS = 3000;
 
 	/**
-	 * While the countdown is running, dims `.flipclock-toolbar` and `.active-preset` until the user
-	 * interacts (pointer, touch, or keyboard); after **{@link FLIPCLOCK_CHROME_IDLE_MS}** with no
-	 * interaction, chrome fades dim again until the next interaction or `flipclock:countdown-complete`.
-	 * @param {FlipClock} clock
+	 * While the countdown is running, dims `.fliptimer-toolbar` and `.active-preset` until the user
+	 * interacts (pointer, touch, or keyboard); after **{@link FLIPTIMER_CHROME_IDLE_MS}** with no
+	 * interaction, chrome fades dim again until the next interaction or `fliptimer:countdown-complete`.
+	 * @param {Fliptimer} clock
 	 * @returns {function(): void}
 	 */
-	function initFlipClockChromeDimming(clock) {
+	function initFliptimerChromeDimming(clock) {
 		var userRevealedChrome = false;
 		var chromeIdleTimer = null;
-		var $toolbar = $(".flipclock-toolbar");
+		var $toolbar = $(".fliptimer-toolbar");
 		var $activePreset = $("#active-preset");
 
 		function clockIsActiveForChromeDim() {
@@ -1777,7 +1777,7 @@
 				}
 				userRevealedChrome = false;
 				applyChromeDim();
-			}, FLIPCLOCK_CHROME_IDLE_MS);
+			}, FLIPTIMER_CHROME_IDLE_MS);
 		}
 
 		function applyChromeDim() {
@@ -1787,8 +1787,8 @@
 				userRevealedChrome = false;
 			}
 			var dim = running && !userRevealedChrome;
-			$toolbar.toggleClass("flipclock-chrome-dimmed", dim);
-			$activePreset.toggleClass("flipclock-chrome-dimmed", dim);
+			$toolbar.toggleClass("fliptimer-chrome-dimmed", dim);
+			$activePreset.toggleClass("fliptimer-chrome-dimmed", dim);
 		}
 
 		function onInteractionRevealChrome() {
@@ -1800,23 +1800,23 @@
 			scheduleChromeDimAfterIdle();
 		}
 
-		$(document).on("mousemove.flipclockChromeDim keydown.flipclockChromeDim", onInteractionRevealChrome);
+		$(document).on("mousemove.fliptimerChromeDim keydown.fliptimerChromeDim", onInteractionRevealChrome);
 		document.addEventListener(
 			"touchstart",
-			function flipclockTouchRevealChrome() {
+			function fliptimerTouchRevealChrome() {
 				onInteractionRevealChrome();
 			},
 			{ passive: true, capture: true },
 		);
 		document.addEventListener(
 			"touchmove",
-			function flipclockTouchMoveRevealChrome() {
+			function fliptimerTouchMoveRevealChrome() {
 				onInteractionRevealChrome();
 			},
 			{ passive: true, capture: true },
 		);
 
-		$(".countdown").on("flipclock:countdown-complete.flipclockChromeDim", function () {
+		$(".countdown").on("fliptimer:countdown-complete.fliptimerChromeDim", function () {
 			userRevealedChrome = false;
 			clearChromeIdleTimer();
 			applyChromeDim();
@@ -1826,16 +1826,16 @@
 	}
 
 	/**
-	 * @param {FlipClock} clock
+	 * @param {Fliptimer} clock
 	 * @param {function(): void} [onAfterToolbarRefresh] — e.g. sync toolbar/active-preset dimming
 	 */
 	/** Ms after which a paused/stopped timer shows local wall time (HH:MM) and hides the toolbar. */
-	var FLIPCLOCK_IDLE_WALL_CLOCK_MS = 10000;
+	var FLIPTIMER_IDLE_WALL_CLOCK_MS = 10000;
 
-	function initFlipClockToolbar(clock, onAfterToolbarRefresh) {
+	function initFliptimerToolbar(clock, onAfterToolbarRefresh) {
 		var $playPause = $("#clock-play-pause-btn");
 		var $reset = $("#clock-reset-btn");
-		var $toolbar = $(".flipclock-toolbar");
+		var $toolbar = $(".fliptimer-toolbar");
 		var $activePresetIdle = $("#active-preset");
 		var prepTimeoutId = null;
 		/** Clears prep flip `animationend` listener + fallback timer (see `beginPrepCountdown`). */
@@ -1846,7 +1846,7 @@
 		var becameInactiveAt = null;
 		var idleWallClockActive = false;
 		var idleWallClockTickId = null;
-		/** Last pointer time while wall-clock idle (toolbar + active-preset revealed); after {@link FLIPCLOCK_IDLE_WALL_CLOCK_MS} with no activity, both fade off again. */
+		/** Last pointer time while wall-clock idle (toolbar + active-preset revealed); after {@link FLIPTIMER_IDLE_WALL_CLOCK_MS} with no activity, both fade off again. */
 		var lastIdleToolbarPointerAt = null;
 		/** Snapshot of round time when entering idle wall-clock mode (restored on Play / Presets unless cleared). */
 		var pausedTimeBeforeIdleWallClock = null;
@@ -1866,8 +1866,8 @@
 				window.clearInterval(idleWallClockTickId);
 				idleWallClockTickId = null;
 			}
-			$toolbar.removeClass("flipclock-idle-clock");
-			$activePresetIdle.removeClass("flipclock-idle-clock");
+			$toolbar.removeClass("fliptimer-idle-clock");
+			$activePresetIdle.removeClass("fliptimer-idle-clock");
 			lastIdleToolbarPointerAt = null;
 			var snap = pausedTimeBeforeIdleWallClock;
 			pausedTimeBeforeIdleWallClock = null;
@@ -1888,8 +1888,8 @@
 			idleWallClockActive = true;
 			lastIdleToolbarPointerAt = null;
 			clock.setToTime(getLocalTimeHhMmString());
-			$toolbar.addClass("flipclock-idle-clock");
-			$activePresetIdle.addClass("flipclock-idle-clock");
+			$toolbar.addClass("fliptimer-idle-clock");
+			$activePresetIdle.addClass("fliptimer-idle-clock");
 			idleWallClockTickId = window.setInterval(function () {
 				if (clock.tickInterval !== false || clock.prepCountdownActive) {
 					exitIdleWallClockMode(false);
@@ -1910,19 +1910,19 @@
 			}
 			if (idleWallClockActive) {
 				if (
-					!$toolbar.hasClass("flipclock-idle-clock") &&
+					!$toolbar.hasClass("fliptimer-idle-clock") &&
 					lastIdleToolbarPointerAt !== null &&
-					Date.now() - lastIdleToolbarPointerAt >= FLIPCLOCK_IDLE_WALL_CLOCK_MS
+					Date.now() - lastIdleToolbarPointerAt >= FLIPTIMER_IDLE_WALL_CLOCK_MS
 				) {
-					$toolbar.addClass("flipclock-idle-clock");
-					$activePresetIdle.addClass("flipclock-idle-clock");
+					$toolbar.addClass("fliptimer-idle-clock");
+					$activePresetIdle.addClass("fliptimer-idle-clock");
 				}
 				return;
 			}
 			if (becameInactiveAt === null) {
 				return;
 			}
-			if (Date.now() - becameInactiveAt < FLIPCLOCK_IDLE_WALL_CLOCK_MS) {
+			if (Date.now() - becameInactiveAt < FLIPTIMER_IDLE_WALL_CLOCK_MS) {
 				return;
 			}
 			enterIdleWallClockMode();
@@ -1931,29 +1931,29 @@
 		clock.exitIdleWallClockMode = exitIdleWallClockMode;
 
 		/**
-		 * While wall-clock idle, pointer motion restores full opacity on `.flipclock-toolbar` and `.active-preset`
-		 * and records activity so both can fade off again after {@link FLIPCLOCK_IDLE_WALL_CLOCK_MS} with no further pointer input.
+		 * While wall-clock idle, pointer motion restores full opacity on `.fliptimer-toolbar` and `.active-preset`
+		 * and records activity so both can fade off again after {@link FLIPTIMER_IDLE_WALL_CLOCK_MS} with no further pointer input.
 		 */
 		function onIdleWallClockPointerActivity() {
 			if (!idleWallClockActive) {
 				return;
 			}
 			lastIdleToolbarPointerAt = Date.now();
-			$toolbar.removeClass("flipclock-idle-clock");
-			$activePresetIdle.removeClass("flipclock-idle-clock");
+			$toolbar.removeClass("fliptimer-idle-clock");
+			$activePresetIdle.removeClass("fliptimer-idle-clock");
 		}
 
-		$(document).on("mousemove.flipclockIdleToolbarReveal", onIdleWallClockPointerActivity);
+		$(document).on("mousemove.fliptimerIdleToolbarReveal", onIdleWallClockPointerActivity);
 		document.addEventListener(
 			"touchstart",
-			function flipclockIdleToolbarTouchReveal() {
+			function fliptimerIdleToolbarTouchReveal() {
 				onIdleWallClockPointerActivity();
 			},
 			{ passive: true, capture: true },
 		);
 		document.addEventListener(
 			"touchmove",
-			function flipclockIdleToolbarTouchMoveReveal() {
+			function fliptimerIdleToolbarTouchMoveReveal() {
 				onIdleWallClockPointerActivity();
 			},
 			{ passive: true, capture: true },
@@ -1994,7 +1994,7 @@
 				clock.setToTime(resume);
 			}
 			clock.start(true);
-			playFlipClockSound("start");
+			playFliptimerSound("start");
 			refresh();
 		}
 
@@ -2094,7 +2094,7 @@
 						return;
 					}
 					schedulePrepChainDoneAfterPaint();
-				}, FLIPCLOCK_PREP_FLIP_MS + FLIPCLOCK_PREP_FLIP_FALLBACK_PAD_MS);
+				}, FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_PREP_FLIP_FALLBACK_PAD_MS);
 			}
 			runStep();
 		}
@@ -2120,14 +2120,14 @@
 		window.setInterval(pollIdleWallClock, 1000);
 
 		$playPause.on("click", function () {
-			flipClockUnlockHtmlAudioIfNeeded();
+			fliptimerUnlockHtmlAudioIfNeeded();
 			exitIdleWallClockMode(true);
 			if (clock.tickInterval !== false) {
 				clock.stop();
-				playFlipClockSound("pause");
+				playFliptimerSound("pause");
 			} else if (clock.prepCountdownActive) {
 				cancelPrepCountdown();
-				playFlipClockSound("pause");
+				playFliptimerSound("pause");
 			} else {
 				beginPrepCountdown();
 			}
@@ -2146,7 +2146,7 @@
 	}
 
 	/**
-	 * @param {FlipClock} clock
+	 * @param {Fliptimer} clock
 	 * @param {function(): void} refreshToolbar
 	 */
 	function initPresetTimers(clock, refreshToolbar) {
@@ -2559,8 +2559,8 @@
 		}
 
 		var $settingsOpenBtn = $("#preset-settings-open-btn");
-		var $counterSize = $("#flipclock-counter-size");
-		var $counterSizeOut = $("#flipclock-counter-size-out");
+		var $counterSize = $("#fliptimer-counter-size");
+		var $counterSizeOut = $("#fliptimer-counter-size-out");
 		var $trackMax = $("#flipclock-preset-track-max");
 		var $trackMaxOut = $("#flipclock-preset-track-max-out");
 
@@ -2902,7 +2902,7 @@
 			$(this).attr("aria-valuenow", String(v));
 			setCounterRangeFillPct(this, v);
 			try {
-				localStorage.setItem(FLIPCLOCK_COUNTER_PCT_KEY, String(v));
+				localStorage.setItem(FLIPTIMER_COUNTER_PCT_KEY, String(v));
 			} catch (e) {
 				/* ignore */
 			}
@@ -2915,7 +2915,7 @@
 			$(this).attr("aria-valuenow", String(v));
 			setCounterRangeFillPct(this, v);
 			try {
-				localStorage.setItem(FLIPCLOCK_COUNTER_PCT_KEY, String(v));
+				localStorage.setItem(FLIPTIMER_COUNTER_PCT_KEY, String(v));
 			} catch (e) {
 				/* ignore */
 			}
@@ -3368,7 +3368,7 @@
 			setActivePresetUi(null);
 		}
 
-		// Initial load: localStorage wins if key exists; else seed from flipClock.json
+		// Initial load: localStorage wins if key exists; else seed from fliptimer.json
 		var stored = loadPresetsFromStorage();
 		if (stored !== null) {
 			presets = stored;
@@ -3529,49 +3529,49 @@
 	}
 
 	$(function () {
-		document.addEventListener("click", flipClockUnlockHtmlAudioIfNeeded, { once: true, capture: true });
-		document.addEventListener("touchstart", flipClockUnlockHtmlAudioIfNeeded, { once: true, capture: true, passive: true });
-		document.addEventListener("keydown", flipClockUnlockHtmlAudioIfNeeded, { once: true, capture: true });
+		document.addEventListener("click", fliptimerUnlockHtmlAudioIfNeeded, { once: true, capture: true });
+		document.addEventListener("touchstart", fliptimerUnlockHtmlAudioIfNeeded, { once: true, capture: true, passive: true });
+		document.addEventListener("keydown", fliptimerUnlockHtmlAudioIfNeeded, { once: true, capture: true });
 
 		initPresetCounterSizeTicks();
 		applyAppBackgroundState(loadAppBgStateFromStorage());
 		var pct0 = loadCounterSizePct();
 		applyCounterSizePct(pct0, null);
-		var clock = new FlipClock({
+		var clock = new Fliptimer({
 			isCountdown: true,
 			startTime: "05:05",
-			tickDuration: FLIPCLOCK_PREP_FLIP_MS + FLIPCLOCK_COUNTDOWN_TICK_BUFFER_MS,
+			tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
 			containerElement: $(".countdown"),
 			face: {
 				minutes: { maxValue: 59 },
 				seconds: { maxValue: 59 },
 			},
 		});
-		window.flipClockInstance = clock;
+		window.fliptimerInstance = clock;
 		clock.setDimensions();
-		$(window).on("resize.flipclockCounter", function () {
-			if (window.flipClockInstance && typeof window.flipClockInstance.setDimensions === "function") {
-				window.flipClockInstance.setDimensions();
+		$(window).on("resize.fliptimerCounter", function () {
+			if (window.fliptimerInstance && typeof window.fliptimerInstance.setDimensions === "function") {
+				window.fliptimerInstance.setDimensions();
 			}
 			refreshPresetCounterSizeRangeFills();
 		});
 		if (window.visualViewport) {
 			window.visualViewport.addEventListener("resize", function () {
-				if (window.flipClockInstance && typeof window.flipClockInstance.setDimensions === "function") {
-					window.flipClockInstance.setDimensions();
+				if (window.fliptimerInstance && typeof window.fliptimerInstance.setDimensions === "function") {
+					window.fliptimerInstance.setDimensions();
 				}
 				refreshPresetCounterSizeRangeFills();
 			});
 		}
-		var applyChromeDim = initFlipClockChromeDimming(clock);
-		var refreshToolbar = initFlipClockToolbar(clock, applyChromeDim);
-		$(".countdown").on("flipclock:countdown-complete", function () {
-			playFlipClockSound("finish");
+		var applyChromeDim = initFliptimerChromeDimming(clock);
+		var refreshToolbar = initFliptimerToolbar(clock, applyChromeDim);
+		$(".countdown").on("fliptimer:countdown-complete", function () {
+			playFliptimerSound("finish");
 			refreshToolbar();
 		});
 		initPresetTimers(clock, refreshToolbar);
-		var $counterSizeInit = $("#flipclock-counter-size");
-		var $counterSizeOutInit = $("#flipclock-counter-size-out");
+		var $counterSizeInit = $("#fliptimer-counter-size");
+		var $counterSizeOutInit = $("#fliptimer-counter-size-out");
 		if ($counterSizeInit.length) {
 			$counterSizeInit.val(String(pct0)).attr("aria-valuenow", String(pct0));
 			$counterSizeOutInit.text(pct0 + "%");

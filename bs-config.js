@@ -1,13 +1,13 @@
 /**
- * Browser-sync: static server and map /flipClock (no .html) to flipClock.html.
- * POST /__flipclock__/save-preset-timers writes the request body to ./flipClock.json (dev only).
+ * Browser-sync: static server and map /fliptimer (no .html) to fliptimer.html.
+ * POST /__fliptimer__/save-preset-timers writes the request body to ./fliptimer.json (dev only).
  * GET /sounds/manifest.json returns a live { files: [...] } from ./sounds (audio only) for the Preloaded dropdown.
  * The JSON may include presets and optional appBackgroundDataUrl (base64 data URL).
  */
 const fs = require("fs");
 const path = require("path");
 
-const FLIPCLOCK_JSON_PATH = path.join(__dirname, "flipClock.json");
+const FLIPTIMER_JSON_PATH = path.join(__dirname, "fliptimer.json");
 const SOUNDS_DIR = path.join(__dirname, "sounds");
 
 /** Serves GET /sounds/manifest.json from the filesystem so the Preloaded list updates when files are added (no manual JSON edit). */
@@ -57,7 +57,7 @@ function soundsManifestMiddleware(req, res, next) {
 
 function savePresetTimersMiddleware(req, res, next) {
 	const url = req.url.indexOf("?") === -1 ? req.url : req.url.slice(0, req.url.indexOf("?"));
-	if (url !== "/__flipclock__/save-preset-timers" || req.method !== "POST") {
+	if (url !== "/__fliptimer__/save-preset-timers" || req.method !== "POST") {
 		next();
 		return;
 	}
@@ -75,7 +75,7 @@ function savePresetTimersMiddleware(req, res, next) {
 			return;
 		}
 		try {
-			fs.writeFileSync(FLIPCLOCK_JSON_PATH, body, "utf8");
+			fs.writeFileSync(FLIPTIMER_JSON_PATH, body, "utf8");
 			res.writeHead(204);
 			res.end();
 		} catch (err) {
@@ -93,27 +93,27 @@ module.exports = {
 	middleware: [
 		savePresetTimersMiddleware,
 		soundsManifestMiddleware,
-		function flipClockHtml(req, res, next) {
+		function fliptimerHtml(req, res, next) {
 			const q = req.url.indexOf("?");
 			const pathOnly = q === -1 ? req.url : req.url.slice(0, q);
 			const qs = q === -1 ? "" : req.url.slice(q);
-			if (pathOnly === "/flipClock" || pathOnly === "/flipClock/") {
-				req.url = "/flipClock.html" + qs;
+			if (pathOnly === "/fliptimer" || pathOnly === "/fliptimer/") {
+				req.url = "/fliptimer.html" + qs;
 			}
 			next();
 		},
 	],
-	// `watch: true` merges server baseDir (`.`) into watched paths — not only `files`. Ignore the JSON
+	// `watch: true` merges server baseDir (`.`) into watched paths — not only `files`. Ignore JSON
 	// we rewrite on every preset save, or Chokidar fires and BrowserSync full-reloads the page.
-	files: ["flipClock.css", "flipClock.html", "flipClock.js", "sounds/**/*"],
+	files: ["fliptimer.css", "fliptimer.html", "fliptimer.js", "sounds/**/*"],
 	watch: true,
 	watchOptions: {
 		ignoreInitial: true,
-		ignored: ["flipClock.json"],
+		ignored: ["fliptimer.json"],
 	},
 	notify: false,
 	// Live reload: injects a small script before </body>. Set false if you add strict CSP and block inline scripts.
 	snippet: true,
 	port: 3000,
-	startPath: "/flipClock",
+	startPath: "/fliptimer",
 };

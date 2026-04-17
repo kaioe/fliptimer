@@ -1,1 +1,19 @@
 node_modules/
+
+# IDE files
+.cursor/
+.vscode/
+.idea/
+
+# Build artifacts
+*.css.map
+*.js.map
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local

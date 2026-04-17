@@ -1,7 +1,7 @@
 /**
  * Builds `dist/` with only files needed to serve the app on a static host.
- * - Compiles flipClock.scss → flipClock.css
- * - Copies HTML (rewrites jQuery + flipClock.js to relative paths), JS, CSS, JSON, favicon, sounds/
+ * - Compiles fliptimer.scss → fliptimer.css
+ * - Copies HTML (rewrites jQuery + fliptimer.js to relative paths), JS, CSS, JSON, favicon, sounds/
  * - Vendors jquery.min.js (no node_modules on the server)
  */
 import { execSync } from "node:child_process";
@@ -48,11 +48,11 @@ function transformHtmlForDist(html) {
 			/src="\/node_modules\/jquery\/dist\/jquery\.min\.js"/g,
 			'src="./vendor/jquery.min.js"'
 		)
-		.replace(/src="\/flipClock\.js(?:\?[^"]*)?"/g, 'src="./flipClock.js"');
+		.replace(/src="\/fliptimer\.js(?:\?[^"]*)?"/g, 'src="./fliptimer.js"');
 }
 
 function main() {
-	execSync("npx sass flipClock.scss flipClock.css --no-source-map", {
+	execSync("npx sass fliptimer.scss fliptimer.css --no-source-map", {
 		cwd: root,
 		stdio: "inherit",
 		shell: true,
@@ -66,20 +66,20 @@ function main() {
 	rmrf(dist);
 	fs.mkdirSync(dist, { recursive: true });
 
-	const htmlPath = path.join(root, "flipClock.html");
+	const htmlPath = path.join(root, "fliptimer.html");
 	const html = fs.readFileSync(htmlPath, "utf8");
 	const htmlOut = transformHtmlForDist(html);
-	fs.writeFileSync(path.join(dist, "flipClock.html"), htmlOut, "utf8");
+	fs.writeFileSync(path.join(dist, "fliptimer.html"), htmlOut, "utf8");
 	fs.writeFileSync(path.join(dist, "index.html"), htmlOut, "utf8");
 
-	copyFile(path.join(root, "flipClock.css"), path.join(dist, "flipClock.css"));
-	copyFile(path.join(root, "flipClock.js"), path.join(dist, "flipClock.js"));
+	copyFile(path.join(root, "fliptimer.css"), path.join(dist, "fliptimer.css"));
+	copyFile(path.join(root, "fliptimer.js"), path.join(dist, "fliptimer.js"));
 
-	const jsonPath = path.join(root, "flipClock.json");
+	const jsonPath = path.join(root, "fliptimer.json");
 	if (fs.existsSync(jsonPath)) {
-		copyFile(jsonPath, path.join(dist, "flipClock.json"));
+		copyFile(jsonPath, path.join(dist, "fliptimer.json"));
 	} else {
-		console.warn("flipClock.json not found; dist will not include a preset seed file.");
+		console.warn("fliptimer.json not found; dist will not include a preset seed file.");
 	}
 
 	const favicon = path.join(root, "favicon.svg");

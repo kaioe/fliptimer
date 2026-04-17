@@ -60,7 +60,7 @@ $anim-shadow-delay: 0.3s;
 // ============================================================================
 
 :root {
-	--flipclock-counter-pct: 12;
+	--fliptimer-counter-pct: 12;
 }
 
 html {
@@ -87,9 +87,9 @@ body {
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 	background: radial-gradient(ellipse at center, rgb(204, 203, 203) 0%, rgb(146, 144, 144) 100%);
 
-	&.flipclock-custom-bg {
+	&.fliptimer-custom-bg {
 		background-color: rgb(146, 144, 144);
-		background-image: var(--flipclock-bg-image);
+		background-image: var(--fliptimer-bg-image);
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -125,7 +125,7 @@ body {
 	}
 }
 
-.flipclock-toolbar {
+.fliptimer-toolbar {
 	width: 100%;
 	align-self: stretch;
 	display: flex;
@@ -136,16 +136,16 @@ body {
 	row-gap: 8px;
 	transition: opacity 0.35s ease;
 
-	&.flipclock-chrome-dimmed {
+	&.fliptimer-chrome-dimmed {
 		opacity: 0.05;
 	}
 
-	&.flipclock-idle-clock {
+	&.fliptimer-idle-clock {
 		opacity: 0;
 	}
 }
 
-.flipclock-toolbar__btn {
+.fliptimer-toolbar__btn {
 	font: inherit;
 	font-size: 12px;
 	padding: 6px 12px;
@@ -218,11 +218,11 @@ body {
 	text-align: left;
 	transition: opacity 0.35s ease;
 
-	&.flipclock-chrome-dimmed {
+	&.fliptimer-chrome-dimmed {
 		opacity: 0.05;
 	}
 
-	&.flipclock-idle-clock {
+	&.fliptimer-idle-clock {
 		opacity: 0;
 	}
 
@@ -342,11 +342,11 @@ body {
 	justify-content: center;
 	width: max-content;
 	max-width: none;
-	height: calc(var(--flipclock-counter-pct, 12) / 100 * min(100vw, 100vh));
+	height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100vw, 100vh));
 	min-height: 72px;
 
 	@supports (width: 1dvw) {
-		height: calc(var(--flipclock-counter-pct, 12) / 100 * min(100dvw, 100dvh));
+		height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100dvw, 100dvh));
 	}
 	--fc-flip-h: 100px;
 	--fc-flip-w: 66px;
@@ -425,7 +425,7 @@ body {
 	ul.flip li span {
 		display: block;
 		height: 100%;
-		// Must scale with digit height; fixed px warps rotateX at large `--flipclock-counter-pct`
+		// Must scale with digit height; fixed px warps rotateX at large `--fliptimer-counter-pct`
 		perspective: calc(var(--fc-flip-h, 100px) * 2);
 	}
 

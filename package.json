@@ -1,16 +1,20 @@
 {
-  "name": "flipclock",
+  "name": "fliptimer",
   "private": true,
   "scripts": {
     "build": "npm run build:css",
-    "build:css": "sass flipClock.scss flipClock.css --no-source-map",
+    "build:css": "sass fliptimer.scss fliptimer.css --no-source-map",
     "build:dist": "node scripts/build-dist.mjs",
     "dev": "concurrently -k -n sass,bs -c cyan,magenta \"npm run dev:sass\" \"npm run dev:serve\"",
-    "dev:sass": "sass --watch --poll flipClock.scss flipClock.css --no-source-map",
+    "dev:sass": "sass --watch --poll fliptimer.scss fliptimer.css --no-source-map",
     "dev:serve": "browser-sync start --config bs-config.js",
     "browser:console": "node scripts/browser-console.mjs",
     "test:preset-save": "node scripts/test-preset-save-no-reload.mjs",
-    "test:prep": "node scripts/test-prep-countdown.mjs"
+    "test:prep": "node scripts/test-prep-countdown.mjs",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:install": "playwright install"
   },
   "devDependencies": {
     "browser-sync": "^3.0.3",
