@@ -4,11 +4,11 @@
  * Playwright fake clock must be installed BEFORE page.goto.
  *
  * Run: npm run test:prep
- * URL: FLIPCLOCK_TEST_URL (default http://127.0.0.1:3000/fliptimer)
+ * URL: FLIPCLOCK_TEST_URL (default http://127.0.0.1:3000/)
  */
 import { chromium } from "playwright";
 
-const baseUrl = process.env.FLIPCLOCK_TEST_URL || "http://127.0.0.1:3000/fliptimer";
+const baseUrl = process.env.FLIPCLOCK_TEST_URL || "http://127.0.0.1:3000/";
 
 function assert(cond, msg) {
 	if (!cond) {

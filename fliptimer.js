@@ -774,7 +774,7 @@
 	/**
 	 * Base URL for resolving `sounds/...` paths. Strips a trailing slash from the path so
 	 * `http://host/fliptimer/` does not resolve `sounds/x` to `http://host/fliptimer/sounds/x` (404);
-	 * without the slash, resolution matches `fliptimer.html` + sibling `sounds/` → `/sounds/x`.
+	 * without the slash, resolution matches `index.html` + sibling `sounds/` → `/sounds/x`.
 	 */
 	function baseHrefForSoundRelativeUrl() {
 		if (typeof URL === "undefined" || typeof location === "undefined" || !location.href) {

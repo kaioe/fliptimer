@@ -1,11 +1,11 @@
 /**
  * Headless Chromium via Playwright: prints console + page errors + failed requests.
  * Usage: node scripts/browser-console.mjs [url]
- * Default: http://127.0.0.1:3000/fliptimer (same page as fliptimer.html)
+ * Default: http://127.0.0.1:3000/ (same page as index.html)
  */
 import { chromium } from "playwright";
 
-const url = process.argv[2] || "http://127.0.0.1:3000/fliptimer";
+const url = process.argv[2] || "http://127.0.0.1:3000/";
 
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();

@@ -1,5 +1,5 @@
 /**
- * Browser-sync: static server and map /fliptimer (no .html) to fliptimer.html.
+ * Browser-sync: static server.
  * POST /__fliptimer__/save-preset-timers writes the request body to ./fliptimer.json (dev only).
  * GET /sounds/manifest.json returns a live { files: [...] } from ./sounds (audio only) for the Preloaded dropdown.
  * The JSON may include presets and optional appBackgroundDataUrl (base64 data URL).
@@ -93,19 +93,19 @@ module.exports = {
 	middleware: [
 		savePresetTimersMiddleware,
 		soundsManifestMiddleware,
-		function fliptimerHtml(req, res, next) {
+		function redirectOldPaths(req, res, next) {
 			const q = req.url.indexOf("?");
 			const pathOnly = q === -1 ? req.url : req.url.slice(0, q);
 			const qs = q === -1 ? "" : req.url.slice(q);
-			if (pathOnly === "/fliptimer" || pathOnly === "/fliptimer/") {
-				req.url = "/fliptimer.html" + qs;
+			if (pathOnly === "/fliptimer" || pathOnly === "/fliptimer/" || pathOnly === "/fliptimer.html") {
+				req.url = "/" + qs;
 			}
 			next();
 		},
 	],
 	// `watch: true` merges server baseDir (`.`) into watched paths — not only `files`. Ignore JSON
 	// we rewrite on every preset save, or Chokidar fires and BrowserSync full-reloads the page.
-	files: ["fliptimer.css", "fliptimer.html", "fliptimer.js", "sounds/**/*"],
+	files: ["fliptimer.css", "index.html", "fliptimer.js", "sounds/**/*"],
 	watch: true,
 	watchOptions: {
 		ignoreInitial: true,
@@ -115,5 +115,5 @@ module.exports = {
 	// Live reload: injects a small script before </body>. Set false if you add strict CSP and block inline scripts.
 	snippet: true,
 	port: 3000,
-	startPath: "/fliptimer",
+	startPath: "/",
 };

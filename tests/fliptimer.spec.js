@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('FlipTimer E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the fliptimer page
-    await page.goto('/fliptimer.html');
+    await page.goto('/');
     // Wait for page to fully load
     await page.waitForLoadState('networkidle');
   });

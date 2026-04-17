@@ -66,10 +66,9 @@ function main() {
 	rmrf(dist);
 	fs.mkdirSync(dist, { recursive: true });
 
-	const htmlPath = path.join(root, "fliptimer.html");
+	const htmlPath = path.join(root, "index.html");
 	const html = fs.readFileSync(htmlPath, "utf8");
 	const htmlOut = transformHtmlForDist(html);
-	fs.writeFileSync(path.join(dist, "fliptimer.html"), htmlOut, "utf8");
 	fs.writeFileSync(path.join(dist, "index.html"), htmlOut, "utf8");
 
 	copyFile(path.join(root, "fliptimer.css"), path.join(dist, "fliptimer.css"));
