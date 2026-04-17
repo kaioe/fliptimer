@@ -2,7 +2,7 @@
 
 > A beautiful, responsive flip-clock timer with customizable presets
 
-FlipTimer is an elegant, web-based countdown timer featuring a classic flip-clock design with smooth 3D animations. Designed for both desktop and mobile, it's perfect for workouts, cooking, focus sessions, or any activity where you need a stylish and reliable timer.
+FlipTimer is an elegant, web-based countdown timer featuring a classic flip-clock design with smooth 3D animations. Designed for both desktop and mobile, it's perfect for workouts, cooking, focus sessions, or any activity where you need a stylish and reliable timer..
 
 [**Live Demo**](index.html) | [**GitHub Repository**](https://github.com/kaioe/fliptimer)
 
