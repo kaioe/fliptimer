@@ -32,15 +32,19 @@ $anim-shadow-delay: 0.3s;
 
 // usage: @include respond-to(768) { ... }  or  @include respond-to(false, 540) { ... }
 @mixin respond-to($minWidth: false, $maxWidth: false) {
-	@if $maxWidth == false or $maxWidth == "" {
+	@if $maxWidth ==false or $maxWidth =="" {
 		@media only screen and (min-width: #{$minWidth}px) {
 			@content;
 		}
-	} @else if $minWidth == false or $minWidth == "" {
+	}
+
+	@else if $minWidth ==false or $minWidth =="" {
 		@media only screen and (max-width: #{$maxWidth}px) {
 			@content;
 		}
-	} @else {
+	}
+
+	@else {
 		@media only screen and (min-width: #{$minWidth}px) and (max-width: #{$maxWidth}px) {
 			@content;
 		}
@@ -348,6 +352,7 @@ body {
 	@supports (width: 1dvw) {
 		height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100dvw, 100dvh));
 	}
+
 	--fc-flip-h: 100px;
 	--fc-flip-w: 66px;
 	--flip-digit-bg: #{$flip-digit-bg-no-preset};
@@ -407,6 +412,7 @@ body {
 		&:not(:last-child)::after {
 			@extend %colon-separator;
 		}
+
 		&:last-child {
 			margin-right: 0;
 		}
@@ -482,7 +488,7 @@ body {
 		justify-content: center;
 		// Some fonts have uneven vertical distribution; a small bottom offset
 		// ensures it doesn't feel like it's "touching" the bottom edge.
-		padding-bottom: 0.05em;
+		padding-bottom: 0em;
 	}
 
 	ul.flip li span div.up div.inn {
@@ -546,6 +552,7 @@ body {
 	0% {
 		z-index: 2;
 	}
+
 	5%,
 	100% {
 		z-index: 4;
@@ -556,6 +563,7 @@ body {
 	0% {
 		transform: rotateX(90deg);
 	}
+
 	100% {
 		transform: rotateX(0deg);
 	}
@@ -565,6 +573,7 @@ body {
 	0% {
 		transform: rotateX(0deg);
 	}
+
 	100% {
 		transform: rotateX(-90deg);
 	}
@@ -574,6 +583,7 @@ body {
 	0% {
 		opacity: 0;
 	}
+
 	100% {
 		opacity: 1;
 	}
@@ -583,6 +593,7 @@ body {
 	0% {
 		opacity: 1;
 	}
+
 	100% {
 		opacity: 0;
 	}
@@ -1267,6 +1278,7 @@ $preset-counter-tick-diameter: 12px;
 
 @each $v in 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95 {
 	$t: math.div($v - 5, 90);
+
 	.preset-counter-size-wrap:not(.preset-counter-size-wrap--track-max) .preset-counter-size-tick[data-value="#{$v}"] {
 		left: calc(#{2 * $preset-counter-thumb-half} + #{$t} * (100% - #{4 * $preset-counter-thumb-half}));
 	}
@@ -1579,6 +1591,7 @@ $preset-counter-tick-diameter: 12px;
 }
 
 @include respond-to(false, 767) {
+
 	.preset-table-wrap,
 	.preset-form-container {
 		margin-left: 8px;
@@ -2086,6 +2099,7 @@ $preset-counter-tick-diameter: 12px;
 		--slider-value-band: 34px;
 		--thumb-size: 32px;
 	}
+
 	--ticks-height: 6px;
 	--ticks-gap: 0px;
 	--value-offset-y: 0px;
@@ -2155,9 +2169,11 @@ $preset-counter-tick-diameter: 12px;
 	position: relative;
 	z-index: 1;
 }
+
 .preset-minutes-slider[data-ticks-position="top"] {
 	--flip-y: 1;
 }
+
 .preset-minutes-slider::before,
 .preset-minutes-slider::after {
 	--offset: calc(var(--thumb-size) / 2);
@@ -2171,12 +2187,14 @@ $preset-counter-tick-diameter: 12px;
 	transform: translateX(calc(var(--min-max-x-offset) * var(--before, -1) * -1)) scale(var(--at-edge));
 	pointer-events: none;
 }
+
 .preset-minutes-slider::before {
 	--before: 1;
 	--at-edge: var(--thumb-close-to-min);
 	counter-reset: x var(--min);
 	left: var(--offset);
 }
+
 .preset-minutes-slider::after {
 	--at-edge: var(--thumb-close-to-max);
 	counter-reset: x var(--max);
@@ -2188,6 +2206,7 @@ $preset-counter-tick-diameter: 12px;
 	bottom: 0;
 	top: auto;
 }
+
 .preset-minutes-slider .range-slider__values {
 	position: relative;
 	top: 50%;
@@ -2198,6 +2217,7 @@ $preset-counter-tick-diameter: 12px;
 	margin: 0 auto;
 	z-index: 5;
 }
+
 .preset-minutes-slider .range-slider__values::after {
 	content: "";
 	width: 100%;
@@ -2205,6 +2225,7 @@ $preset-counter-tick-diameter: 12px;
 	height: 0;
 	background: red;
 }
+
 .preset-minutes-slider .range-slider__progress {
 	--start-end: calc(var(--thumb-size) / 2);
 	--clip-end: calc(100% - (var(--cb)) * 1%);
@@ -2222,6 +2243,7 @@ $preset-counter-tick-diameter: 12px;
 	z-index: -1;
 	border-radius: var(--progress-radius);
 }
+
 .preset-minutes-slider .range-slider__progress::before {
 	content: "";
 	position: absolute;
@@ -2236,8 +2258,9 @@ $preset-counter-tick-diameter: 12px;
 	z-index: 1;
 	border-radius: inherit;
 }
+
 // Native range tracks sit above siblings and hid our custom bar — keep them fully transparent.
-.preset-minutes-slider > input::-webkit-slider-runnable-track {
+.preset-minutes-slider>input::-webkit-slider-runnable-track {
 	-webkit-appearance: none;
 	appearance: none;
 	width: 100%;
@@ -2246,28 +2269,33 @@ $preset-counter-tick-diameter: 12px;
 	border: none;
 	box-shadow: none;
 }
-.preset-minutes-slider > input::-moz-range-track {
+
+.preset-minutes-slider>input::-moz-range-track {
 	width: 100%;
 	height: var(--track-height);
 	background: transparent;
 	border: none;
 	box-shadow: none;
 }
-.preset-minutes-slider > input::-moz-range-progress {
+
+.preset-minutes-slider>input::-moz-range-progress {
 	background: transparent;
 }
-.preset-minutes-slider > input::-ms-track {
+
+.preset-minutes-slider>input::-ms-track {
 	width: 100%;
 	height: var(--track-height);
 	background: transparent;
 	border-color: transparent;
 	color: transparent;
 }
-.preset-minutes-slider > input::-ms-fill-lower,
-.preset-minutes-slider > input::-ms-fill-upper {
+
+.preset-minutes-slider>input::-ms-fill-lower,
+.preset-minutes-slider>input::-ms-fill-upper {
 	background: transparent;
 }
-.preset-minutes-slider > input {
+
+.preset-minutes-slider>input {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
@@ -2282,10 +2310,12 @@ $preset-counter-tick-diameter: 12px;
 	outline: none;
 	background: none;
 }
-.preset-minutes-slider > input:not(:only-of-type) {
+
+.preset-minutes-slider>input:not(:only-of-type) {
 	pointer-events: none;
 }
-.preset-minutes-slider > input::-webkit-slider-thumb {
+
+.preset-minutes-slider>input::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
 	height: var(--thumb-size);
@@ -2299,7 +2329,8 @@ $preset-counter-tick-diameter: 12px;
 	-webkit-transition: 0.1s;
 	transition: 0.1s;
 }
-.preset-minutes-slider > input::-moz-range-thumb {
+
+.preset-minutes-slider>input::-moz-range-thumb {
 	-moz-appearance: none;
 	appearance: none;
 	height: var(--thumb-size);
@@ -2313,7 +2344,8 @@ $preset-counter-tick-diameter: 12px;
 	-moz-transition: 0.1s;
 	transition: 0.1s;
 }
-.preset-minutes-slider > input::-ms-thumb {
+
+.preset-minutes-slider>input::-ms-thumb {
 	appearance: none;
 	height: var(--thumb-size);
 	width: var(--thumb-size);
@@ -2326,56 +2358,70 @@ $preset-counter-tick-diameter: 12px;
 	-ms-transition: 0.1s;
 	transition: 0.1s;
 }
-.preset-minutes-slider > input:hover {
+
+.preset-minutes-slider>input:hover {
 	--thumb-shadow: var(--thumb-shadow-hover);
 }
-.preset-minutes-slider > input:hover + output {
+
+.preset-minutes-slider>input:hover+output {
 	--value-background: var(--value-background-hover);
 	--y-offset: -5px;
 	color: var(--value-active-color);
 	box-shadow: 0 0 0 3px var(--value-background);
 }
-.preset-minutes-slider > input:active {
+
+.preset-minutes-slider>input:active {
 	--thumb-shadow: var(--thumb-shadow-active);
 	cursor: -webkit-grabbing;
 	cursor: grabbing;
 	z-index: 2;
 }
-.preset-minutes-slider > input:active + output {
+
+.preset-minutes-slider>input:active+output {
 	transition: 0s;
 }
-.preset-minutes-slider > input:nth-of-type(1) {
+
+.preset-minutes-slider>input:nth-of-type(1) {
 	--is-left-most: Clamp(0, (var(--value-a) - var(--value-b)) * 99999, 1);
 }
-.preset-minutes-slider > input:nth-of-type(1) + output {
+
+.preset-minutes-slider>input:nth-of-type(1)+output {
 	--value: var(--value-a);
 	--x-offset: calc(var(--completed-a) * -1%);
 }
-.preset-minutes-slider > input:nth-of-type(1) + output:not(:only-of-type) {
+
+.preset-minutes-slider>input:nth-of-type(1)+output:not(:only-of-type) {
 	--flip: calc(var(--thumbs-too-close) * -1);
 }
-.preset-minutes-slider > input:nth-of-type(1) + output::after {
+
+.preset-minutes-slider>input:nth-of-type(1)+output::after {
 	content: var(--prefix, "") var(--text-value-a) var(--suffix, "");
 }
-.preset-minutes-slider > input:nth-of-type(2) {
+
+.preset-minutes-slider>input:nth-of-type(2) {
 	--is-left-most: Clamp(0, (var(--value-b) - var(--value-a)) * 99999, 1);
 }
-.preset-minutes-slider > input:nth-of-type(2) + output {
+
+.preset-minutes-slider>input:nth-of-type(2)+output {
 	--value: var(--value-b);
 }
-.preset-minutes-slider > input:nth-of-type(3) + output {
+
+.preset-minutes-slider>input:nth-of-type(3)+output {
 	--value: var(--value-c);
 	--x-offset: calc(var(--completed-c) * -1%);
 	// Rounds thumb uses 0–10 on the track (independent of minute --max)
 	--pos: calc(((var(--value-c) - var(--rounds-min, 0)) / (var(--rounds-max, 10) - var(--rounds-min, 0))) * 100%);
 }
-.preset-minutes-slider > input:nth-of-type(3) + output::after {
+
+.preset-minutes-slider>input:nth-of-type(3)+output::after {
 	content: var(--prefix, "") var(--text-value-c) var(--suffix, "");
 }
-.preset-minutes-slider > input:only-of-type ~ .range-slider__progress {
+
+.preset-minutes-slider>input:only-of-type~.range-slider__progress {
 	--clip-start: 0;
 }
-.preset-minutes-slider > input + output {
+
+.preset-minutes-slider>input+output {
 	--flip: -1;
 	--x-offset: calc(var(--completed-b) * -1%);
 	--pos: calc(((var(--value) - var(--min)) / (var(--max) - var(--min))) * 100%);
@@ -2391,7 +2437,8 @@ $preset-counter-tick-diameter: 12px;
 		all 0.12s ease-out,
 		left 0s;
 }
-.preset-minutes-slider > input + output::after {
+
+.preset-minutes-slider>input+output::after {
 	content: var(--prefix, "") var(--text-value-b) var(--suffix, "");
 	font: var(--value-font);
 }
@@ -2402,7 +2449,7 @@ $preset-counter-tick-diameter: 12px;
 	padding-bottom: 0;
 }
 
-.preset-minutes-slider--triple > input {
+.preset-minutes-slider--triple>input {
 	top: var(--slider-value-band);
 }
 
@@ -2411,18 +2458,18 @@ $preset-counter-tick-diameter: 12px;
 }
 
 // Thumb center on the track: inset by half thumb, then interpolate over (100% − thumb)
-.preset-minutes-slider--triple > input + output {
+.preset-minutes-slider--triple>input+output {
 	--pos: calc(var(--thumb-size) / 2 + (100% - var(--thumb-size)) * (var(--value) - var(--min)) / (var(--max) - var(--min)));
 	top: calc(var(--slider-value-band) / 2);
 	transform: translate(-50%, -50%);
 }
 
 // Extra class keeps `--pos` on the 0–10 rounds scale (minute `--min`/`--max` on the wrapper would misplace the label).
-.preset-minutes-slider.preset-minutes-slider--triple > input:nth-of-type(3) + output {
+.preset-minutes-slider.preset-minutes-slider--triple>input:nth-of-type(3)+output {
 	--pos: calc(var(--thumb-size) / 2 + (100% - var(--thumb-size)) * (var(--value-c) - var(--rounds-min, 0)) / (var(--rounds-max, 10) - var(--rounds-min, 0)));
 }
 
-.preset-minutes-slider--triple > input:hover + output {
+.preset-minutes-slider--triple>input:hover+output {
 	transform: translate(-50%, calc(-50% + var(--y-offset, 0px)));
 }
 
@@ -2476,64 +2523,64 @@ $preset-thumb-triple: (
 );
 
 @each $ti, $tcolor in $preset-thumb-triple {
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti})::-webkit-slider-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti})::-webkit-slider-thumb {
 		@include preset-thumb-raised($tcolor);
 		-webkit-clip-path: var(--thumb-clip-#{$ti}, none);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti})::-moz-range-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti})::-moz-range-thumb {
 		@include preset-thumb-raised($tcolor);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti})::-ms-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti})::-ms-thumb {
 		@include preset-thumb-raised($tcolor);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti}):hover::-webkit-slider-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti}):hover::-webkit-slider-thumb {
 		@include preset-thumb-raised-hover($tcolor);
 		-webkit-clip-path: var(--thumb-clip-#{$ti}, none);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti}):hover::-moz-range-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti}):hover::-moz-range-thumb {
 		@include preset-thumb-raised-hover($tcolor);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti}):hover::-ms-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti}):hover::-ms-thumb {
 		@include preset-thumb-raised-hover($tcolor);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti}):active::-webkit-slider-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti}):active::-webkit-slider-thumb {
 		@include preset-thumb-raised-active($tcolor);
 		-webkit-clip-path: var(--thumb-clip-#{$ti}, none);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti}):active::-moz-range-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti}):active::-moz-range-thumb {
 		@include preset-thumb-raised-active($tcolor);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 
-	.preset-minutes-slider--triple > input:nth-of-type(#{$ti}):active::-ms-thumb {
+	.preset-minutes-slider--triple>input:nth-of-type(#{$ti}):active::-ms-thumb {
 		@include preset-thumb-raised-active($tcolor);
 		clip-path: var(--thumb-clip-#{$ti}, none);
 	}
 }
 
-.preset-minutes-slider--triple > input:nth-of-type(1):hover + output {
+.preset-minutes-slider--triple>input:nth-of-type(1):hover+output {
 	--value-background-hover: #{$thumb-minutes};
 }
 
-.preset-minutes-slider--triple > input:nth-of-type(2):hover + output {
+.preset-minutes-slider--triple>input:nth-of-type(2):hover+output {
 	--value-background-hover: #{$thumb-interval};
 }
 
-.preset-minutes-slider--triple > input:nth-of-type(3):hover + output {
+.preset-minutes-slider--triple>input:nth-of-type(3):hover+output {
 	--value-background-hover: #{$thumb-rounds};
 }
 
@@ -2567,7 +2614,7 @@ $preset-thumb-triple: (
 	transition: opacity 0.12s ease-out;
 }
 
-.preset-minutes-slider--triple > input:hover ~ .preset-minutes-slider__output--cluster {
+.preset-minutes-slider--triple>input:hover~.preset-minutes-slider__output--cluster {
 	transform: translate(-50%, calc(-50% - 5px));
 }
 
