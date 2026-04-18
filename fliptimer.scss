@@ -371,7 +371,7 @@ body {
 	}
 
 	li {
-		line-height: $flip-li-line-height;
+		line-height: normal;
 
 		// Reduces subpixel jitter during transforms in Chrome
 		span .inn {
@@ -419,7 +419,6 @@ body {
 		top: 0;
 		width: 100%;
 		height: 100%;
-		line-height: 60px;
 	}
 
 	ul.flip li span {
@@ -474,9 +473,16 @@ body {
 		height: 200%;
 		color: var(--flip-digit-fg, #{$digit-fg});
 		text-shadow: var(--flip-digit-text-shadow, 0 1px 2px #000);
-		text-align: center;
 		background-color: var(--flip-digit-bg, #{$flip-digit-bg-no-preset});
 		border-radius: $flip-radius;
+
+		// Flex centering for perfect vertical/horizontal alignment
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		// Some fonts have uneven vertical distribution; a small bottom offset
+		// ensures it doesn't feel like it's "touching" the bottom edge.
+		padding-bottom: 0.05em;
 	}
 
 	ul.flip li span div.up div.inn {

@@ -249,16 +249,14 @@ body.fliptimer-custom-bg {
   max-width: none;
   height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100vw, 100vh));
   min-height: 72px;
+  --fc-flip-h: 100px;
+  --fc-flip-w: 66px;
+  --flip-digit-bg: #2d2d2d;
 }
 @supports (width: 1dvw) {
   .countdown {
     height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100dvw, 100dvh));
   }
-}
-.countdown {
-  --fc-flip-h: 100px;
-  --fc-flip-w: 66px;
-  --flip-digit-bg: #2d2d2d;
 }
 .countdown * {
   margin: 0;
@@ -275,7 +273,7 @@ body.fliptimer-custom-bg {
   list-style: none;
 }
 .countdown li {
-  line-height: 87px;
+  line-height: normal;
 }
 .countdown li span .inn {
   backface-visibility: hidden;
@@ -308,7 +306,6 @@ body.fliptimer-custom-bg {
   top: 0;
   width: 100%;
   height: 100%;
-  line-height: 60px;
 }
 .countdown ul.flip li span {
   display: block;
@@ -355,9 +352,12 @@ body.fliptimer-custom-bg {
   height: 200%;
   color: var(--flip-digit-fg, #ccc);
   text-shadow: var(--flip-digit-text-shadow, 0 1px 2px #000);
-  text-align: center;
   background-color: var(--flip-digit-bg, #2d2d2d);
   border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0.05em;
 }
 .countdown ul.flip li span div.up div.inn {
   top: 0;
@@ -1406,26 +1406,26 @@ body.fliptimer-custom-bg {
 
 @media only screen and (max-width: 767px) {
   .preset-table-wrap,
-  .preset-form-container {
+.preset-form-container {
     margin-left: 8px;
     margin-right: 8px;
   }
   .preset-table th,
-  .preset-table td {
+.preset-table td {
     padding: 4px 5px;
   }
   .preset-table th:nth-child(2),
-  .preset-table th:nth-child(3),
-  .preset-table th:nth-child(4),
-  .preset-table td:nth-child(2),
-  .preset-table td:nth-child(3),
-  .preset-table td:nth-child(4) {
+.preset-table th:nth-child(3),
+.preset-table th:nth-child(4),
+.preset-table td:nth-child(2),
+.preset-table td:nth-child(3),
+.preset-table td:nth-child(4) {
     font-size: 10px;
     padding-left: 3px;
     padding-right: 3px;
   }
   .preset-table th:nth-child(5),
-  .preset-table td:nth-child(5) {
+.preset-table td:nth-child(5) {
     overflow-wrap: normal;
     word-break: normal;
   }
@@ -1844,14 +1844,6 @@ body.fliptimer-custom-bg {
   --slider-gap-track-ticks: 6px;
   --slider-gap-ticks-minmax: 5px;
   --thumb-size: 26px;
-}
-@media (pointer: coarse) {
-  .preset-form__count-field--minutes .preset-minutes-slider--triple {
-    --slider-value-band: 34px;
-    --thumb-size: 32px;
-  }
-}
-.preset-form__count-field--minutes .preset-minutes-slider--triple {
   --ticks-height: 6px;
   --ticks-gap: 0px;
   --value-offset-y: 0px;
@@ -1860,6 +1852,12 @@ body.fliptimer-custom-bg {
   padding-top: 0;
   padding-bottom: 0;
   background-position-y: calc(var(--slider-value-band) + var(--thumb-size) + var(--slider-gap-track-ticks));
+}
+@media (pointer: coarse) {
+  .preset-form__count-field--minutes .preset-minutes-slider--triple {
+    --slider-value-band: 34px;
+    --thumb-size: 32px;
+  }
 }
 
 .preset-minutes-slider {
@@ -2220,7 +2218,7 @@ body.fliptimer-custom-bg {
 
 .preset-minutes-slider--triple > input:nth-of-type(1)::-webkit-slider-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(94.58, 154.82, 223.12), rgb(23.16, 114.24, 217.28));
+  background-image: linear-gradient(to bottom, #5f9bdf, #1772d9);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2230,7 +2228,7 @@ body.fliptimer-custom-bg {
 
 .preset-minutes-slider--triple > input:nth-of-type(1)::-moz-range-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(94.58, 154.82, 223.12), rgb(23.16, 114.24, 217.28));
+  background-image: linear-gradient(to bottom, #5f9bdf, #1772d9);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2239,7 +2237,7 @@ body.fliptimer-custom-bg {
 
 .preset-minutes-slider--triple > input:nth-of-type(1)::-ms-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(94.58, 154.82, 223.12), rgb(23.16, 114.24, 217.28));
+  background-image: linear-gradient(to bottom, #5f9bdf, #1772d9);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2247,43 +2245,43 @@ body.fliptimer-custom-bg {
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(1):hover::-webkit-slider-thumb {
-  background-image: linear-gradient(to bottom, rgb(23.16, 114.24, 217.28), rgb(94.58, 154.82, 223.12));
+  background-image: linear-gradient(to bottom, #1772d9, #5f9bdf);
   -webkit-clip-path: var(--thumb-clip-1, none);
   clip-path: var(--thumb-clip-1, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(1):hover::-moz-range-thumb {
-  background-image: linear-gradient(to bottom, rgb(23.16, 114.24, 217.28), rgb(94.58, 154.82, 223.12));
+  background-image: linear-gradient(to bottom, #1772d9, #5f9bdf);
   clip-path: var(--thumb-clip-1, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(1):hover::-ms-thumb {
-  background-image: linear-gradient(to bottom, rgb(23.16, 114.24, 217.28), rgb(94.58, 154.82, 223.12));
+  background-image: linear-gradient(to bottom, #1772d9, #5f9bdf);
   clip-path: var(--thumb-clip-1, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(1):active::-webkit-slider-thumb {
-  background-image: linear-gradient(to bottom, rgb(73.8, 142.5, 220.6), rgb(61.56, 136.08, 221.2));
+  background-image: linear-gradient(to bottom, #4a8fdd, #3e88dd);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   -webkit-clip-path: var(--thumb-clip-1, none);
   clip-path: var(--thumb-clip-1, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(1):active::-moz-range-thumb {
-  background-image: linear-gradient(to bottom, rgb(73.8, 142.5, 220.6), rgb(61.56, 136.08, 221.2));
+  background-image: linear-gradient(to bottom, #4a8fdd, #3e88dd);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   clip-path: var(--thumb-clip-1, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(1):active::-ms-thumb {
-  background-image: linear-gradient(to bottom, rgb(73.8, 142.5, 220.6), rgb(61.56, 136.08, 221.2));
+  background-image: linear-gradient(to bottom, #4a8fdd, #3e88dd);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   clip-path: var(--thumb-clip-1, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(2)::-webkit-slider-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(217.34, 165.98, 106.56), rgb(205.32, 130.8, 44.32));
+  background-image: linear-gradient(to bottom, #d9a66b, #cd832c);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2293,7 +2291,7 @@ body.fliptimer-custom-bg {
 
 .preset-minutes-slider--triple > input:nth-of-type(2)::-moz-range-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(217.34, 165.98, 106.56), rgb(205.32, 130.8, 44.32));
+  background-image: linear-gradient(to bottom, #d9a66b, #cd832c);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2302,7 +2300,7 @@ body.fliptimer-custom-bg {
 
 .preset-minutes-slider--triple > input:nth-of-type(2)::-ms-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(217.34, 165.98, 106.56), rgb(205.32, 130.8, 44.32));
+  background-image: linear-gradient(to bottom, #d9a66b, #cd832c);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2310,43 +2308,43 @@ body.fliptimer-custom-bg {
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(2):hover::-webkit-slider-thumb {
-  background-image: linear-gradient(to bottom, rgb(205.32, 130.8, 44.32), rgb(217.34, 165.98, 106.56));
+  background-image: linear-gradient(to bottom, #cd832c, #d9a66b);
   -webkit-clip-path: var(--thumb-clip-2, none);
   clip-path: var(--thumb-clip-2, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(2):hover::-moz-range-thumb {
-  background-image: linear-gradient(to bottom, rgb(205.32, 130.8, 44.32), rgb(217.34, 165.98, 106.56));
+  background-image: linear-gradient(to bottom, #cd832c, #d9a66b);
   clip-path: var(--thumb-clip-2, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(2):hover::-ms-thumb {
-  background-image: linear-gradient(to bottom, rgb(205.32, 130.8, 44.32), rgb(217.34, 165.98, 106.56));
+  background-image: linear-gradient(to bottom, #cd832c, #d9a66b);
   clip-path: var(--thumb-clip-2, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(2):active::-webkit-slider-thumb {
-  background-image: linear-gradient(to bottom, rgb(212.4, 155.1, 89), rgb(212.04, 149.76, 78.32));
+  background-image: linear-gradient(to bottom, #d49b59, #d4964e);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   -webkit-clip-path: var(--thumb-clip-2, none);
   clip-path: var(--thumb-clip-2, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(2):active::-moz-range-thumb {
-  background-image: linear-gradient(to bottom, rgb(212.4, 155.1, 89), rgb(212.04, 149.76, 78.32));
+  background-image: linear-gradient(to bottom, #d49b59, #d4964e);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   clip-path: var(--thumb-clip-2, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(2):active::-ms-thumb {
-  background-image: linear-gradient(to bottom, rgb(212.4, 155.1, 89), rgb(212.04, 149.76, 78.32));
+  background-image: linear-gradient(to bottom, #d49b59, #d4964e);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   clip-path: var(--thumb-clip-2, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(3)::-webkit-slider-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(169.6, 127.54, 237.38), rgb(134.48, 73.76, 238.44));
+  background-image: linear-gradient(to bottom, #aa80ed, #864aee);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2356,7 +2354,7 @@ body.fliptimer-custom-bg {
 
 .preset-minutes-slider--triple > input:nth-of-type(3)::-moz-range-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(169.6, 127.54, 237.38), rgb(134.48, 73.76, 238.44));
+  background-image: linear-gradient(to bottom, #aa80ed, #864aee);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2365,7 +2363,7 @@ body.fliptimer-custom-bg {
 
 .preset-minutes-slider--triple > input:nth-of-type(3)::-ms-thumb {
   background-color: transparent;
-  background-image: linear-gradient(to bottom, rgb(169.6, 127.54, 237.38), rgb(134.48, 73.76, 238.44));
+  background-image: linear-gradient(to bottom, #aa80ed, #864aee);
   border-radius: 50%;
   box-shadow: 0 calc(var(--thumb-size) * 0.114) calc(var(--thumb-size) * 0.143) 0 rgba(0, 0, 0, 0.3), inset 0 calc(var(--thumb-size) * 0.057) 1px 1px rgba(255, 255, 255, 0.98), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.5);
   transition: background-image 0.1s linear, box-shadow 0.1s linear, transform 0.1s linear;
@@ -2373,36 +2371,36 @@ body.fliptimer-custom-bg {
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(3):hover::-webkit-slider-thumb {
-  background-image: linear-gradient(to bottom, rgb(134.48, 73.76, 238.44), rgb(169.6, 127.54, 237.38));
+  background-image: linear-gradient(to bottom, #864aee, #aa80ed);
   -webkit-clip-path: var(--thumb-clip-3, none);
   clip-path: var(--thumb-clip-3, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(3):hover::-moz-range-thumb {
-  background-image: linear-gradient(to bottom, rgb(134.48, 73.76, 238.44), rgb(169.6, 127.54, 237.38));
+  background-image: linear-gradient(to bottom, #864aee, #aa80ed);
   clip-path: var(--thumb-clip-3, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(3):hover::-ms-thumb {
-  background-image: linear-gradient(to bottom, rgb(134.48, 73.76, 238.44), rgb(169.6, 127.54, 237.38));
+  background-image: linear-gradient(to bottom, #864aee, #aa80ed);
   clip-path: var(--thumb-clip-3, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(3):active::-webkit-slider-thumb {
-  background-image: linear-gradient(to bottom, rgb(158.5, 111.7, 236.7), rgb(153.52, 102.64, 238.68));
+  background-image: linear-gradient(to bottom, #9f70ed, #9a67ef);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   -webkit-clip-path: var(--thumb-clip-3, none);
   clip-path: var(--thumb-clip-3, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(3):active::-moz-range-thumb {
-  background-image: linear-gradient(to bottom, rgb(158.5, 111.7, 236.7), rgb(153.52, 102.64, 238.68));
+  background-image: linear-gradient(to bottom, #9f70ed, #9a67ef);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   clip-path: var(--thumb-clip-3, none);
 }
 
 .preset-minutes-slider--triple > input:nth-of-type(3):active::-ms-thumb {
-  background-image: linear-gradient(to bottom, rgb(158.5, 111.7, 236.7), rgb(153.52, 102.64, 238.68));
+  background-image: linear-gradient(to bottom, #9f70ed, #9a67ef);
   box-shadow: 0 calc(var(--thumb-size) * 0.043) calc(var(--thumb-size) * 0.071) 0 rgba(0, 0, 0, 0.4), inset 0 calc(var(--thumb-size) * -0.043) 1px 1px rgba(204, 198, 197, 0.55);
   clip-path: var(--thumb-clip-3, none);
 }

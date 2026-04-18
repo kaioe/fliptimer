@@ -455,8 +455,8 @@ export function initPresetTimers(clock, refreshToolbar) {
 	var $settingsOpenBtn = $("#preset-settings-open-btn");
 	var $counterSize = $("#fliptimer-counter-size");
 	var $counterSizeOut = $("#fliptimer-counter-size-out");
-	var $trackMax = $("#flipclock-preset-track-max");
-	var $trackMaxOut = $("#flipclock-preset-track-max-out");
+	var $trackMax = $("#fliptimer-preset-track-max");
+	var $trackMaxOut = $("#fliptimer-preset-track-max-out");
 
 	function closePresetSettings() {
 		$settingsFrame.removeAttr(PRESET_SETTINGS_EXPANDED_ATTR);

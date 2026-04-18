@@ -97,7 +97,12 @@ module.exports = {
 			const q = req.url.indexOf("?");
 			const pathOnly = q === -1 ? req.url : req.url.slice(0, q);
 			const qs = q === -1 ? "" : req.url.slice(q);
-			if (pathOnly === "/fliptimer" || pathOnly === "/fliptimer/" || pathOnly === "/fliptimer.html") {
+			const oldPaths = [
+				"/fliptimer", "/fliptimer/", "/fliptimer.html",
+				"/flipclock", "/flipclock/", "/flipclock.html",
+				"/flipClock", "/flipClock/", "/flipClock.html"
+			];
+			if (oldPaths.includes(pathOnly)) {
 				req.url = "/" + qs;
 			}
 			next();

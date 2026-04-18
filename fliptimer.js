@@ -81,8 +81,8 @@ $(function () {
 		$counterSizeOutInit.text(pct0 + "%");
 		setCounterRangeFillPct($counterSizeInit[0], pct0);
 	}
-	var $trackMaxInit = $("#flipclock-preset-track-max");
-	var $trackMaxOutInit = $("#flipclock-preset-track-max-out");
+	var $trackMaxInit = $("#fliptimer-preset-track-max");
+	var $trackMaxOutInit = $("#fliptimer-preset-track-max-out");
 	if ($trackMaxInit.length) {
 		var tm0 = snapTrackMaxMinutes(getPresetTrackMax());
 		setPresetTrackMax(tm0);

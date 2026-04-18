@@ -152,11 +152,7 @@ Fliptimer.prototype.setDimensions = function () {
 	$("ul.flip", container)
 		.css({
 			width: flipWidth,
-			fontSize: flipHeight - 10 + "px",
-		})
-		.find("li")
-		.css({
-			lineHeight: flipHeight + "px",
+			fontSize: (flipHeight * 0.85) + "px",
 		});
 };
 
