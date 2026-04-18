@@ -1,52 +1,6 @@
 {
   "version": 1,
-  "presets": [
-    {
-      "id": "preset-1774691664737-8xytasr",
-      "name": "Blue Belts",
-      "color": "#1e5a8c",
-      "minutes": 6,
-      "rounds": 5,
-      "intervalMinutes": 2
-    },
-    {
-      "id": "preset-1774691984278-cikytkg",
-      "name": "Purple Belts",
-      "color": "#6b2d9c",
-      "minutes": 7,
-      "rounds": 5,
-      "intervalMinutes": 2
-    },
-    {
-      "id": "preset-1774718577143-4fufkcy",
-      "name": "Brow Belts",
-      "color": "#853a1e",
-      "minutes": 8,
-      "rounds": 1,
-      "intervalMinutes": 2
-    },
-    {
-      "id": "preset-1774718667019-ku44yqg",
-      "name": "Black Belt",
-      "color": "#000000",
-      "minutes": 10,
-      "rounds": 10,
-      "intervalMinutes": 2
-    },
-    {
-      "id": "preset-1774718828127-r6hzxbm",
-      "name": "Open Mat",
-      "color": "#c41e3a",
-      "minutes": 7,
-      "rounds": 10,
-      "intervalMinutes": 2
-    }
-  ],
+  "presets": [],
   "appBackgroundFile": "imgs/background.webp",
-  "soundSource": "preloaded",
-  "soundPreloaded": {
-    "start": "female-eryn-fight.mp3",
-    "pause": "female-eryn-pause.mp3",
-    "finish": "female-eryn-finish.mp3"
-  }
+  "soundSource": "upload"
 }
