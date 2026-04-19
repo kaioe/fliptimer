@@ -23,6 +23,24 @@ export function comparableIntToMmSsString(t) {
 	return s.slice(0, 2) + ":" + s.slice(2, 4);
 }
 
+/** Inverse of {@link timeStringToComparableInt} for 4-digit HH:MM faces (pads to 4 digits). */
+export function comparableIntToHhMmString(t) {
+	var n = Math.max(0, Math.min(2359, parseInt(String(t), 10) || 0));
+	var s = String(n);
+	while (s.length < 4) {
+		s = "0" + s;
+	}
+	return s.slice(0, 2) + ":" + s.slice(2, 4);
+}
+
+/** Returns current local time as "HH:MM" string. */
+export function getLocalTimeHhMmString() {
+	var d = new Date();
+	var h = d.getHours();
+	var m = d.getMinutes();
+	return (h < 10 ? "0" + h : String(h)) + ":" + (m < 10 ? "0" + m : String(m));
+}
+
 /** Prep step 5…1 → `00:05`…`00:01` on the flip clock. */
 export function prepStepToMmSs(seconds) {
 	var sec = Math.max(1, Math.min(5, seconds | 0));
@@ -223,7 +241,7 @@ Fliptimer.prototype.createFaceDigit = function (digit) {
  */
 Fliptimer.prototype.start = function (resumeOnly) {
 	if (!resumeOnly) {
-		this.setToTime(this.options.startTime);
+		this.snapToTime(this.options.startTime);
 	}
 	var self = this;
 	this.tickInterval = setInterval(function () {
@@ -234,6 +252,18 @@ Fliptimer.prototype.start = function (resumeOnly) {
 Fliptimer.prototype.stop = function () {
 	clearInterval(this.tickInterval);
 	this.tickInterval = false;
+};
+
+/**
+ * Dynamically swap the face configuration (e.g. clock HH:MM ↔ countdown MM:SS).
+ * Rebuilds the DOM, reapplies dimensions, and restarts ticking.
+ * @param {Object} newOpts — partial options to merge: { face, isCountdown, startTime, maxTime, minTime, tickDuration }
+ */
+Fliptimer.prototype.rebuildFace = function (newOpts) {
+	this.stop();
+	$.extend(this.options, newOpts);
+	this.digitSelectors = [];
+	this.init();
 };
 
 Fliptimer.prototype.resetDigits = function () {
@@ -254,6 +284,30 @@ Fliptimer.prototype.resetDigits = function () {
 	}
 
 	container.addClass("play");
+};
+
+Fliptimer.prototype.snapToTime = function (time) {
+	var timeArray = time.replace(/:/g, "").split("").reverse();
+	var container = this.options.containerElement;
+
+	container.addClass("play no-flip");
+	for (var i = 0; i < this.digitSelectors.length; i++) {
+		var sel = this.getDigitSelectorByIndex(i);
+		var $col = $(sel, container);
+		$col.removeClass("current previous countdownFix clockFix");
+		var di = parseInt(timeArray[i], 10);
+		if (Number.isNaN(di)) {
+			di = 0;
+		}
+		$col.eq(di).addClass("current");
+	}
+	// Remove no-flip after a frame so subsequent ticks animate normally
+	var self = this;
+	requestAnimationFrame(function () {
+		requestAnimationFrame(function () {
+			container.removeClass("no-flip");
+		});
+	});
 };
 
 Fliptimer.prototype.setToTime = function (time) {

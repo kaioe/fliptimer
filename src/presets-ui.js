@@ -4,7 +4,7 @@
 const $ = window.jQuery;
 "use strict";
 
-import { Fliptimer } from "./fliptimer-clock.js";
+import { Fliptimer, getLocalTimeHhMmString } from "./fliptimer-clock.js";
 import {
 	PRESET_STORAGE_KEY, ACTIVE_PRESET_ID_STORAGE_KEY, PRESET_SLIDER_THUMBS_KEY,
 	PRESET_TRACK_MAX_KEY, FLIPTIMER_COUNTER_PCT_KEY, FLIPTIMER_APP_BG_KEY,
@@ -21,6 +21,7 @@ import {
 import {
 	playFliptimerSound, syncAllPresetFileDrops, syncPresetFileDropFromInput,
 	fliptimerUnlockHtmlAudioIfNeeded, assignFileToInput,
+	FLIPTIMER_PREP_FLIP_MS, FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
 } from "./sound-manager.js";
 import {
 	PRESET_COLOR_SWATCHES, normalizeHexColor, applyCounterContrastFromPresetColor,
@@ -61,6 +62,22 @@ export function initPresetTimers(clock, refreshToolbar) {
 			saveActivePresetIdToStorage(null);
 			applyCounterContrastFromPresetColor($cd, null);
 			$activePreset.attr("hidden", "hidden").attr("aria-hidden", "true");
+			/* Rebuild back to clock mode if currently in countdown mode */
+			if (clock.options.isCountdown === true) {
+				clock.cancelPrepCountdown();
+				clock.rebuildFace({
+					isCountdown: false,
+					startTime: getLocalTimeHhMmString(),
+					maxTime: "23:59",
+					minTime: "00:00",
+					tickDuration: 1000,
+					face: {
+						hours: { maxValue: 23 },
+						minutes: { maxValue: 59 },
+					},
+				});
+				refreshToolbar();
+			}
 			return;
 		}
 		activePresetId = p.id;
@@ -1239,9 +1256,19 @@ export function initPresetTimers(clock, refreshToolbar) {
 		}
 		clock.cancelPrepCountdown();
 		var mmss = minutesToStartTime(p.minutes);
+		clock.rebuildFace({
+			isCountdown: true,
+			startTime: mmss,
+			maxTime: mmss,
+			minTime: "00:00",
+			tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+			face: {
+				minutes: { maxValue: 59 },
+				seconds: { maxValue: 59 },
+			},
+		});
+		/* Preserve original behavior: set the time but don't auto-start — user must press play */
 		clock.stop();
-		clock.options.startTime = mmss;
-		clock.setToTime(mmss);
 		setActivePresetUi(p);
 		refreshToolbar();
 	}

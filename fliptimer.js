@@ -2,7 +2,7 @@
  * Fliptimer — entry point (ES module)
  * Bootstraps the app after DOMContentLoaded.
  */
-import { Fliptimer } from "./src/fliptimer-clock.js";
+import { Fliptimer, getLocalTimeHhMmString } from "./src/fliptimer-clock.js";
 import {
 	PRESET_TRACK_MAX_KEY,
 	DEFAULT_BG_FILE,
@@ -44,13 +44,15 @@ $(function () {
 	}
 	applyAppBackgroundState(bgState);
 	var clock = new Fliptimer({
-		isCountdown: true,
-		startTime: "05:05",
-		tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+		isCountdown: false,
+		startTime: getLocalTimeHhMmString(),
+		maxTime: "23:59",
+		minTime: "00:00",
+		tickDuration: 1000,
 		containerElement: $(".countdown"),
 		face: {
+			hours: { maxValue: 23 },
 			minutes: { maxValue: 59 },
-			seconds: { maxValue: 59 },
 		},
 	});
 	window.fliptimerInstance = clock;

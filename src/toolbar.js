@@ -4,7 +4,7 @@
 const $ = window.jQuery;
 "use strict";
 
-import { comparableIntToMmSsString, prepStepToMmSs } from "./fliptimer-clock.js";
+import { comparableIntToMmSsString, prepStepToMmSs, getLocalTimeHhMmString } from "./fliptimer-clock.js";
 import {
 	playFliptimerSound, playPrepCountdownBeep,
 	fliptimerUnlockHtmlAudioIfNeeded,
@@ -106,9 +106,6 @@ export function initFliptimerChromeDimming(clock) {
  * @param {Fliptimer} clock
  * @param {function(): void} [onAfterToolbarRefresh] — e.g. sync toolbar/active-preset dimming
  */
-/** Ms after which a paused/stopped timer shows local wall time (HH:MM) and hides the toolbar. */
-export const FLIPTIMER_IDLE_WALL_CLOCK_MS = 10000;
-
 export function initFliptimerToolbar(clock, onAfterToolbarRefresh) {
 	var $playPause = $("#clock-play-pause-btn");
 	var $reset = $("#clock-reset-btn");
@@ -151,121 +148,8 @@ export function initFliptimerToolbar(clock, onAfterToolbarRefresh) {
 	/** Snapshot of `MM:SS` to restore after prep (or if prep is cancelled). */
 	var prepResumeTimeStr = null;
 
-	var becameInactiveAt = null;
-	var idleWallClockActive = false;
-	var idleWallClockTickId = null;
-	/** Last pointer time while wall-clock idle (toolbar + active-preset revealed); after {@link FLIPTIMER_IDLE_WALL_CLOCK_MS} with no activity, both fade off again. */
-	var lastIdleToolbarPointerAt = null;
-	/** Snapshot of round time when entering idle wall-clock mode (restored on Play / Presets unless cleared). */
-	var pausedTimeBeforeIdleWallClock = null;
-
-	function getLocalTimeHhMmString() {
-		var d = new Date();
-		var h = d.getHours();
-		var m = d.getMinutes();
-		return (h < 10 ? "0" + h : String(h)) + ":" + (m < 10 ? "0" + m : String(m));
-	}
-
-	function exitIdleWallClockMode(restorePausedFace) {
-		if (!idleWallClockActive) {
-			return;
-		}
-		if (idleWallClockTickId !== null) {
-			window.clearInterval(idleWallClockTickId);
-			idleWallClockTickId = null;
-		}
-		$toolbar.removeClass("fliptimer-idle-clock");
-		$activePresetIdle.removeClass("fliptimer-idle-clock");
-		lastIdleToolbarPointerAt = null;
-		var snap = pausedTimeBeforeIdleWallClock;
-		pausedTimeBeforeIdleWallClock = null;
-		idleWallClockActive = false;
-		if (restorePausedFace !== false && snap !== null) {
-			clock.setToTime(snap);
-		}
-	}
-
-	function enterIdleWallClockMode() {
-		if (clock.tickInterval !== false || clock.prepCountdownActive) {
-			return;
-		}
-		if (idleWallClockActive) {
-			return;
-		}
-		pausedTimeBeforeIdleWallClock = comparableIntToMmSsString(clock.getCurrentTime());
-		idleWallClockActive = true;
-		lastIdleToolbarPointerAt = null;
-		clock.setToTime(getLocalTimeHhMmString());
-		$toolbar.addClass("fliptimer-idle-clock");
-		$activePresetIdle.addClass("fliptimer-idle-clock");
-		idleWallClockTickId = window.setInterval(function () {
-			if (clock.tickInterval !== false || clock.prepCountdownActive) {
-				exitIdleWallClockMode(false);
-				return;
-			}
-			if (!idleWallClockActive) {
-				return;
-			}
-			clock.setToTime(getLocalTimeHhMmString());
-		}, 60000);
-	}
-
-	function pollIdleWallClock() {
-		if (clock.tickInterval !== false || clock.prepCountdownActive) {
-			becameInactiveAt = null;
-			exitIdleWallClockMode(false);
-			return;
-		}
-		if (idleWallClockActive) {
-			if (
-				!$toolbar.hasClass("fliptimer-idle-clock") &&
-				lastIdleToolbarPointerAt !== null &&
-				Date.now() - lastIdleToolbarPointerAt >= FLIPTIMER_IDLE_WALL_CLOCK_MS
-			) {
-				$toolbar.addClass("fliptimer-idle-clock");
-				$activePresetIdle.addClass("fliptimer-idle-clock");
-			}
-			return;
-		}
-		if (becameInactiveAt === null) {
-			return;
-		}
-		if (Date.now() - becameInactiveAt < FLIPTIMER_IDLE_WALL_CLOCK_MS) {
-			return;
-		}
-		enterIdleWallClockMode();
-	}
-
-	clock.exitIdleWallClockMode = exitIdleWallClockMode;
-
-	/**
-	 * While wall-clock idle, pointer motion restores full opacity on `.fliptimer-toolbar` and `.active-preset`
-	 * and records activity so both can fade off again after {@link FLIPTIMER_IDLE_WALL_CLOCK_MS} with no further pointer input.
-	 */
-	function onIdleWallClockPointerActivity() {
-		if (!idleWallClockActive) {
-			return;
-		}
-		lastIdleToolbarPointerAt = Date.now();
-		$toolbar.removeClass("fliptimer-idle-clock");
-		$activePresetIdle.removeClass("fliptimer-idle-clock");
-	}
-
-	$(document).on("mousemove.fliptimerIdleToolbarReveal", onIdleWallClockPointerActivity);
-	document.addEventListener(
-		"touchstart",
-		function fliptimerIdleToolbarTouchReveal() {
-			onIdleWallClockPointerActivity();
-		},
-		{ passive: true, capture: true },
-	);
-	document.addEventListener(
-		"touchmove",
-		function fliptimerIdleToolbarTouchMoveReveal() {
-			onIdleWallClockPointerActivity();
-		},
-		{ passive: true, capture: true },
-	);
+	/* Provide a no-op so consumers (presets-ui) don't need feature-check branches. */
+	clock.exitIdleWallClockMode = function () {};
 
 	function clearPrepSchedule() {
 		if (typeof prepFlipCleanup === "function") {
@@ -410,11 +294,8 @@ export function initFliptimerToolbar(clock, onAfterToolbarRefresh) {
 	function refresh() {
 		var running = clock.tickInterval !== false || clock.prepCountdownActive === true;
 		if (running) {
-			becameInactiveAt = null;
-			exitIdleWallClockMode(false);
 			$playPause.html(TOOLBAR_ICON_PAUSE).attr("aria-label", "Pause").addClass("is-playing");
 		} else {
-			becameInactiveAt = Date.now();
 			$playPause.html(TOOLBAR_ICON_PLAY).attr("aria-label", "Play").removeClass("is-playing");
 		}
 		if (typeof onAfterToolbarRefresh === "function") {
@@ -422,14 +303,15 @@ export function initFliptimerToolbar(clock, onAfterToolbarRefresh) {
 		}
 	}
 
-	clock.stop();
+	/* Do NOT call clock.stop() here — the clock should tick immediately in clock mode. */
 	refresh();
 
-	window.setInterval(pollIdleWallClock, 1000);
-
 	$playPause.on("click", function () {
+		/* Play/Pause only makes sense in countdown mode */
+		if (clock.options.isCountdown !== true) {
+			return;
+		}
 		fliptimerUnlockHtmlAudioIfNeeded();
-		exitIdleWallClockMode(true);
 		if (clock.tickInterval !== false) {
 			clock.stop();
 			playFliptimerSound("pause");
@@ -443,10 +325,17 @@ export function initFliptimerToolbar(clock, onAfterToolbarRefresh) {
 	});
 
 	$reset.on("click", function () {
-		cancelPrepCountdown();
-		exitIdleWallClockMode(false);
-		clock.stop();
-		clock.setToTime(clock.options.startTime);
+		if (clock.options.isCountdown === true) {
+			/* Countdown mode: reset to start time and stop */
+			cancelPrepCountdown();
+			clock.stop();
+			clock.setToTime(clock.options.startTime);
+		} else {
+			/* Clock mode: snap to current local time (noop-ish, but handles edge cases) */
+			clock.stop();
+			clock.snapToTime(getLocalTimeHhMmString());
+			clock.start(true);
+		}
 		refresh();
 	});
 
