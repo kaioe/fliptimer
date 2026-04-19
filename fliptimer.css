@@ -370,6 +370,14 @@ body.fliptimer-custom-bg {
   bottom: 0;
 }
 
+.no-flip ul li,
+.no-flip ul li .up,
+.no-flip ul li .down,
+.no-flip ul li .shadow {
+  animation: none !important;
+  transform: none !important;
+}
+
 .play ul li.previous {
   z-index: 2;
 }
