@@ -88,6 +88,15 @@ This creates a `dist/` folder with all files needed for static hosting:
 > [!WARNING]
 > The `dist/` folder is self-contained and can be deployed to any static hosting service (GitHub Pages, Netlify, Vercel, etc.) without requiring Node.js on the server.
 
+### Shipped `fliptimer.json` (GitHub Pages seed)
+
+The committed `fliptimer.json` is copied into `dist/` and is the **first-run** preset document for visitors who have no preset data in `localStorage` yet. As of 2026-04-19 it is configured so the public demo behaves well out of the box:
+
+- **`soundSource`: `preloaded`** with **`soundPreloaded`** pointing at real files under `sounds/` (so start / pause / finish are audible without uploading audio).
+- **`appBackgroundFile`**: `imgs/background.webp`** (no base64 in the repo seed; user uploads still use a data URL in the browser only).
+
+If the live site ever looks “wrong” after a deploy, try a hard refresh or clear site data for the Pages origin: older visits may have cached **`soundSource`: `upload`** or a large **`fliptimer-app-bg-v1`** background in `localStorage` from an earlier seed.
+
 ## 📋 Technical Specifications
 
 | Component | Specification |

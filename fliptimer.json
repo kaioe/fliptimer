@@ -2,5 +2,10 @@
   "version": 1,
   "presets": [],
   "appBackgroundFile": "imgs/background.webp",
-  "soundSource": "upload"
+  "soundSource": "preloaded",
+  "soundPreloaded": {
+    "start": "Male Russo - Start.mp3",
+    "pause": "Male Russo - Pause.mp3",
+    "finish": "Male Russo - Finish.mp3"
+  }
 }
