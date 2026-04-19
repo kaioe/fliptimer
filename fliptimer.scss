@@ -784,6 +784,19 @@ body {
 	overflow-x: auto;
 	overflow-y: auto;
 	-webkit-overflow-scrolling: touch;
+	scrollbar-width: thin;
+	scrollbar-color: #666 transparent;
+
+	&::-webkit-scrollbar {
+		width: 6px;
+	}
+	&::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	&::-webkit-scrollbar-thumb {
+		background: #666;
+		border-radius: 3px;
+	}
 }
 
 // Timer settings: inline above preset table; entire frame (#preset-settings-frame) toggled via header cog
