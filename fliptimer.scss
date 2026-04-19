@@ -114,10 +114,11 @@ body {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
+	justify-content: center;
 	gap: 10px;
 	padding: max(10px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
 	box-sizing: border-box;
-	margin: auto;
+	margin: 0 auto;
 
 	@include respond-to(false, 400) {
 		gap: 8px;
