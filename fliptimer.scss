@@ -344,6 +344,12 @@ body {
 	height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100vw, 100vh));
 	min-height: 72px;
 	margin: auto 0;
+	opacity: 0;
+	transition: opacity 0.15s ease;
+
+	&.fliptimer-ready {
+		opacity: 1;
+	}
 
 	@supports (width: 1dvw) {
 		height: calc(var(--fliptimer-counter-pct, 12) / 100 * min(100dvw, 100dvh));

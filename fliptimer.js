@@ -55,6 +55,7 @@ $(function () {
 	});
 	window.fliptimerInstance = clock;
 	clock.setDimensions();
+	$(".countdown").addClass("fliptimer-ready");
 	$(window).on("resize.fliptimerCounter", function () {
 		if (window.fliptimerInstance && typeof window.fliptimerInstance.setDimensions === "function") {
 			window.fliptimerInstance.setDimensions();
