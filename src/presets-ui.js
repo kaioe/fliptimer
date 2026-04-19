@@ -70,7 +70,7 @@ export function initPresetTimers(clock, refreshToolbar) {
 					startTime: getLocalTimeHhMmString(),
 					maxTime: "23:59",
 					minTime: "00:00",
-					tickDuration: 1000,
+					tickDuration: 60000,
 					face: {
 						hours: { maxValue: 23 },
 						minutes: { maxValue: 59 },

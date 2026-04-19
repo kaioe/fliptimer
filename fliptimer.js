@@ -48,7 +48,7 @@ $(function () {
 		startTime: getLocalTimeHhMmString(),
 		maxTime: "23:59",
 		minTime: "00:00",
-		tickDuration: 1000,
+		tickDuration: 60000,
 		containerElement: $(".countdown"),
 		face: {
 			hours: { maxValue: 23 },
