@@ -37,7 +37,7 @@ FlipTimer is easy to set up and run locally:
    This will start BrowserSync on port 3000 (or the next available port) and open the timer in your browser.
 
 > [!TIP]
-> **Development Mode:** The dev server automatically watches for changes to your SCSS files and reloads the browser. It also provides preset synchronization to `fliptimer.json`.
+> **Development Mode:** The dev server automatically watches for changes to your SCSS files and reloads the browser. It also provides preset synchronization to `fliptimer.json`. Dev and build scripts run Sass and `concurrently` through `node …` so they work even when `node_modules/.bin` is not on your PATH (common on Windows). Optional `@parcel/watcher-*` packages are declared so `npm install` can install the native file watcher for your OS; avoid `npm ci --omit=optional` or installs that skip optional dependencies, or Sass watch may fall back with a warning.
 
 ## 🛠️ Usage
 

@@ -52,7 +52,7 @@ function transformHtmlForDist(html) {
 }
 
 function main() {
-	execSync("npx sass fliptimer.scss fliptimer.css --style=compressed --source-map", {
+	execSync("node node_modules/sass/sass.js fliptimer.scss fliptimer.css --style=compressed --source-map", {
 		cwd: root,
 		stdio: "inherit",
 		shell: true,
