@@ -47,7 +47,7 @@ body.fliptimer-custom-bg {
   gap: 10px;
   padding: max(10px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
   box-sizing: border-box;
-  margin: 0 auto;
+  margin: auto;
 }
 @media only screen and (max-width: 400px) {
   .container {
