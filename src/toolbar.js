@@ -35,7 +35,7 @@ export function initFliptimerChromeDimming(clock) {
 	var $activePreset = $("#active-preset");
 
 	function clockIsActiveForChromeDim() {
-		return clock.tickInterval !== false || clock.prepCountdownActive === true;
+		return clock.options.isCountdown === true && (clock.tickInterval !== false || clock.prepCountdownActive === true);
 	}
 
 	function clearChromeIdleTimer() {
@@ -292,7 +292,7 @@ export function initFliptimerToolbar(clock, onAfterToolbarRefresh) {
 	}
 
 	function refresh() {
-		var running = clock.tickInterval !== false || clock.prepCountdownActive === true;
+		var running = (clock.options.isCountdown === true) && (clock.tickInterval !== false || clock.prepCountdownActive === true);
 		if (running) {
 			$playPause.html(TOOLBAR_ICON_PAUSE).attr("aria-label", "Pause").addClass("is-playing");
 		} else {
