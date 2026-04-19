@@ -6,6 +6,7 @@ import { Fliptimer } from "./src/fliptimer-clock.js";
 import {
 	PRESET_TRACK_MAX_KEY,
 	DEFAULT_BG_FILE,
+	migrateLocalStorage,
 	snapTrackMaxMinutes,
 	getPresetTrackMax,
 	setPresetTrackMax,
@@ -16,6 +17,9 @@ import {
 	applyCounterSizePct,
 	loadAppBgStateFromStorage,
 } from "./src/storage.js";
+
+/* Migrate old flipclock-* localStorage keys before anything reads them. */
+migrateLocalStorage();
 import {
 	FLIPTIMER_PREP_FLIP_MS,
 	FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,

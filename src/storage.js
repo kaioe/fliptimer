@@ -16,6 +16,34 @@ export const SOUNDS_MANIFEST_URL = "sounds/manifest.json";
 export const FLIPTIMER_APP_BG_KEY = "fliptimer-app-bg-v1";
 export const PRESET_JSON_FILE = "fliptimer.json";
 export const DEFAULT_BG_FILE = "imgs/background.webp";
+
+/**
+ * One-time migration: copy old `flipclock-*` localStorage keys to `fliptimer-*`.
+ * Runs silently on every load; no-ops once old keys are gone.
+ */
+const _OLD_TO_NEW = [
+	["flipclock-preset-timers-v1",        PRESET_STORAGE_KEY],
+	["flipclock-active-preset-id-v1",      ACTIVE_PRESET_ID_STORAGE_KEY],
+	["flipclock-preset-slider-thumbs-v1",  PRESET_SLIDER_THUMBS_KEY],
+	["flipclock-preset-track-max-v1",      PRESET_TRACK_MAX_KEY],
+	["flipclock-counter-pct-v1",           FLIPTIMER_COUNTER_PCT_KEY],
+	["flipclock-sounds-v1",                FLIPTIMER_SOUNDS_KEY],
+	["flipclock-sound-filenames-v1",       FLIPTIMER_SOUND_NAMES_KEY],
+	["flipclock-sound-source-v1",          FLIPTIMER_SOUND_SOURCE_KEY],
+	["flipclock-sound-preloaded-v1",       FLIPTIMER_SOUND_PRELOADED_KEY],
+	["flipclock-app-bg-v1",                FLIPTIMER_APP_BG_KEY],
+];
+
+export function migrateLocalStorage() {
+	for (var [oldKey, newKey] of _OLD_TO_NEW) {
+		if (localStorage.getItem(oldKey) !== null && localStorage.getItem(newKey) === null) {
+			localStorage.setItem(newKey, localStorage.getItem(oldKey));
+			localStorage.removeItem(oldKey);
+		} else if (localStorage.getItem(oldKey) !== null) {
+			localStorage.removeItem(oldKey);
+		}
+	}
+}
 /** Keys for Timer settings → Sounds (must match `data-sound-kind` in HTML). */
 export const PRESET_SOUND_KINDS = ["start", "pause", "finish"];
 
