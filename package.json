@@ -3,10 +3,10 @@
   "private": true,
   "scripts": {
     "build": "npm run build:css",
-    "build:css": "sass fliptimer.scss fliptimer.css --style=compressed --source-map",
+    "build:css": "node node_modules/sass/sass.js fliptimer.scss fliptimer.css --style=compressed --source-map",
     "build:dist": "node scripts/build-dist.mjs",
-    "dev": "concurrently -k -n sass,bs -c cyan,magenta \"npm run dev:sass\" \"npm run dev:serve\"",
-    "dev:sass": "sass --watch --poll fliptimer.scss fliptimer.css --style=expanded --source-map",
+    "dev": "node node_modules/concurrently/dist/bin/concurrently.js -k -n sass,bs -c cyan,magenta \"npm run dev:sass\" \"npm run dev:serve\"",
+    "dev:sass": "node node_modules/sass/sass.js --watch --poll fliptimer.scss fliptimer.css --style=expanded --source-map",
     "dev:serve": "node node_modules/browser-sync/dist/bin.js start --config bs-config.js",
     "server": "npm run dev:serve",
     "browser:console": "node scripts/browser-console.mjs",
@@ -25,5 +25,12 @@
   },
   "dependencies": {
     "jquery": "^3.7.1"
+  },
+  "optionalDependencies": {
+    "@parcel/watcher-darwin-arm64": "2.5.6",
+    "@parcel/watcher-darwin-x64": "2.5.6",
+    "@parcel/watcher-linux-x64-glibc": "2.5.6",
+    "@parcel/watcher-win32-arm64": "2.5.6",
+    "@parcel/watcher-win32-x64": "2.5.6"
   }
 }
