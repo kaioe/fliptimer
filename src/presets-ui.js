@@ -1300,7 +1300,7 @@ export function initPresetTimers(clock, refreshToolbar) {
 			presets = doc.presets;
 			savePresetsToStorage(presets);
 			if (doc.appBackgroundDataUrl) {
-				persistAppBgState({ dataUrl: doc.appBackgroundDataUrl });
+				/* Do not persist: seed JSON must not fill localStorage with a huge data URL (every load would keep using base64 in CSS). User uploads still persist via the file input handler. */
 				applyAppBackgroundState({ dataUrl: doc.appBackgroundDataUrl });
 			} else if (doc.appBackgroundFile) {
 				applyAppBackgroundState({ dataUrl: doc.appBackgroundFile });

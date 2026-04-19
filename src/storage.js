@@ -34,6 +34,8 @@ const _OLD_TO_NEW = [
 	["flipclock-app-bg-v1",                FLIPTIMER_APP_BG_KEY],
 ];
 
+const _MIGRATED_BG_NO_FILENAME_KEY = "fliptimer-migrated-bg-no-filename-v1";
+
 export function migrateLocalStorage() {
 	for (var [oldKey, newKey] of _OLD_TO_NEW) {
 		if (localStorage.getItem(oldKey) !== null && localStorage.getItem(newKey) === null) {
@@ -41,6 +43,29 @@ export function migrateLocalStorage() {
 			localStorage.removeItem(oldKey);
 		} else if (localStorage.getItem(oldKey) !== null) {
 			localStorage.removeItem(oldKey);
+		}
+	}
+	if (localStorage.getItem(_MIGRATED_BG_NO_FILENAME_KEY) === "1") {
+		return;
+	}
+	try {
+		var raw = localStorage.getItem(FLIPTIMER_APP_BG_KEY);
+		if (raw) {
+			var o = JSON.parse(raw);
+			if (o && typeof o.dataUrl === "string" && o.dataUrl.indexOf("data:image/") === 0) {
+				var fn = o.fileName;
+				if (typeof fn !== "string" || fn.trim() === "") {
+					/* Legacy: first-run used to persist appBackgroundDataUrl from fliptimer.json without fileName. User uploads always set fileName. */
+					localStorage.removeItem(FLIPTIMER_APP_BG_KEY);
+				}
+			}
+		}
+		localStorage.setItem(_MIGRATED_BG_NO_FILENAME_KEY, "1");
+	} catch (e) {
+		try {
+			localStorage.setItem(_MIGRATED_BG_NO_FILENAME_KEY, "1");
+		} catch (e2) {
+			/* ignore */
 		}
 	}
 }

@@ -95,7 +95,9 @@ The committed `fliptimer.json` is copied into `dist/` and is the **first-run** p
 - **`soundSource`: `preloaded`** with **`soundPreloaded`** pointing at real files under `sounds/` (so start / pause / finish are audible without uploading audio).
 - **`appBackgroundFile`**: `imgs/background.webp`** (no base64 in the repo seed; user uploads still use a data URL in the browser only).
 
-If the live site ever looks “wrong” after a deploy, try a hard refresh or clear site data for the Pages origin: older visits may have cached **`soundSource`: `upload`** or a large **`fliptimer-app-bg-v1`** background in `localStorage` from an earlier seed.
+If the live site ever looks “wrong” after a deploy, try a hard refresh or clear site data for the Pages origin: older visits may have cached **`soundSource`: `upload`** or legacy background data in `localStorage` from an earlier seed.
+
+**Background:** Older versions called `persistAppBgState` when `fliptimer.json` contained `appBackgroundDataUrl`, which copied a multi‑megabyte data URL into `localStorage` so the UI kept using base64 in CSS. Current code no longer persists that seed, and a one‑time migration removes stored backgrounds that are `data:image/…` **without** a `fileName` (uploads always set `fileName`).
 
 ## 📋 Technical Specifications
 
