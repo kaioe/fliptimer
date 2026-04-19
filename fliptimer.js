@@ -55,7 +55,6 @@ $(function () {
 	});
 	window.fliptimerInstance = clock;
 	clock.setDimensions();
-	$(".countdown").addClass("fliptimer-ready");
 	$(window).on("resize.fliptimerCounter", function () {
 		if (window.fliptimerInstance && typeof window.fliptimerInstance.setDimensions === "function") {
 			window.fliptimerInstance.setDimensions();
@@ -78,7 +77,8 @@ $(function () {
 	});
 	initPresetTimers(clock, refreshToolbar);
 	var pct0 = loadCounterSizePct();
-	applyCounterSizePct(pct0, null);
+	applyCounterSizePct(pct0, clock);
+	$(".countdown").addClass("fliptimer-ready");
 	var $counterSizeInit = $("#fliptimer-counter-size");
 	var $counterSizeOutInit = $("#fliptimer-counter-size-out");
 	if ($counterSizeInit.length) {
