@@ -1,6 +1,6 @@
 /**
  * Builds `dist/` with only files needed to serve the app on a static host.
- * - Compiles fliptimer.scss → fliptimer.css
+ * - Compiles fliptimer.scss → minified fliptimer.css + fliptimer.css.map
  * - Copies HTML (rewrites jQuery + fliptimer.js to relative paths), JS, CSS, JSON, favicon, sounds/
  * - Vendors jquery.min.js (no node_modules on the server)
  */
@@ -52,7 +52,7 @@ function transformHtmlForDist(html) {
 }
 
 function main() {
-	execSync("npx sass fliptimer.scss fliptimer.css --no-source-map", {
+	execSync("npx sass fliptimer.scss fliptimer.css --style=compressed --source-map", {
 		cwd: root,
 		stdio: "inherit",
 		shell: true,
@@ -72,6 +72,10 @@ function main() {
 	fs.writeFileSync(path.join(dist, "index.html"), htmlOut, "utf8");
 
 	copyFile(path.join(root, "fliptimer.css"), path.join(dist, "fliptimer.css"));
+	const cssMap = path.join(root, "fliptimer.css.map");
+	if (fs.existsSync(cssMap)) {
+		copyFile(cssMap, path.join(dist, "fliptimer.css.map"));
+	}
 	copyFile(path.join(root, "fliptimer.js"), path.join(dist, "fliptimer.js"));
 
 	const jsonPath = path.join(root, "fliptimer.json");

@@ -70,7 +70,9 @@ Access advanced options by clicking the **gear icon** in the preset modal header
 ```bash
 npm run build
 ```
-This compiles `fliptimer.scss` to `fliptimer.css`.
+This compiles `fliptimer.scss` to minified `fliptimer.css` (`--style=compressed`) and writes `fliptimer.css.map` for browser DevTools (the map file is gitignored; CI still ships it inside `dist/` when you run `build:dist`).
+
+Development (`npm run dev`) compiles expanded CSS with the same source map so you can debug against the SCSS sources.
 
 ### Create Distribution Bundle
 ```bash
@@ -78,7 +80,7 @@ npm run build:dist
 ```
 This creates a `dist/` folder with all files needed for static hosting:
 - `index.html`
-- `fliptimer.css` and `fliptimer.js`
+- `fliptimer.css` (minified), `fliptimer.css.map` when present, and `fliptimer.js`
 - Vendored jQuery (`vendor/jquery.min.js`)
 - `sounds/` directory with all audio files
 - `favicon.svg` and optional `fliptimer.json`
@@ -91,7 +93,7 @@ This creates a `dist/` folder with all files needed for static hosting:
 | Component | Specification |
 | :--- | :--- |
 | **Framework** | Vanilla JS + jQuery |
-| **Styling** | Sass/SCSS |
+| **Styling** | Sass/SCSS → CSS (compressed for production, source maps in dev and dist) |
 | **Animations** | CSS 3D Transforms |
 | **Storage** | localStorage |
 | **Dev Server** | BrowserSync |
@@ -124,7 +126,8 @@ npm run test:preset-save
 fliptimer/
 ├── index.html          # Main application HTML
 ├── fliptimer.scss      # Source styles (edit this)
-├── fliptimer.css       # Compiled CSS (generated)
+├── fliptimer.css       # Compiled CSS (generated; minified via npm run build)
+├── fliptimer.css.map   # Sass source map (generated; gitignored)
 ├── fliptimer.js        # Application logic
 ├── fliptimer.json      # Presets and settings
 ├── sounds/             # Audio files

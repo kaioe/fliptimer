@@ -3,10 +3,10 @@
   "private": true,
   "scripts": {
     "build": "npm run build:css",
-    "build:css": "sass fliptimer.scss fliptimer.css --no-source-map",
+    "build:css": "sass fliptimer.scss fliptimer.css --style=compressed --source-map",
     "build:dist": "node scripts/build-dist.mjs",
     "dev": "concurrently -k -n sass,bs -c cyan,magenta \"npm run dev:sass\" \"npm run dev:serve\"",
-    "dev:sass": "sass --watch --poll fliptimer.scss fliptimer.css --no-source-map",
+    "dev:sass": "sass --watch --poll fliptimer.scss fliptimer.css --style=expanded --source-map",
     "dev:serve": "node node_modules/browser-sync/dist/bin.js start --config bs-config.js",
     "server": "npm run dev:serve",
     "browser:console": "node scripts/browser-console.mjs",
