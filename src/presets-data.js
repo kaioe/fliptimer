@@ -15,6 +15,7 @@ import {
 	loadSoundNamesFromStorage, saveSoundNamesToStorage,
 	loadAppBgStateFromStorage,
 } from "./storage.js";
+import { normalizeHexColor } from "./colors.js";
 
 export function generatePresetId() {
 	return "preset-" + Date.now() + "-" + Math.random().toString(36).slice(2, 9);

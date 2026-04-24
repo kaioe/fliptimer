@@ -306,7 +306,7 @@ export function initPresetTimers(clock, refreshToolbar) {
 		}
 		var mergedGroup = null;
 		for (var gk in groups) {
-			if (groups.hasOwnProperty(gk) && groups[gk].length >= 2) {
+			if (Object.prototype.hasOwnProperty.call(groups, gk) && groups[gk].length >= 2) {
 				mergedGroup = groups[gk].slice();
 				break;
 			}
