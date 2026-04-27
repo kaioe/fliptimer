@@ -29,7 +29,7 @@ export function baseHrefForSoundRelativeUrl() {
 	}
 }
 
-/** URL for a file under `sounds/` (path segments encoded). Uses absolute path /sounds/ from current origin. */
+/** URL for a file under `sounds/` (path segments encoded). Preserves current page path structure. */
 export function preloadedFilenameToSoundUrl(filename) {
 	if (typeof filename !== "string" || filename.length === 0) {
 		return null;
@@ -55,7 +55,12 @@ export function preloadedFilenameToSoundUrl(filename) {
 	var rel = "sounds/" + enc;
 	try {
 		if (typeof location !== "undefined" && location.origin && typeof URL !== "undefined") {
-			return location.origin + "/" + rel;
+			var currentPath = location.pathname;
+			if (currentPath === "/") {
+				return location.origin + "/" + rel;
+			}
+			var basePath = currentPath.replace(/\/$/, "");
+			return location.origin + basePath + "/" + rel;
 		}
 	} catch (e2) {
 		/* ignore */

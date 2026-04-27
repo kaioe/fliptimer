@@ -1,0 +1,862 @@
+{
+  "nodes": [
+    {
+      "id": "indexhtml_main_container",
+      "label": "Main Container (.container)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L14",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_toolbar",
+      "label": "FlipTimer Toolbar",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L15-42",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_countdown",
+      "label": "Countdown Display (.countdown)",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L43",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_active_preset",
+      "label": "Active Preset Info Panel",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L44-63",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_preset_modal",
+      "label": "Preset Settings Modal",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L66-335",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_preset_form",
+      "label": "Preset Timer Form",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L258-332",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_sound_settings",
+      "label": "Sound Settings Panel",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L108-188",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_bg_settings",
+      "label": "Background Image Settings",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L190-215",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_counter_size",
+      "label": "Counter Size Slider",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L217-237",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_color_picker",
+      "label": "Color Picker Popover",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L277-291",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "indexhtml_jquery_cdn",
+      "label": "jQuery CDN Dependency",
+      "file_type": "document",
+      "source_file": "index.html",
+      "source_location": "L10",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_flip_clock_design",
+      "label": "Flip-Clock Design Feature",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L11",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_responsive_touch",
+      "label": "Responsive Touch Support",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L12",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_customizable_presets",
+      "label": "Customizable Timer Presets",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L13",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_sound_effects",
+      "label": "Sound Effects System",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L14",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_dark_theme",
+      "label": "Dark Theme UI",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L15",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_lightweight",
+      "label": "Lightweight Architecture",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L16",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_browsersync",
+      "label": "BrowserSync Dev Server",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L37",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_dist_bundle",
+      "label": "Distribution Bundle (dist/)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L78-89",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_fliptimer_json",
+      "label": "fliptimer.json Preset Seed",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L91-100",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_playwright",
+      "label": "Playwright Testing",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L111",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_sass_pipeline",
+      "label": "Sass/SCSS Build Pipeline",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L70-75",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "readme_github_pages",
+      "label": "GitHub Pages Deployment",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "L93",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prep_countdown_mechanism",
+      "label": "5-Second Prep Countdown",
+      "file_type": "document",
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L1-70",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prep_countdown_state",
+      "label": "Prep Countdown State Machine",
+      "file_type": "document",
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L12-18",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prep_animation_sync",
+      "label": "Animation Synchronization (rAF)",
+      "file_type": "document",
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L9",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prep_cancel_paths",
+      "label": "Prep Cancel Paths",
+      "file_type": "document",
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L59-63",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "prep_idle_interaction",
+      "label": "Prep vs Idle Wall Clock Interaction",
+      "file_type": "document",
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L51-57",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "plan_es_module_split",
+      "label": "ES Module Split Architecture",
+      "file_type": "document",
+      "source_file": "docs/plans/2026-04-18-es-module-split.md",
+      "source_location": "L1-146",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "plan_module_deps",
+      "label": "Module Dependency Graph",
+      "file_type": "document",
+      "source_file": "docs/plans/2026-04-18-es-module-split.md",
+      "source_location": "L138-146",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "plan_iife_to_esm",
+      "label": "IIFE to ES Module Migration",
+      "file_type": "document",
+      "source_file": "docs/plans/2026-04-18-es-module-split.md",
+      "source_location": "L5-9",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "plan_clock_first_mode",
+      "label": "Clock-First Mode Design",
+      "file_type": "document",
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L1-373",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "plan_rebuild_face",
+      "label": "rebuildFace() Face Swapping",
+      "file_type": "document",
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L31-53",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "plan_clock_countdown_transition",
+      "label": "Clock-to-Countdown Mode Transition",
+      "file_type": "document",
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L120-154",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "plan_colon_css",
+      "label": "Colon Separator CSS Logic",
+      "file_type": "document",
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L288-316",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "img_background",
+      "label": "BJJ Training Background Image",
+      "file_type": "image",
+      "source_file": "imgs/background.webp",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "sounds_female_eryn",
+      "label": "Female Eryn Voice Prompts",
+      "file_type": "document",
+      "source_file": "sounds/",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "sounds_male_russo",
+      "label": "Male Russo Voice Prompts",
+      "file_type": "document",
+      "source_file": "sounds/",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "indexhtml_jquery_cdn",
+      "target": "indexhtml_toolbar",
+      "relation": "enables",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_toolbar",
+      "target": "indexhtml_countdown",
+      "relation": "controls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L15-43",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_active_preset",
+      "target": "indexhtml_countdown",
+      "relation": "displays_info_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L44-63",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_preset_modal",
+      "target": "indexhtml_active_preset",
+      "relation": "configures",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L66-63",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_preset_form",
+      "target": "indexhtml_preset_modal",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L258-332",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_sound_settings",
+      "target": "indexhtml_preset_modal",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L108-188",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_bg_settings",
+      "target": "indexhtml_preset_modal",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L190-215",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_counter_size",
+      "target": "indexhtml_preset_modal",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L217-237",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_color_picker",
+      "target": "indexhtml_preset_form",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L277-291",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_flip_clock_design",
+      "target": "readme_dark_theme",
+      "relation": "complements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "README.md",
+      "source_location": "L11-15",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_sound_effects",
+      "target": "sounds_female_eryn",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "README.md",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_sound_effects",
+      "target": "sounds_male_russo",
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "README.md",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_sass_pipeline",
+      "target": "readme_dist_bundle",
+      "relation": "feeds_into",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L70-89",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_dist_bundle",
+      "target": "readme_github_pages",
+      "relation": "deployed_to",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L78-93",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_fliptimer_json",
+      "target": "readme_dist_bundle",
+      "relation": "included_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L91-89",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_browsersync",
+      "target": "readme_sass_pipeline",
+      "relation": "integrates_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md",
+      "source_location": "L37-75",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_lightweight",
+      "target": "indexhtml_jquery_cdn",
+      "relation": "contradicts",
+      "confidence": "INFERRED",
+      "confidence_score": 0.6,
+      "source_file": "README.md",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "prep_countdown_mechanism",
+      "target": "prep_countdown_state",
+      "relation": "manages",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L1-18",
+      "weight": 1.0
+    },
+    {
+      "source": "prep_countdown_mechanism",
+      "target": "prep_animation_sync",
+      "relation": "depends_on",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "prep_countdown_mechanism",
+      "target": "prep_cancel_paths",
+      "relation": "has",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L59-63",
+      "weight": 1.0
+    },
+    {
+      "source": "prep_countdown_mechanism",
+      "target": "prep_idle_interaction",
+      "relation": "interacts_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L51-57",
+      "weight": 1.0
+    },
+    {
+      "source": "prep_countdown_mechanism",
+      "target": "sounds_female_eryn",
+      "relation": "triggers",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "indexhtml_toolbar",
+      "target": "prep_countdown_mechanism",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L1-5",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_sound_effects",
+      "target": "prep_countdown_mechanism",
+      "relation": "integrates_with",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "docs/prep-countdown-analysis.md",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_es_module_split",
+      "target": "plan_module_deps",
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/plans/2026-04-18-es-module-split.md",
+      "source_location": "L138-146",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_es_module_split",
+      "target": "plan_iife_to_esm",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/plans/2026-04-18-es-module-split.md",
+      "source_location": "L5-9",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_iife_to_esm",
+      "target": "indexhtml_jquery_cdn",
+      "relation": "depends_on",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "docs/plans/2026-04-18-es-module-split.md",
+      "source_location": "L125-126",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_es_module_split",
+      "target": "readme_sass_pipeline",
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "docs/plans/2026-04-18-es-module-split.md",
+      "source_location": "L1-9",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_clock_first_mode",
+      "target": "plan_rebuild_face",
+      "relation": "introduces",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L31-53",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_clock_first_mode",
+      "target": "plan_clock_countdown_transition",
+      "relation": "describes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L120-154",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_clock_first_mode",
+      "target": "plan_colon_css",
+      "relation": "analyzes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L288-316",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_rebuild_face",
+      "target": "plan_clock_countdown_transition",
+      "relation": "enables",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L31-154",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_clock_first_mode",
+      "target": "prep_countdown_mechanism",
+      "relation": "depends_on",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L134",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_clock_first_mode",
+      "target": "plan_es_module_split",
+      "relation": "depends_on",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "plan_colon_css",
+      "target": "indexhtml_countdown",
+      "relation": "styles",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md",
+      "source_location": "L288-316",
+      "weight": 1.0
+    },
+    {
+      "source": "img_background",
+      "target": "indexhtml_bg_settings",
+      "relation": "configured_by",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L190-215",
+      "weight": 1.0
+    },
+    {
+      "source": "img_background",
+      "target": "readme_dark_theme",
+      "relation": "complements",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "imgs/background.webp",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "sounds_female_eryn",
+      "target": "indexhtml_sound_settings",
+      "relation": "available_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L123-137",
+      "weight": 1.0
+    },
+    {
+      "source": "sounds_male_russo",
+      "target": "indexhtml_sound_settings",
+      "relation": "available_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html",
+      "source_location": "L123-137",
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "he_preset_modal_components",
+      "label": "Preset Modal Components",
+      "nodes": [
+        "indexhtml_preset_modal",
+        "indexhtml_preset_form",
+        "indexhtml_sound_settings",
+        "indexhtml_bg_settings",
+        "indexhtml_counter_size"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "index.html"
+    },
+    {
+      "id": "he_flipclock_features",
+      "label": "FlipTimer Core Features",
+      "nodes": [
+        "readme_flip_clock_design",
+        "readme_responsive_touch",
+        "readme_customizable_presets",
+        "readme_sound_effects",
+        "readme_dark_theme"
+      ],
+      "relation": "implement",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.9,
+      "source_file": "README.md"
+    },
+    {
+      "id": "he_mode_transitions",
+      "label": "Clock \u2194 Countdown Mode Transitions",
+      "nodes": [
+        "plan_clock_first_mode",
+        "plan_rebuild_face",
+        "plan_clock_countdown_transition",
+        "prep_countdown_mechanism"
+      ],
+      "relation": "participate_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.85,
+      "source_file": "docs/plans/2026-04-19-clock-first-mode.md"
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

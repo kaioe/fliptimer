@@ -1,0 +1,16 @@
+/mnt/c/Users/kaioe/apps/fliptimer/index.html
+/mnt/c/Users/kaioe/apps/fliptimer/README.md
+/mnt/c/Users/kaioe/apps/fliptimer/docs/prep-countdown-analysis.md
+/mnt/c/Users/kaioe/apps/fliptimer/docs/plans/2026-04-18-es-module-split.md
+/mnt/c/Users/kaioe/apps/fliptimer/docs/plans/2026-04-19-clock-first-mode.md
+/mnt/c/Users/kaioe/apps/fliptimer/favicon.svg
+/mnt/c/Users/kaioe/apps/fliptimer/imgs/background.webp
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/female-eryn-fight.mp3
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/female-eryn-finish.mp3
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/female-eryn-pause.mp3
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/female-eryn-rest.mp3
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/female-eryn-stop.mp3
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/Male Russo - Finish.mp3
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/Male Russo - Pause.mp3
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/Male Russo - Start.mp3
+/mnt/c/Users/kaioe/apps/fliptimer/sounds/Male Russo - Stop.mp3
