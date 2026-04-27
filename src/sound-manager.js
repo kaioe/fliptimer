@@ -211,7 +211,7 @@ export function fliptimerUnlockHtmlAudioIfNeeded() {
 
 var preloadedAudios = {};
 
-function ensurePreloadedSound(url) {
+export function ensurePreloadedSound(url) {
 	var audio = preloadedAudios[url];
 	if (!audio) {
 		audio = new Audio(url);
