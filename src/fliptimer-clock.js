@@ -244,6 +244,8 @@ Fliptimer.prototype.start = function (resumeOnly) {
 		this.snapToTime(this.options.startTime);
 	}
 	var self = this;
+	this.stop();
+	var running = (this.options.isCountdown === true) && (this.tickInterval !== false || this.prepCountdownActive === true);
 	this.tickInterval = setInterval(function () {
 		self.tick();
 	}, this.options.tickDuration);

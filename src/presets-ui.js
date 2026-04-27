@@ -34,12 +34,7 @@ import {
 } from "./storage.js";
 import {
     playFliptimerSound,
-    syncAllPresetFileDrops,
-    syncPresetFileDropFromInput,
-    fliptimerUnlockHtmlAudioIfNeeded,
-    assignFileToInput,
-    FLIPTIMER_PREP_FLIP_MS,
-    FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+    ensurePreloadedSound,
 } from "./sound-manager.js";
 import {
     PRESET_COLOR_SWATCHES,
@@ -711,6 +706,8 @@ export function initPresetTimers(clock, refreshToolbar) {
             var val = cur[skind];
             if (val && files.indexOf(val) >= 0) {
                 $sel.val(val);
+                var url = "sounds/" + val;
+                ensurePreloadedSound(url);
             } else {
                 $sel.val("");
             }

@@ -209,51 +209,27 @@ export function fliptimerUnlockHtmlAudioIfNeeded() {
 	}
 }
 
+var preloadedAudios = {};
+
+function ensurePreloadedSound(url) {
+	var audio = preloadedAudios[url];
+	if (!audio) {
+		audio = new Audio(url);
+		audio.preload = "auto";
+		preloadedAudios[url] = audio;
+	}
+	return audio;
+}
+
 export function playFliptimerSound(kind) {
 	var url = resolveSoundUrlForKind(kind);
 	if (!url || typeof url !== "string") {
 		return;
 	}
-	try {
-		var a = new Audio();
-		if ("playsInline" in a) {
-			a.playsInline = true;
-		}
-		try {
-			a.setAttribute("playsinline", "");
-		} catch (eAttr) {
-			/* ignore */
-		}
-		a.preload = "auto";
-		a.volume = 1;
-		var run = function () {
-			var p = a.play();
-			if (p && typeof p.catch === "function") {
-				p.catch(function () {});
-			}
-		};
-		var done = false;
-		var tryPlay = function () {
-			if (done) {
-				return;
-			}
-			done = true;
-			run();
-		};
-		a.addEventListener("canplay", tryPlay, { once: true });
-		a.addEventListener(
-			"error",
-			function () {
-				done = true;
-			},
-			{ once: true },
-		);
-		a.src = url;
-		a.load();
-		if (typeof a.readyState === "number" && a.readyState >= 2) {
-			tryPlay();
-		}
-	} catch (e) {
-		/* ignore */
-	}
+	var audio = ensurePreloadedSound(url);
+	audio.currentTime = 0;
+	var playPromise = audio.play();
+	playPromise.catch(function() {
+		console.warn("Sound playback failed:", kind, url);
+	});
 }
