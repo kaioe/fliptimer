@@ -826,6 +826,10 @@ body {
 	box-sizing: border-box;
 	border-bottom: 1px solid #444;
 	background: linear-gradient(180deg, #323232 0%, #222222 100%);
+	overflow-x: hidden;
+	width: 100%;
+	max-width: 100%;
+	touch-action: pan-y;
 }
 
 .preset-settings-inline__title {
