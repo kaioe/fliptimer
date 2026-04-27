@@ -36,6 +36,8 @@ import {
     playFliptimerSound,
     ensurePreloadedSound,
     syncAllPresetFileDrops,
+    FLIPTIMER_PREP_FLIP_MS,
+    FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
 } from "./sound-manager.js";
 import {
     PRESET_COLOR_SWATCHES,
