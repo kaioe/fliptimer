@@ -5,10 +5,7 @@ const $ = window.jQuery;
 "use strict";
 
 import {
-	loadSoundSourceFromStorage,
 	loadPreloadedSoundSelectionsFromStorage,
-	loadSoundsFromStorage,
-	loadSoundNamesFromStorage,
 	loadAppBgStateFromStorage,
 } from "./storage.js";
 
@@ -32,7 +29,7 @@ export function baseHrefForSoundRelativeUrl() {
 	}
 }
 
-/** URL for a file under `sounds/` (path segments encoded). */
+/** URL for a file under `sounds/` (path segments encoded). Uses absolute path /sounds/ from current origin. */
 export function preloadedFilenameToSoundUrl(filename) {
 	if (typeof filename !== "string" || filename.length === 0) {
 		return null;
@@ -57,25 +54,19 @@ export function preloadedFilenameToSoundUrl(filename) {
 	var enc = parts.map(encodeURIComponent).join("/");
 	var rel = "sounds/" + enc;
 	try {
-		if (typeof URL !== "undefined" && typeof location !== "undefined" && location.href) {
-			return new URL(rel, baseHrefForSoundRelativeUrl()).href;
+		if (typeof location !== "undefined" && location.origin && typeof URL !== "undefined") {
+			return location.origin + "/" + rel;
 		}
 	} catch (e2) {
 		/* ignore */
 	}
-	return rel;
+	return null;
 }
 
 export function resolveSoundUrlForKind(kind) {
-	var src = loadSoundSourceFromStorage();
-	if (src === "preloaded") {
-		var sel = loadPreloadedSoundSelectionsFromStorage();
-		var fn = sel[kind];
-		return preloadedFilenameToSoundUrl(fn);
-	}
-	var sounds = loadSoundsFromStorage();
-	var url = sounds[kind];
-	return typeof url === "string" && url.length > 0 ? url : null;
+	var sel = loadPreloadedSoundSelectionsFromStorage();
+	var fn = sel[kind];
+	return preloadedFilenameToSoundUrl(fn);
 }
 
 export function assignFileToInput(input, file) {
@@ -102,19 +93,10 @@ export function syncPresetFileDropFromInput(input) {
 	}
 	var $label = $drop.find("[data-file-label]");
 	var $btn = $drop.find(".preset-file-drop__btn");
-	var kind = $(input).attr("data-sound-kind");
 	var isBg = $(input).hasClass("preset-settings-file--bg");
 	var hasFile = false;
 	var displayName = "";
-	if (kind) {
-		var sounds = loadSoundsFromStorage();
-		var url = sounds[kind];
-		hasFile = typeof url === "string" && url.length > 0;
-		if (hasFile) {
-			var names = loadSoundNamesFromStorage();
-			displayName = names[kind] || "Audio file";
-		}
-	} else if (isBg) {
+	if (isBg) {
 		var st = loadAppBgStateFromStorage();
 		hasFile = !!(st && st.dataUrl);
 		if (hasFile) {
@@ -128,7 +110,7 @@ export function syncPresetFileDropFromInput(input) {
 }
 
 export function syncAllPresetFileDrops() {
-	$(".preset-file-drop__input.preset-settings-file").each(function () {
+	$(".preset-file-drop__input.preset-settings-file--bg").each(function () {
 		syncPresetFileDropFromInput(this);
 	});
 }

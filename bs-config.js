@@ -10,7 +10,143 @@ const path = require("path");
 const FLIPTIMER_JSON_PATH = path.join(__dirname, "fliptimer.json");
 const SOUNDS_DIR = path.join(__dirname, "sounds");
 
-/** Serves GET /sounds/manifest.json from the filesystem so the Preloaded list updates when files are added (no manual JSON edit). */
+const AUDIO_EXT = /\.(mp3|wav|ogg|opus|m4a|aac|flac|webm)$/i;
+
+function listSoundsDir() {
+	var files = [];
+	try {
+		var names = fs.readdirSync(SOUNDS_DIR, { withFileTypes: true });
+		for (var i = 0; i < names.length; i++) {
+			var d = names[i];
+			if (!d.isFile()) { continue; }
+			var name = d.name;
+			if (name === "manifest.json") { continue; }
+			if (!AUDIO_EXT.test(name)) { continue; }
+			files.push(name);
+		}
+		files.sort(function (a, b) { return a.localeCompare(b, undefined, { sensitivity: "base" }); });
+	} catch (err) {
+		files = [];
+	}
+	return files;
+}
+
+function uploadSoundMiddleware(req, res, next) {
+	var q = req.url.indexOf("?");
+	var pathOnly = q === -1 ? req.url : req.url.slice(0, q);
+	if (pathOnly !== "/__fliptimer__/upload-sound" || req.method !== "POST") {
+		next();
+		return;
+	}
+	var chunks = [];
+	req.on("data", function (chunk) { chunks.push(chunk); });
+	req.on("end", function () {
+		var contentType = req.headers["content-type"] || "";
+		var boundaryMatch = contentType.match(/boundary=(?:"([^"]+)"|([^\s;]+))/);
+		var boundary = boundaryMatch ? (boundaryMatch[1] || boundaryMatch[2]) : null;
+		if (!boundary) {
+			res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+			res.end("Missing boundary");
+			return;
+		}
+		var buf = Buffer.concat(chunks);
+		var boundaryBuf = Buffer.from("--" + boundary);
+		var parts = [];
+		var start = buf.indexOf(boundaryBuf);
+		while (start !== -1) {
+			var end = buf.indexOf(boundaryBuf, start + boundaryBuf.length);
+			if (end === -1) { break; }
+			var part = buf.slice(start + boundaryBuf.length, end);
+			if (part.length > 4 && part[0] === 0x0d && part[1] === 0x0a) {
+				parts.push(part);
+			}
+			start = end;
+		}
+		var fileName = null;
+		var fileData = null;
+		for (var pi = 0; pi < parts.length; pi++) {
+			var part = parts[pi];
+			var headerEnd = part.indexOf(Buffer.from("\r\n\r\n"));
+			if (headerEnd === -1) { continue; }
+			var header = part.slice(0, headerEnd).toString("utf8");
+			var body = part.slice(headerEnd + 4);
+			if (body.length >= 2 && body[body.length - 2] === 0x0d && body[body.length - 1] === 0x0a) {
+				body = body.slice(0, -2);
+			}
+			var cdMatch = header.match(/Content-Disposition:\s*form-data;\s*name="file";\s*filename="([^"]+)"/i);
+			if (cdMatch) {
+				fileName = cdMatch[1].replace(/[\/\\]/g, "_").trim();
+				fileData = body;
+				break;
+			}
+		}
+		if (!fileName || !fileData || fileData.length === 0) {
+			res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+			res.end("No file in request");
+			return;
+		}
+		if (!AUDIO_EXT.test(fileName)) {
+			res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+			res.end("Not an audio file");
+			return;
+		}
+		var safeName = fileName.replace(/[^a-zA-Z0-9._\-\s()]/g, "_");
+		var targetPath = path.join(SOUNDS_DIR, safeName);
+		try {
+			if (!fs.existsSync(SOUNDS_DIR)) { fs.mkdirSync(SOUNDS_DIR, { recursive: true }); }
+			fs.writeFileSync(targetPath, fileData);
+			res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+			res.end(JSON.stringify({ file: safeName }));
+		} catch (err) {
+			res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+			res.end(err && err.message ? String(err.message) : "Write failed");
+		}
+	});
+}
+
+function deleteSoundMiddleware(req, res, next) {
+	var q = req.url.indexOf("?");
+	var pathOnly = q === -1 ? req.url : req.url.slice(0, q);
+	if (pathOnly !== "/__fliptimer__/delete-sound" || req.method !== "POST") {
+		next();
+		return;
+	}
+	var chunks = [];
+	req.on("data", function (chunk) { chunks.push(chunk); });
+	req.on("end", function () {
+		var body;
+		try { body = JSON.parse(Buffer.concat(chunks).toString("utf8")); } catch (e) {
+			res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+			res.end("Invalid JSON");
+			return;
+		}
+		var fileName = body && body.file;
+		if (typeof fileName !== "string" || fileName.trim() === "") {
+			res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+			res.end("Missing file name");
+			return;
+		}
+		if (fileName.indexOf("..") !== -1 || fileName.indexOf("/") !== -1 || fileName.indexOf("\\") !== -1) {
+			res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+			res.end("Invalid file name");
+			return;
+		}
+		var targetPath = path.join(SOUNDS_DIR, fileName);
+		try {
+			if (fs.existsSync(targetPath)) {
+				fs.unlinkSync(targetPath);
+			}
+			var remaining = listSoundsDir();
+			res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+			res.end(JSON.stringify({ files: remaining }));
+		} catch (err) {
+			res.writeHead(500, { "Content-Type": "text/plain; charset=utf-8" });
+			res.end(err && err.message ? String(err.message) : "Delete failed");
+		}
+	});
+}
+
+/** Serves GET /sounds/manifest.json from the filesystem so the list updates when files are added or removed. */
 function soundsManifestMiddleware(req, res, next) {
 	if (req.method !== "GET") {
 		next();
@@ -22,30 +158,7 @@ function soundsManifestMiddleware(req, res, next) {
 		next();
 		return;
 	}
-	var files = [];
-	try {
-		var names = fs.readdirSync(SOUNDS_DIR, { withFileTypes: true });
-		var audioExt = /\.(mp3|wav|ogg|opus|m4a|aac|flac|webm)$/i;
-		for (var i = 0; i < names.length; i++) {
-			var d = names[i];
-			if (!d.isFile()) {
-				continue;
-			}
-			var name = d.name;
-			if (name === "manifest.json") {
-				continue;
-			}
-			if (!audioExt.test(name)) {
-				continue;
-			}
-			files.push(name);
-		}
-		files.sort(function (a, b) {
-			return a.localeCompare(b, undefined, { sensitivity: "base" });
-		});
-	} catch (err) {
-		files = [];
-	}
+	var files = listSoundsDir();
 	var body = JSON.stringify({ files: files }, null, 2);
 	res.writeHead(200, {
 		"Content-Type": "application/json; charset=utf-8",
@@ -92,6 +205,8 @@ module.exports = {
 	},
 	middleware: [
 		savePresetTimersMiddleware,
+		uploadSoundMiddleware,
+		deleteSoundMiddleware,
 		soundsManifestMiddleware,
 		function redirectOldPaths(req, res, next) {
 			const q = req.url.indexOf("?");

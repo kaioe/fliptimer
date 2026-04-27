@@ -9,10 +9,8 @@ import {
 	PRESET_SLIDER_THUMBS_KEY, PRESET_TRACK_MAX_KEY, FLIPTIMER_APP_BG_KEY,
 	PRESET_JSON_FILE, DEFAULT_BG_FILE, PRESET_SOUND_KINDS,
 	snapTrackMaxMinutes, getPresetTrackMax, loadPresetTrackMax,
-	loadSoundSourceFromStorage, saveSoundSourceToStorage,
-	loadPreloadedSoundSelectionsFromStorage, savePreloadedSoundSelectionsToStorage,
-	loadSoundsFromStorage, saveSoundsToStorage,
-	loadSoundNamesFromStorage, saveSoundNamesToStorage,
+	applySoundSelectionsFromJson,
+	loadPreloadedSoundSelectionsFromStorage,
 	loadAppBgStateFromStorage,
 } from "./storage.js";
 import { normalizeHexColor } from "./colors.js";
@@ -273,65 +271,12 @@ export function fetchPresetTimersDocument() {
 		});
 }
 
-export function normalizeSoundDataUrlFromDoc(s) {
-	if (typeof s !== "string" || s.indexOf("data:audio/") !== 0) {
-		return null;
-	}
-	return s;
-}
-
-/** Reads optional sound mode, preloaded filenames, and `sounds` / `soundFileNames` from fliptimer.json (first-run seed). */
+/** Reads optional preloaded filenames from fliptimer.json and stores in memory (no localStorage). */
 export function applySoundsFromJsonRoot(root) {
 	if (!root || typeof root !== "object") {
 		return;
 	}
-	if (root.soundSource === "preloaded" || root.soundSource === "upload") {
-		saveSoundSourceToStorage(root.soundSource);
-	}
-	if (root.soundPreloaded && typeof root.soundPreloaded === "object") {
-		var merged = loadPreloadedSoundSelectionsFromStorage();
-		for (var pi = 0; pi < PRESET_SOUND_KINDS.length; pi++) {
-			var pk = PRESET_SOUND_KINDS[pi];
-			var pfn = root.soundPreloaded[pk];
-			if (typeof pfn === "string") {
-				merged[pk] = pfn;
-			}
-		}
-		savePreloadedSoundSelectionsToStorage(merged);
-	}
-	if (loadSoundSourceFromStorage() === "preloaded") {
-		return;
-	}
-	var sounds = {};
-	if (root.sounds && typeof root.sounds === "object") {
-		for (var i = 0; i < PRESET_SOUND_KINDS.length; i++) {
-			var k = PRESET_SOUND_KINDS[i];
-			var u = normalizeSoundDataUrlFromDoc(root.sounds[k]);
-			if (u) {
-				sounds[k] = u;
-			}
-		}
-	}
-	if (Object.keys(sounds).length === 0) {
-		return;
-	}
-	saveSoundsToStorage(sounds);
-	var names = {};
-	if (root.soundFileNames && typeof root.soundFileNames === "object") {
-		for (var j = 0; j < PRESET_SOUND_KINDS.length; j++) {
-			var kk = PRESET_SOUND_KINDS[j];
-			if (!sounds[kk]) {
-				continue;
-			}
-			var fn = root.soundFileNames[kk];
-			if (typeof fn === "string" && fn.length > 0) {
-				names[kk] = fn;
-			}
-		}
-	}
-	if (Object.keys(names).length > 0) {
-		saveSoundNamesToStorage(names);
-	}
+	applySoundSelectionsFromJson(root);
 }
 
 var warnedPresetSave404 = false;
@@ -549,7 +494,7 @@ export function persistAppBgState(state) {
 	}
 }
 
-/** Writes fliptimer.json in the app root when served via `npm run dev` (BrowserSync middleware). Includes optional appBackgroundFile (or appBackgroundDataUrl for user uploads); sounds as data URLs when source is Upload, else soundPreloaded paths. No-op if fetch fails (e.g. file:// or static host without the endpoint). */
+/** Writes fliptimer.json in the app root when served via `npm run dev` (BrowserSync middleware). Includes optional appBackgroundFile (or appBackgroundDataUrl for user uploads); sound selections as filenames. No-op if fetch fails. */
 export function syncPresetJsonToProjectFile(presets) {
 	var doc = { version: 1, presets: presets };
 	var bg = getAppBackgroundDataUrlForSync();
@@ -558,29 +503,16 @@ export function syncPresetJsonToProjectFile(presets) {
 	} else {
 		doc.appBackgroundFile = DEFAULT_BG_FILE;
 	}
-	var soundSource = loadSoundSourceFromStorage();
-	doc.soundSource = soundSource;
-	if (soundSource === "preloaded") {
-		var pre = loadPreloadedSoundSelectionsFromStorage();
-		var preOut = {};
-		for (var si = 0; si < PRESET_SOUND_KINDS.length; si++) {
-			var sk = PRESET_SOUND_KINDS[si];
-			if (typeof pre[sk] === "string" && pre[sk].length > 0) {
-				preOut[sk] = pre[sk];
-			}
+	var pre = loadPreloadedSoundSelectionsFromStorage();
+	var preOut = {};
+	for (var si = 0; si < PRESET_SOUND_KINDS.length; si++) {
+		var sk = PRESET_SOUND_KINDS[si];
+		if (typeof pre[sk] === "string" && pre[sk].length > 0) {
+			preOut[sk] = pre[sk];
 		}
-		if (Object.keys(preOut).length > 0) {
-			doc.soundPreloaded = preOut;
-		}
-	} else {
-		var sounds = loadSoundsFromStorage();
-		if (sounds && typeof sounds === "object" && Object.keys(sounds).length > 0) {
-			doc.sounds = sounds;
-		}
-		var soundNames = loadSoundNamesFromStorage();
-		if (soundNames && typeof soundNames === "object" && Object.keys(soundNames).length > 0) {
-			doc.soundFileNames = soundNames;
-		}
+	}
+	if (Object.keys(preOut).length > 0) {
+		doc.soundPreloaded = preOut;
 	}
 	var payload = JSON.stringify(doc, null, 2);
 	if (typeof fetch !== "function") {

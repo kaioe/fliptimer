@@ -1107,6 +1107,54 @@ body {
 	}
 }
 
+.preset-settings-sound-controls {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+}
+
+.preset-sound-upload-btn,
+.preset-sound-delete-btn {
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	margin: 0;
+	padding: 0;
+	font-size: 16px;
+	line-height: 1;
+	color: #aaa;
+	background: #3d4550;
+	border: 1px solid #555c6a;
+	border-radius: 8px;
+	cursor: pointer;
+	transition:
+		background 0.15s ease,
+		color 0.15s ease;
+
+	&:hover {
+		color: #f4f1ee;
+		background: #4a5260;
+	}
+
+	&:focus-visible {
+		outline: 2px solid #48bb78;
+		outline-offset: 2px;
+	}
+}
+
+.preset-sound-delete-btn {
+	color: #e74c3c;
+
+	&:hover {
+		color: #ff6b6b;
+		background: #5a2020;
+	}
+}
+
 .preset-settings-upload-row {
 	display: grid;
 	grid-template-columns: minmax(52px, auto) 1fr;
