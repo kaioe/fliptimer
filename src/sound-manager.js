@@ -128,6 +128,15 @@ var fliptimerAudioUnlockDone = false;
 /** Shared Web Audio context (prep beeps + unlock). */
 var fliptimerSharedAudioContext = null;
 
+/** Boost multiplier for all fliptimer sounds (1.0 = normal, 2.0 = double, 3.0 = triple). */
+var FLIPTIMER_VOLUME_BOOST = 3.0;
+
+/** Gain node for amplified playback of HTMLAudioElement sounds. */
+var fliptimerBoostGainNode = null;
+
+/** Tracks which audio elements are already connected to the boost gain (createMediaElementSource is once-only). */
+var boostedAudioElements = new WeakSet();
+
 /**
  * Wall time for one full digit flip (ms). Must match `fliptimer.scss` stacked halves:
  * `$anim-delay-stack` + `$anim-flip` → 0.5s + 0.5s. Used only for prep beep timing (not in `doTick`).
@@ -151,6 +160,10 @@ export function getFliptimerSharedAudioContext() {
 			return null;
 		}
 		fliptimerSharedAudioContext = new Ctx();
+		/* Create a shared gain node for boosted HTMLAudioElement playback */
+		fliptimerBoostGainNode = fliptimerSharedAudioContext.createGain();
+		fliptimerBoostGainNode.gain.value = FLIPTIMER_VOLUME_BOOST;
+		fliptimerBoostGainNode.connect(fliptimerSharedAudioContext.destination);
 		return fliptimerSharedAudioContext;
 	} catch (e) {
 		return null;
@@ -173,7 +186,7 @@ export function playPrepCountdownBeep() {
 		osc.type = "sine";
 		osc.frequency.setValueAtTime(880, t0);
 		gain.gain.setValueAtTime(0.0001, t0);
-		gain.gain.linearRampToValueAtTime(0.2, t0 + 0.01);
+		gain.gain.linearRampToValueAtTime(0.6, t0 + 0.01);
 		gain.gain.linearRampToValueAtTime(0.0001, t0 + 0.09);
 		osc.connect(gain);
 		gain.connect(ctx.destination);
@@ -228,6 +241,21 @@ export function playFliptimerSound(kind) {
 	}
 	var audio = ensurePreloadedSound(url);
 	audio.currentTime = 0;
+
+	/* Route through Web Audio gain node for volume boost (once per element) */
+	if (!boostedAudioElements.has(audio)) {
+		try {
+			var ctx = getFliptimerSharedAudioContext();
+			if (ctx && fliptimerBoostGainNode) {
+				var source = ctx.createMediaElementSource(audio);
+				source.connect(fliptimerBoostGainNode);
+				boostedAudioElements.add(audio);
+			}
+		} catch (e) {
+			/* Already connected or unsupported — play without boost */
+		}
+	}
+
 	var playPromise = audio.play();
 	playPromise.catch(function() {
 		console.warn("Sound playback failed:", kind, url);
