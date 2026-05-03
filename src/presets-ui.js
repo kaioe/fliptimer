@@ -1516,9 +1516,7 @@ window.updateFliptimerRoundIndicator = function(clock) {
     }
     $activeCurrentRound.text(String(clock.currentRound));
     $activeTotalRounds.text(String(clock.totalRounds));
-    if (!$activeCurrentRoundDisplay.is("[hidden]")) {
-        $activeCurrentRoundDisplay.text(String(clock.currentRound));
-    }
+    $activeCurrentRoundDisplay.text(String(clock.currentRound));
 };
 
 window.showFliptimerIntervalIndicator = function() {
