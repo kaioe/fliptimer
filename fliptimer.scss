@@ -259,6 +259,20 @@ body {
 		}
 	}
 
+	&__current-round-display {
+		position: absolute;
+		top: 50%;
+		right: 10px;
+		transform: translateY(-50%);
+		z-index: 0;
+		font-size: 3rem;
+		font-weight: 700;
+		color: rgba(255, 255, 255, 0.15);
+		pointer-events: none;
+		user-select: none;
+		line-height: 1;
+	}
+
 	&__head {
 		display: flex;
 		flex-wrap: wrap;

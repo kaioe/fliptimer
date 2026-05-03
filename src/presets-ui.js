@@ -96,6 +96,7 @@ export function initPresetTimers(clock, refreshToolbar) {
 
     function setActivePresetUi(p) {
         var $cd = $(".countdown");
+        var $activeCurrentRoundDisplay = $("#active-preset-current-round-display");
         if (!p) {
             activePresetId = null;
             saveActivePresetIdToStorage(null);
@@ -104,6 +105,7 @@ export function initPresetTimers(clock, refreshToolbar) {
             /* Hide round/interval indicators when clearing preset */
             $activeRoundIndicator.attr("hidden", "hidden");
             $activeIntervalIndicator.attr("hidden", "hidden");
+            $activeCurrentRoundDisplay.attr("hidden", "hidden");
             /* Rebuild back to clock mode if currently in countdown mode */
             if (clock.options.isCountdown === true) {
                 clock.cancelPrepCountdown();
@@ -134,11 +136,13 @@ export function initPresetTimers(clock, refreshToolbar) {
         /* Initialize round/interval indicators */
         if (p.rounds > 1) {
             $activeRoundIndicator.removeAttr("hidden");
+            $activeCurrentRoundDisplay.removeAttr("hidden");
             if (typeof window.updateFliptimerRoundIndicator === "function") {
                 window.updateFliptimerRoundIndicator(clock);
             }
         } else {
             $activeRoundIndicator.attr("hidden", "hidden");
+            $activeCurrentRoundDisplay.attr("hidden", "hidden");
         }
         $activeIntervalIndicator.attr("hidden", "hidden");
     }
@@ -1506,11 +1510,15 @@ window.updateFliptimerRoundIndicator = function(clock) {
     var $activeRoundIndicator = $("#active-preset-round-indicator");
     var $activeCurrentRound = $("#active-preset-current-round");
     var $activeTotalRounds = $("#active-preset-total-rounds");
+    var $activeCurrentRoundDisplay = $("#active-preset-current-round-display");
     if ($activeRoundIndicator.is("[hidden]")) {
         return;
     }
     $activeCurrentRound.text(String(clock.currentRound));
     $activeTotalRounds.text(String(clock.totalRounds));
+    if (!$activeCurrentRoundDisplay.is("[hidden]")) {
+        $activeCurrentRoundDisplay.text(String(clock.currentRound));
+    }
 };
 
 window.showFliptimerIntervalIndicator = function() {
