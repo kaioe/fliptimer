@@ -183,9 +183,104 @@ test.describe('FlipTimer E2E Tests', () => {
     const clearBtn = page.locator('#active-preset-clear');
     if (await clearBtn.isVisible()) {
       await clearBtn.click();
-      
+
       // Verify active preset is hidden
       await expect(clearBtn).not.toBeVisible();
     }
+  });
+
+  test('multi-round timer shows correct round display', async ({ page }) => {
+    // Open preset modal
+    const presetsBtn = page.locator('button[aria-label="Presets"]');
+    await presetsBtn.click();
+
+    // Click "New Timer" button
+    const newTimerBtn = page.locator('button[aria-label="Add new timer"]');
+    await newTimerBtn.click();
+
+    // Fill in preset name
+    const nameInput = page.locator('#preset-name');
+    await nameInput.fill('Round Test Timer');
+
+    // Set duration to 1 minute (fast for testing)
+    const durationSlider = page.locator('#preset-duration-slider');
+    await durationSlider.fill('1');
+
+    // Set rounds to 3
+    const roundsSlider = page.locator('#preset-rounds-slider');
+    await roundsSlider.fill('3');
+
+    // Save preset
+    const saveBtn = page.locator('button[aria-label="Save timer"]');
+    await saveBtn.click();
+
+    // Wait for modal to close and re-open
+    await page.waitForTimeout(500);
+    await presetsBtn.click();
+
+    // Apply preset
+    const applyBtn = page.locator('.preset-table').getByText('Round Test Timer').locator('..').locator('button[aria-label="Apply timer"]');
+    await applyBtn.click();
+
+    // Close modal
+    const closeBtn = page.locator('#preset-modal-close');
+    await closeBtn.click();
+
+    // Verify rounds display shows "1 / 3" initially
+    const roundsDisplay = page.locator('#active-preset-rounds');
+    await expect(roundsDisplay).toBeVisible();
+    await expect(roundsDisplay).toHaveText('1 / 3');
+
+    // Verify large round display shows "1"
+    const largeRoundDisplay = page.locator('#active-preset-current-round-display');
+    await expect(largeRoundDisplay).toBeVisible();
+    await expect(largeRoundDisplay).toHaveText('1');
+  });
+
+  test('multi-round timer increments round correctly', async ({ page }) => {
+    // Skip if no timer with 3 rounds exists
+    const presetsBtn = page.locator('button[aria-label="Presets"]');
+    await presetsBtn.click();
+
+    const testTimer = page.locator('.preset-table').getByText('Round Test Timer');
+    if (!(await testTimer.isVisible())) {
+      test.skip();
+      return;
+    }
+
+    // Apply preset
+    const applyBtn = page.locator('.preset-table').getByText('Round Test Timer').locator('..').locator('button[aria-label="Apply timer"]');
+    await applyBtn.click();
+
+    // Close modal
+    const closeBtn = page.locator('#preset-modal-close');
+    await closeBtn.click();
+
+    // Start timer
+    const playBtn = page.locator('button[aria-label="Play"]');
+    await playBtn.click();
+
+    // Wait for round 1 to complete (1 minute + overhead)
+    await page.waitForTimeout(75000);
+
+    // Check that rounds display shows "2 / 3" after round 1
+    const roundsDisplay = page.locator('#active-preset-rounds');
+    const roundsText = await roundsDisplay.textContent();
+    expect(roundsText).toBe('2 / 3');
+
+    // Wait for round 2 to complete
+    await page.waitForTimeout(75000);
+
+    // Check that rounds display shows "3 / 3" after round 2
+    const roundsText2 = await roundsDisplay.textContent();
+    expect(roundsText2).toBe('3 / 3');
+
+    // Wait for round 3 to complete
+    await page.waitForTimeout(75000);
+
+    // After all rounds complete, check state
+    const finalRoundsText = await roundsDisplay.textContent();
+    // Should still show "3 / 3" since timer is at end state
+    expect(finalRoundsText).toBe('3 / 3');
   });
 });
