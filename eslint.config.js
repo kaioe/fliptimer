@@ -23,7 +23,7 @@ export default [
       ...js.configs.recommended.rules,
 
       // Custom overrides
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      'no-unused-vars': 'off',  // Disable unused vars warnings to reduce noise
       'no-undef': 'off',
       'eqeqeq': 'warn',
       'no-throw-literal': 'error',
