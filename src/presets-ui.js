@@ -1316,24 +1316,7 @@ export function initPresetTimers(clock, refreshToolbar) {
         setActivePresetUi(p);
         refreshToolbar();
     }
-        clock.cancelPrepCountdown();
-        var mmss = minutesToStartTime(p.minutes);
-        clock.rebuildFace({
-            isCountdown: true,
-            startTime: mmss,
-            maxTime: mmss,
-            minTime: "00:00",
-            tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
-            face: {
-                minutes: { maxValue: 59 },
-                seconds: { maxValue: 59 },
-            },
-        });
-        /* Preserve original behavior: set the time but don't auto-start — user must press play */
-        clock.stop();
-        setActivePresetUi(p);
-        refreshToolbar();
-    }
+
 
     function tryRestoreActivePresetFromStorage() {
         var id = loadActivePresetIdFromStorage();
@@ -1528,7 +1511,7 @@ window.updateFliptimerRoundIndicator = function(clock) {
     }
     $activeCurrentRound.text(String(clock.currentRound));
     $activeTotalRounds.text(String(clock.totalRounds));
-}
+};
 
 window.showFliptimerIntervalIndicator = function() {
     var $activeIntervalIndicator = $("#active-preset-interval-indicator");
@@ -1537,9 +1520,9 @@ window.showFliptimerIntervalIndicator = function() {
         return;
     }
     $activeIntervalIndicator.removeAttr("hidden");
-}
+};
 
 window.hideFliptimerIntervalIndicator = function() {
     var $activeIntervalIndicator = $("#active-preset-interval-indicator");
     $activeIntervalIndicator.attr("hidden", "hidden");
-}
+};

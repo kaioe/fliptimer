@@ -4,6 +4,7 @@ node_modules/
 .cursor/
 .vscode/
 .idea/
+everything-claude-code
 
 # Build artifacts
 *.css.map

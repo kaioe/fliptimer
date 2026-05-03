@@ -99,7 +99,7 @@ export function loadActivePresetIdFromStorage() {
 
 export function saveActivePresetIdToStorage(id) {
 	try {
-		if (id == null || id === "") {
+		if (id === null || id === undefined || id === "") {
 			localStorage.removeItem(ACTIVE_PRESET_ID_STORAGE_KEY);
 		} else {
 			localStorage.setItem(ACTIVE_PRESET_ID_STORAGE_KEY, String(id));

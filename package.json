@@ -1,6 +1,8 @@
 {
   "name": "fliptimer",
+  "type": "module",
   "private": true,
+
   "scripts": {
     "build": "npm run build:css",
     "build:css": "node node_modules/sass/sass.js fliptimer.scss fliptimer.css --style=compressed --source-map",

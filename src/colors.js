@@ -19,7 +19,7 @@ export const PRESET_COLOR_SWATCHES = [
 ];
 
 export function normalizeHexColor(hex) {
-	var s = String(hex == null ? "" : hex).trim();
+	var s = String(hex === null || hex === undefined ? "" : hex).trim();
 	if (/^#[0-9A-Fa-f]{6}$/.test(s)) {
 		return s.toLowerCase();
 	}
@@ -74,7 +74,7 @@ export function applyCounterContrastFromPresetColor($cd, hex) {
 	if (!el || !el.style) {
 		return;
 	}
-	if (hex == null) {
+	if (hex === null || hex === undefined) {
 		el.style.removeProperty("--flip-digit-bg");
 		el.style.removeProperty("--flip-digit-fg");
 		el.style.removeProperty("--flip-digit-text-shadow");
