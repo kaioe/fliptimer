@@ -1508,10 +1508,10 @@ export function initPresetTimers(clock, refreshToolbar) {
 
 // Export functions for external use
 window.updateFliptimerRoundIndicator = function(clock) {
-    var $activeRoundIndicator = $("#active-preset-round-indicator");
     var $activeRounds = $("#active-preset-rounds");
     var $activeCurrentRoundDisplay = $("#active-preset-current-round-display");
-    if ($activeRoundIndicator.is("[hidden]")) {
+    var $activePreset = $("#active-preset");
+    if ($activePreset.is("[hidden]")) {
         return;
     }
     $activeRounds.text(clock.currentRound + " / " + clock.totalRounds);
