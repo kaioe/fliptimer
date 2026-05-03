@@ -145,25 +145,6 @@ $(function () {
 		}
 		refreshToolbar();
 	});
-								clock.stop();
-								// Trigger prep countdown via play button
-								setTimeout(function() {
-									$playPauseBtn.trigger("click");
-								}, 100);
-							}
-						}
-					} catch (e) {
-						// Ignore errors
-					}
-				}
-			}
-		} else {
-			// All rounds complete after interval
-			playFliptimerSound("finish");
-			clock.resetRounds();
-		}
-		refreshToolbar();
-	});
 
 	function startIntervalTimer() {
 		if (clock.intervalMinutes <= 0) {
