@@ -70,8 +70,13 @@ function getTransitionSupport() {
  */
 export function Fliptimer(options) {
 	this.tickInterval = false;
-	/** True while the 5s prep countdown runs (before the main interval starts). */
+	/** True while 5s prep countdown runs (before the main interval starts). */
 	this.prepCountdownActive = false;
+	/** Round tracking for multi-round presets */
+	this.currentRound = 1;
+	this.totalRounds = 1;
+	this.intervalMinutes = 0;
+	this.isIntervalMode = false;
 	this.digitSelectors = [];
 	this.options = this.createConfig(options);
 	this.init();
@@ -100,6 +105,40 @@ Fliptimer.prototype.getDefaultConfig = function () {
 			seconds: { maxValue: 59 },
 		},
 	};
+};
+
+Fliptimer.prototype.setRounds = function (rounds) {
+	this.totalRounds = Math.max(1, Math.min(10, rounds || 1));
+	this.currentRound = 1;
+};
+
+Fliptimer.prototype.setInterval = function (minutes) {
+	this.intervalMinutes = Math.max(0, minutes || 0);
+};
+
+Fliptimer.prototype.resetRounds = function () {
+	this.currentRound = 1;
+	this.isIntervalMode = false;
+};
+
+Fliptimer.prototype.hasNextRound = function () {
+	return this.currentRound < this.totalRounds;
+};
+
+Fliptimer.prototype.nextRound = function () {
+	if (this.hasNextRound()) {
+		this.currentRound++;
+		return true;
+	}
+	return false;
+};
+
+Fliptimer.prototype.startIntervalMode = function () {
+	this.isIntervalMode = true;
+};
+
+Fliptimer.prototype.endIntervalMode = function () {
+	this.isIntervalMode = false;
 };
 
 // -------------------------------------------------------------------------
@@ -437,7 +476,11 @@ Fliptimer.prototype.doTick = function (digitIndex) {
 
 		if (isDown && this.isMinTimeReached()) {
 			this.stop();
-			opts.containerElement.trigger("fliptimer:countdown-complete");
+			if (this.isIntervalMode) {
+				opts.containerElement.trigger("fliptimer:interval-complete");
+			} else {
+				opts.containerElement.trigger("fliptimer:countdown-complete");
+			}
 			return;
 		}
 

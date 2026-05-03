@@ -89,6 +89,10 @@ export function initPresetTimers(clock, refreshToolbar) {
     var $activeDur = $("#active-preset-duration");
     var $activeInt = $("#active-preset-interval");
     var $activeRounds = $("#active-preset-rounds");
+    var $activeRoundIndicator = $("#active-preset-round-indicator");
+    var $activeCurrentRound = $("#active-preset-current-round");
+    var $activeTotalRounds = $("#active-preset-total-rounds");
+    var $activeIntervalIndicator = $("#active-preset-interval-indicator");
 
     function setActivePresetUi(p) {
         var $cd = $(".countdown");
@@ -97,6 +101,9 @@ export function initPresetTimers(clock, refreshToolbar) {
             saveActivePresetIdToStorage(null);
             applyCounterContrastFromPresetColor($cd, null);
             $activePreset.attr("hidden", "hidden").attr("aria-hidden", "true");
+            /* Hide round/interval indicators when clearing preset */
+            $activeRoundIndicator.attr("hidden", "hidden");
+            $activeIntervalIndicator.attr("hidden", "hidden");
             /* Rebuild back to clock mode if currently in countdown mode */
             if (clock.options.isCountdown === true) {
                 clock.cancelPrepCountdown();
@@ -123,6 +130,17 @@ export function initPresetTimers(clock, refreshToolbar) {
         $activeDur.text(formatPresetMinuteLabel(p.minutes));
         $activeInt.text(formatPresetMinuteLabel(p.intervalMinutes));
         $activeRounds.text(String(p.rounds));
+
+        /* Initialize round/interval indicators */
+        if (p.rounds > 1) {
+            $activeRoundIndicator.removeAttr("hidden");
+            if (typeof window.updateFliptimerRoundIndicator === "function") {
+                window.updateFliptimerRoundIndicator(clock);
+            }
+        } else {
+            $activeRoundIndicator.attr("hidden", "hidden");
+        }
+        $activeIntervalIndicator.attr("hidden", "hidden");
     }
 
     function syncActivePresetFromList() {
@@ -1278,6 +1296,27 @@ export function initPresetTimers(clock, refreshToolbar) {
             clock.exitIdleWallClockMode(false);
         }
         clock.cancelPrepCountdown();
+        clock.setRounds(p.rounds);
+        clock.setInterval(p.intervalMinutes);
+        clock.resetRounds();
+        var mmss = minutesToStartTime(p.minutes);
+        clock.rebuildFace({
+            isCountdown: true,
+            startTime: mmss,
+            maxTime: mmss,
+            minTime: "00:00",
+            tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+            face: {
+                minutes: { maxValue: 59 },
+                seconds: { maxValue: 59 },
+            },
+        });
+        /* Preserve original behavior: set time but don't auto-start — user must press play */
+        clock.stop();
+        setActivePresetUi(p);
+        refreshToolbar();
+    }
+        clock.cancelPrepCountdown();
         var mmss = minutesToStartTime(p.minutes);
         clock.rebuildFace({
             isCountdown: true,
@@ -1345,6 +1384,7 @@ export function initPresetTimers(clock, refreshToolbar) {
 
     $("#active-preset-clear").on("click", function() {
         clock.cancelPrepCountdown();
+        clock.resetRounds();
         if (typeof clock.exitIdleWallClockMode === "function") {
             clock.exitIdleWallClockMode(true);
         }
@@ -1476,4 +1516,30 @@ export function initPresetTimers(clock, refreshToolbar) {
     $("#preset-form-reset").on("click", function() {
         resetForm();
     });
+}
+
+// Export functions for external use
+window.updateFliptimerRoundIndicator = function(clock) {
+    var $activeRoundIndicator = $("#active-preset-round-indicator");
+    var $activeCurrentRound = $("#active-preset-current-round");
+    var $activeTotalRounds = $("#active-preset-total-rounds");
+    if ($activeRoundIndicator.is("[hidden]")) {
+        return;
+    }
+    $activeCurrentRound.text(String(clock.currentRound));
+    $activeTotalRounds.text(String(clock.totalRounds));
+}
+
+window.showFliptimerIntervalIndicator = function() {
+    var $activeIntervalIndicator = $("#active-preset-interval-indicator");
+    var $activePreset = $("#active-preset");
+    if ($activePreset.is("[hidden]")) {
+        return;
+    }
+    $activeIntervalIndicator.removeAttr("hidden");
+}
+
+window.hideFliptimerIntervalIndicator = function() {
+    var $activeIntervalIndicator = $("#active-preset-interval-indicator");
+    $activeIntervalIndicator.attr("hidden", "hidden");
 }

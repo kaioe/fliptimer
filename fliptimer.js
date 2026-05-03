@@ -28,7 +28,7 @@ import {
 } from "./src/sound-manager.js";
 import { initFliptimerChromeDimming, initFliptimerToolbar } from "./src/toolbar.js";
 import { initPresetTimers } from "./src/presets-ui.js";
-import { applyAppBackgroundState } from "./src/presets-data.js";
+import { applyAppBackgroundState, minutesToStartTime } from "./src/presets-data.js";
 
 const $ = window.jQuery;
 
@@ -73,10 +73,120 @@ $(function () {
 	}
 	var applyChromeDim = initFliptimerChromeDimming(clock);
 	var refreshToolbar = initFliptimerToolbar(clock, applyChromeDim);
+	var $playPauseBtn = $("#clock-play-pause-btn");
+
+	// Handle round completion
 	$(".countdown").on("fliptimer:countdown-complete", function () {
-		playFliptimerSound("finish");
+		if (clock.intervalMinutes > 0) {
+			// Play interval before next round
+			playFliptimerSound("finish");
+			if (typeof window.updateFliptimerRoundIndicator === "function") {
+				window.updateFliptimerRoundIndicator();
+			}
+			setTimeout(function() {
+				startIntervalTimer();
+			}, 1000);
+		} else if (clock.hasNextRound()) {
+			// Start next round immediately
+			playFliptimerSound("finish");
+			clock.nextRound();
+			if (typeof window.updateFliptimerRoundIndicator === "function") {
+				window.updateFliptimerRoundIndicator();
+			}
+			clock.stop();
+			// Trigger prep countdown via play button
+			$playPauseBtn.trigger("click");
+		} else {
+			// All rounds complete
+			playFliptimerSound("finish");
+			clock.resetRounds();
+		}
 		refreshToolbar();
 	});
+
+	// Handle interval completion
+	$(".countdown").on("fliptimer:interval-complete", function () {
+		if (typeof window.hideFliptimerIntervalIndicator === "function") {
+			window.hideFliptimerIntervalIndicator();
+		}
+		if (clock.hasNextRound()) {
+			// Start next round after interval
+			playFliptimerSound("start");
+			clock.nextRound();
+			clock.endIntervalMode();
+			if (typeof window.updateFliptimerRoundIndicator === "function") {
+				window.updateFliptimerRoundIndicator();
+			}
+			// Rebuild timer for next round
+			var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
+			if (activePresetId) {
+				// Find and apply the active preset
+				var stored = localStorage.getItem("fliptimer-presets");
+				if (stored) {
+					try {
+						var data = JSON.parse(stored);
+						if (data && data.presets) {
+							var preset = data.presets.find(function(p) { return p.id === activePresetId; });
+							if (preset) {
+								var mmss = minutesToStartTime(preset.minutes);
+								clock.rebuildFace({
+									isCountdown: true,
+									startTime: mmss,
+									maxTime: mmss,
+									minTime: "00:00",
+									tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+									face: {
+										minutes: { maxValue: 59 },
+										seconds: { maxValue: 59 },
+									},
+								});
+								clock.stop();
+								// Trigger prep countdown via play button
+								setTimeout(function() {
+									$playPauseBtn.trigger("click");
+								}, 100);
+							}
+						}
+					} catch (e) {
+						// Ignore errors
+					}
+				}
+			}
+		} else {
+			// All rounds complete after interval
+			playFliptimerSound("finish");
+			clock.resetRounds();
+		}
+		refreshToolbar();
+	});
+
+	function startIntervalTimer() {
+		if (clock.intervalMinutes <= 0) {
+			return;
+		}
+		var intervalTimeStr = minutesToStartTime(clock.intervalMinutes);
+		clock.rebuildFace({
+			isCountdown: true,
+			startTime: intervalTimeStr,
+			maxTime: intervalTimeStr,
+			minTime: "00:00",
+			tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+			face: {
+				minutes: { maxValue: 59 },
+				seconds: { maxValue: 59 },
+			},
+		});
+		clock.startIntervalMode();
+		clock.stop();
+		if (typeof window.showFliptimerIntervalIndicator === "function") {
+			window.showFliptimerIntervalIndicator();
+		}
+		// Trigger prep countdown via play button
+		setTimeout(function() {
+			$playPauseBtn.trigger("click");
+		}, 100);
+	}
+
 	initPresetTimers(clock, refreshToolbar);
 	var pct0 = loadCounterSizePct();
 	applyCounterSizePct(pct0, clock);
