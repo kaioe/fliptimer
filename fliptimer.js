@@ -87,19 +87,13 @@ $(function () {
 			setTimeout(function() {
 				startIntervalTimer();
 			}, 1000);
-		} else if (clock.hasNextRound()) {
-			// Start next round immediately
+		} else {
+			// No interval: this is the final countdown
 			playFliptimerSound("finish");
-			clock.nextRound();
-			console.log("[Fliptimer] countdown-complete - incremented to:", clock.currentRound);
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
-			clock.stop();
-			// Trigger prep countdown via play button
-			$playPauseBtn.trigger("click");
-		} else {
-			// All rounds complete
+			// No more rounds - reset and stop
 			playFliptimerSound("finish");
 			clock.resetRounds();
 		}
@@ -122,25 +116,48 @@ $(function () {
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
-			// Rebuild timer for next round
-			var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
-			if (activePresetId) {
-				// Find and apply the active preset
-				var stored = localStorage.getItem("fliptimer-presets");
-				if (stored) {
-					try {
-						var data = JSON.parse(stored);
-						if (data && data.presets) {
-							var preset = data.presets.find(function(p) { return p.id === activePresetId; });
-							if (preset) {
-								var mmss = minutesToStartTime(preset.minutes);
-								clock.rebuildFace({
-									isCountdown: true,
-									startTime: mmss,
-									maxTime: mmss,
-									minTime: "00:00",
-									tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
-								});
+			// Only rebuild and start if this is not the final round
+			if (clock.currentRound <= clock.totalRounds) {
+				// Rebuild timer for next round
+				var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
+				if (activePresetId) {
+					// Find and apply active preset
+					var stored = localStorage.getItem("fliptimer-presets");
+					if (stored) {
+						try {
+							var data = JSON.parse(stored);
+							if (data && data.presets) {
+								var preset = data.presets.find(function(p) { return p.id === activePresetId; });
+								if (preset) {
+									var mmss = minutesToStartTime(preset.minutes);
+									clock.rebuildFace({
+										isCountdown: true,
+										startTime: mmss,
+										maxTime: mmss,
+										minTime: "00:00",
+										tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+										face: {
+											minutes: { maxValue: 59 },
+											seconds: { maxValue: 59 },
+										},
+									});
+									clock.start();
+								}
+						}
+					} catch (e) {}
+				}
+			}
+		} else {
+			// All rounds complete
+			playFliptimerSound("finish");
+			if (typeof window.updateFliptimerRoundIndicator === "function") {
+				window.updateFliptimerRoundIndicator(clock);
+			}
+			clock.resetRounds();
+		}
+		refreshToolbar();
+	});
+
 								clock.start();
 							}
 						}
