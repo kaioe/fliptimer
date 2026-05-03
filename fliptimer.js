@@ -81,7 +81,7 @@ $(function () {
 			// Play interval before next round
 			playFliptimerSound("finish");
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
-				window.updateFliptimerRoundIndicator();
+				window.updateFliptimerRoundIndicator(clock);
 			}
 			setTimeout(function() {
 				startIntervalTimer();
@@ -91,7 +91,7 @@ $(function () {
 			playFliptimerSound("finish");
 			clock.nextRound();
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
-				window.updateFliptimerRoundIndicator();
+				window.updateFliptimerRoundIndicator(clock);
 			}
 			clock.stop();
 			// Trigger prep countdown via play button
@@ -115,7 +115,7 @@ $(function () {
 			clock.nextRound();
 			clock.endIntervalMode();
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
-				window.updateFliptimerRoundIndicator();
+				window.updateFliptimerRoundIndicator(clock);
 			}
 			// Rebuild timer for next round
 			var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
