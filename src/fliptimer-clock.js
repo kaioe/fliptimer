@@ -122,7 +122,7 @@ Fliptimer.prototype.resetRounds = function () {
 };
 
 Fliptimer.prototype.hasNextRound = function () {
-	return this.currentRound <= this.totalRounds;
+	return this.currentRound < this.totalRounds;
 };
 
 Fliptimer.prototype.nextRound = function () {
