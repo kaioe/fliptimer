@@ -1514,6 +1514,7 @@ window.updateFliptimerRoundIndicator = function(clock) {
     if ($activePreset.is("[hidden]")) {
         return;
     }
+    console.log("[Fliptimer] updateFliptimerRoundIndicator - currentRound:", clock.currentRound, "totalRounds:", clock.totalRounds);
     $activeRounds.text(clock.currentRound + " / " + clock.totalRounds);
     $activeCurrentRoundDisplay.text(String(clock.currentRound));
 };
