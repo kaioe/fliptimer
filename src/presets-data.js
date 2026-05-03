@@ -525,9 +525,9 @@ export function syncPresetJsonToProjectFile(presets) {
 		credentials: "same-origin",
 	})
 		.then(function (res) {
-			if (res && res.status === 404 && !warnedPresetSave404) {
+			if ((res && res.status === 404 || res.status === 405) && !warnedPresetSave404) {
 				warnedPresetSave404 = true;
-				console.warn("[Fliptimer] fliptimer.json sync failed (404). Page origin: " + (typeof location !== "undefined" ? location.origin : "?") + ". Use the exact Local: URL from npm run dev (BrowserSync + bs-config.js). If port 3000 is busy, BrowserSync uses 3001, 3002, … — a bookmark to :3000 may hit a different app without POST /__fliptimer__/save-preset-timers.");
+				console.warn("[Fliptimer] fliptimer.json sync failed (" + res.status + "). Page origin: " + (typeof location !== "undefined" ? location.origin : "?") + ". Preset saving only works in development (npm run dev). In production, presets are saved to localStorage.");
 			}
 		})
 		.catch(function () {});
