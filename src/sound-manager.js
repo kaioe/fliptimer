@@ -172,6 +172,9 @@ export function getFliptimerSharedAudioContext() {
 
 /** Short sine beep for prep countdown (one per second). */
 export function playPrepCountdownBeep() {
+	if (isFliptimerSoundMuted()) {
+		return;
+	}
 	var ctx = getFliptimerSharedAudioContext();
 	if (!ctx) {
 		return;
@@ -224,6 +227,17 @@ export function fliptimerUnlockHtmlAudioIfNeeded() {
 
 var preloadedAudios = {};
 
+/** Global mute state - set from toolbar.js mute button */
+var fliptimerSoundMuted = false;
+
+export function isFliptimerSoundMuted() {
+	return fliptimerSoundMuted;
+}
+
+export function setFliptimerSoundMuted(muted) {
+	fliptimerSoundMuted = !!muted;
+}
+
 export function ensurePreloadedSound(url) {
 	var audio = preloadedAudios[url];
 	if (!audio) {
@@ -235,6 +249,9 @@ export function ensurePreloadedSound(url) {
 }
 
 export function playFliptimerSound(kind) {
+	if (isFliptimerSoundMuted()) {
+		return;
+	}
 	var url = resolveSoundUrlForKind(kind);
 	if (!url || typeof url !== "string") {
 		return;
