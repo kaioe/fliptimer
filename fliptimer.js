@@ -81,6 +81,11 @@ $(function () {
 		if (clock.intervalMinutes > 0) {
 			// Play interval before next round
 			playFliptimerSound("finish");
+			// Increment to next round BEFORE updating display
+			if (clock.hasNextRound()) {
+				clock.nextRound();
+				console.log("[Fliptimer] countdown-complete - incremented to:", clock.currentRound);
+			}
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
@@ -108,15 +113,13 @@ $(function () {
 
 	// Handle interval completion
 	$(".countdown").on("fliptimer:interval-complete", function () {
-		console.log("[Fliptimer] interval-complete - before nextRound, currentRound:", clock.currentRound);
+		console.log("[Fliptimer] interval-complete - currentRound:", clock.currentRound);
 		if (typeof window.hideFliptimerIntervalIndicator === "function") {
 			window.hideFliptimerIntervalIndicator();
 		}
 		if (clock.hasNextRound()) {
-			// Start next round after interval
+			// Start next round after interval (round already incremented)
 			playFliptimerSound("start");
-			clock.nextRound();
-			console.log("[Fliptimer] interval-complete - after nextRound, currentRound:", clock.currentRound);
 			clock.endIntervalMode();
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
