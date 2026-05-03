@@ -80,6 +80,10 @@ $(function () {
 		if (clock.intervalMinutes > 0) {
 			// Play interval before next round
 			playFliptimerSound("finish");
+			// Move to next round before interval so indicator shows correct round
+			if (clock.hasNextRound()) {
+				clock.nextRound();
+			}
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
@@ -112,7 +116,6 @@ $(function () {
 		if (clock.hasNextRound()) {
 			// Start next round after interval
 			playFliptimerSound("start");
-			clock.nextRound();
 			clock.endIntervalMode();
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
@@ -135,11 +138,16 @@ $(function () {
 									maxTime: mmss,
 									minTime: "00:00",
 									tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
-									face: {
-										minutes: { maxValue: 59 },
-										seconds: { maxValue: 59 },
-									},
 								});
+								clock.start();
+							}
+						}
+					} catch (e) {}
+				}
+			}
+		}
+		refreshToolbar();
+	});
 								clock.stop();
 								// Trigger prep countdown via play button
 								setTimeout(function() {
