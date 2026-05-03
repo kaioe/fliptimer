@@ -80,6 +80,9 @@ $(function () {
 		if (clock.intervalMinutes > 0) {
 			// Play interval before next round
 			playFliptimerSound("finish");
+			if (clock.hasNextRound()) {
+				clock.nextRound();
+			}
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
@@ -112,7 +115,6 @@ $(function () {
 		if (clock.hasNextRound()) {
 			// Start next round after interval
 			playFliptimerSound("start");
-			clock.nextRound();
 			clock.endIntervalMode();
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
