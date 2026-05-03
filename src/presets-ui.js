@@ -131,17 +131,18 @@ export function initPresetTimers(clock, refreshToolbar) {
         $activeName.text(p.name);
         $activeDur.text(formatPresetMinuteLabel(p.minutes));
         $activeInt.text(formatPresetMinuteLabel(p.intervalMinutes));
-        $activeRounds.text(String(p.rounds));
 
         /* Initialize round/interval indicators */
         if (p.rounds > 1) {
-            $activeRoundIndicator.removeAttr("hidden");
+            $activeRoundIndicator.attr("hidden", "hidden");
+            $activeRounds.text(clock.currentRound + " / " + p.rounds);
             $activeCurrentRoundDisplay.removeAttr("hidden");
             if (typeof window.updateFliptimerRoundIndicator === "function") {
                 window.updateFliptimerRoundIndicator(clock);
             }
         } else {
             $activeRoundIndicator.attr("hidden", "hidden");
+            $activeRounds.text(String(p.rounds));
             $activeCurrentRoundDisplay.attr("hidden", "hidden");
         }
         $activeIntervalIndicator.attr("hidden", "hidden");
@@ -1508,14 +1509,12 @@ export function initPresetTimers(clock, refreshToolbar) {
 // Export functions for external use
 window.updateFliptimerRoundIndicator = function(clock) {
     var $activeRoundIndicator = $("#active-preset-round-indicator");
-    var $activeCurrentRound = $("#active-preset-current-round");
-    var $activeTotalRounds = $("#active-preset-total-rounds");
+    var $activeRounds = $("#active-preset-rounds");
     var $activeCurrentRoundDisplay = $("#active-preset-current-round-display");
     if ($activeRoundIndicator.is("[hidden]")) {
         return;
     }
-    $activeCurrentRound.text(String(clock.currentRound));
-    $activeTotalRounds.text(String(clock.totalRounds));
+    $activeRounds.text(clock.currentRound + " / " + clock.totalRounds);
     $activeCurrentRoundDisplay.text(String(clock.currentRound));
 };
 
