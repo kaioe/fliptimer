@@ -88,14 +88,45 @@ $(function () {
 				startIntervalTimer();
 			}, 1000);
 		} else {
-			// No interval: this is the final countdown
 			playFliptimerSound("finish");
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
-			// No more rounds - reset and stop
-			playFliptimerSound("finish");
-			clock.resetRounds();
+			if (clock.hasNextRound()) {
+				clock.nextRound();
+				var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
+				if (activePresetId) {
+					var stored = localStorage.getItem("fliptimer-presets");
+					if (stored) {
+						try {
+							var data = JSON.parse(stored);
+							if (data && data.presets) {
+								var preset = data.presets.find(function(p) { return p.id === activePresetId; });
+								if (preset) {
+									var mmss = minutesToStartTime(preset.minutes);
+									clock.rebuildFace({
+										isCountdown: true,
+										startTime: mmss,
+										maxTime: mmss,
+										minTime: "00:00",
+										tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+										face: {
+											minutes: { maxValue: 59 },
+											seconds: { maxValue: 59 },
+										},
+									});
+									if (typeof window.updateFliptimerRoundIndicator === "function") {
+										window.updateFliptimerRoundIndicator(clock);
+									}
+									clock.start();
+								}
+							}
+						} catch (e) {}
+					}
+				}
+			} else {
+				clock.resetRounds();
+			}
 		}
 		refreshToolbar();
 	});
