@@ -107,21 +107,16 @@ $(function () {
 			window.hideFliptimerIntervalIndicator();
 		}
 		if (clock.hasNextRound()) {
-			// Increment to next round before starting
 			clock.nextRound();
 			console.log("[Fliptimer] interval-complete - incremented to:", clock.currentRound);
-			// Start next round after interval
 			playFliptimerSound("start");
 			clock.endIntervalMode();
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
-			// Only rebuild and start if this is not the final round
 			if (clock.currentRound <= clock.totalRounds) {
-				// Rebuild timer for next round
 				var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
 				if (activePresetId) {
-					// Find and apply active preset
 					var stored = localStorage.getItem("fliptimer-presets");
 					if (stored) {
 						try {
@@ -143,27 +138,17 @@ $(function () {
 									});
 									clock.start();
 								}
-						}
-					} catch (e) {}
+							}
+						} catch (e) {}
+					}
 				}
 			}
 		} else {
-			// All rounds complete
 			playFliptimerSound("finish");
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
 			clock.resetRounds();
-		}
-		refreshToolbar();
-	});
-
-								clock.start();
-							}
-						}
-					} catch (e) {}
-				}
-			}
 		}
 		refreshToolbar();
 	});

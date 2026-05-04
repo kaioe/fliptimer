@@ -1487,6 +1487,27 @@ export function initPresetTimers(clock, refreshToolbar) {
         commitPresetForm();
     });
 
+    var $runBtn = $("#preset-run-btn");
+    $runBtn.on("click", function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var minutes = parseFloat($minutes.val()) || 0;
+        if (minutes <= 0) {
+            $minutes.trigger("focus");
+            return;
+        }
+        var tempPreset = normalizePreset({
+            id: "__temp_run__",
+            name: "Quick Timer",
+            color: $color.val(),
+            minutes: minutes,
+            intervalMinutes: parseFloat($interval.val()) || 0,
+            rounds: Math.round(parseFloat($rounds.val())) || 1,
+        });
+        applyPreset(tempPreset);
+        closeModal();
+    });
+
     $form.on("submit", function(e) {
         e.preventDefault();
         e.stopPropagation();
