@@ -53,7 +53,7 @@ describe("Fliptimer round progression", () => {
 				return false;
 			},
 			hasNextRound: function() {
-				return this.currentRound <= this.totalRounds;
+				return this.currentRound < this.totalRounds;
 			},
 		};
 	});
@@ -71,10 +71,10 @@ describe("Fliptimer round progression", () => {
 			expect(clock.hasNextRound()).toBe(true);
 		});
 
-		it("should return true when currentRound equals totalRounds", () => {
+		it("should return false when currentRound equals totalRounds", () => {
 			clock.totalRounds = 3;
 			clock.currentRound = 3;
-			expect(clock.hasNextRound()).toBe(true);
+			expect(clock.hasNextRound()).toBe(false);
 		});
 
 		it("should return false when currentRound exceeds totalRounds", () => {

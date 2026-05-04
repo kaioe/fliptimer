@@ -1538,6 +1538,8 @@ window.updateFliptimerRoundIndicator = function(clock) {
     console.log("[Fliptimer] updateFliptimerRoundIndicator - currentRound:", clock.currentRound, "totalRounds:", clock.totalRounds);
     $activeRounds.text(clock.currentRound + " / " + clock.totalRounds);
     $activeCurrentRoundDisplay.text(String(clock.currentRound));
+    $("#active-preset-current-round").text(String(clock.currentRound));
+    $("#active-preset-total-rounds").text(String(clock.totalRounds));
 };
 
 window.showFliptimerIntervalIndicator = function() {

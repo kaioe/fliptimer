@@ -78,22 +78,17 @@ $(function () {
 	// Handle round completion
 	$(".countdown").on("fliptimer:countdown-complete", function () {
 		console.log("[Fliptimer] countdown-complete - currentRound:", clock.currentRound, "totalRounds:", clock.totalRounds);
-		if (clock.intervalMinutes > 0) {
-			// Play interval before next round
-			playFliptimerSound("finish");
+		playFliptimerSound("finish");
+		if (clock.hasNextRound()) {
+			clock.nextRound();
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
-			setTimeout(function() {
-				startIntervalTimer();
-			}, 1000);
-		} else {
-			playFliptimerSound("finish");
-			if (typeof window.updateFliptimerRoundIndicator === "function") {
-				window.updateFliptimerRoundIndicator(clock);
-			}
-			if (clock.hasNextRound()) {
-				clock.nextRound();
+			if (clock.intervalMinutes > 0) {
+				setTimeout(function() {
+					startIntervalTimer();
+				}, 1000);
+			} else {
 				var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
 				if (activePresetId) {
 					var stored = localStorage.getItem("fliptimer-presets");
@@ -115,18 +110,17 @@ $(function () {
 											seconds: { maxValue: 59 },
 										},
 									});
-									if (typeof window.updateFliptimerRoundIndicator === "function") {
-										window.updateFliptimerRoundIndicator(clock);
-									}
-									clock.start();
 								}
 							}
 						} catch (e) {}
 					}
 				}
-			} else {
-				clock.resetRounds();
 			}
+		} else {
+			if (typeof window.updateFliptimerRoundIndicator === "function") {
+				window.updateFliptimerRoundIndicator(clock);
+			}
+			clock.resetRounds();
 		}
 		refreshToolbar();
 	});
@@ -145,33 +139,30 @@ $(function () {
 			if (typeof window.updateFliptimerRoundIndicator === "function") {
 				window.updateFliptimerRoundIndicator(clock);
 			}
-			if (clock.currentRound <= clock.totalRounds) {
-				var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
-				if (activePresetId) {
-					var stored = localStorage.getItem("fliptimer-presets");
-					if (stored) {
-						try {
-							var data = JSON.parse(stored);
-							if (data && data.presets) {
-								var preset = data.presets.find(function(p) { return p.id === activePresetId; });
-								if (preset) {
-									var mmss = minutesToStartTime(preset.minutes);
-									clock.rebuildFace({
-										isCountdown: true,
-										startTime: mmss,
-										maxTime: mmss,
-										minTime: "00:00",
-										tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
-										face: {
-											minutes: { maxValue: 59 },
-											seconds: { maxValue: 59 },
-										},
-									});
-									clock.start();
-								}
+			var activePresetId = localStorage.getItem("fliptimer-active-preset-id");
+			if (activePresetId) {
+				var stored = localStorage.getItem("fliptimer-presets");
+				if (stored) {
+					try {
+						var data = JSON.parse(stored);
+						if (data && data.presets) {
+							var preset = data.presets.find(function(p) { return p.id === activePresetId; });
+							if (preset) {
+								var mmss = minutesToStartTime(preset.minutes);
+								clock.rebuildFace({
+									isCountdown: true,
+									startTime: mmss,
+									maxTime: mmss,
+									minTime: "00:00",
+									tickDuration: FLIPTIMER_PREP_FLIP_MS + FLIPTIMER_COUNTDOWN_TICK_BUFFER_MS,
+									face: {
+										minutes: { maxValue: 59 },
+										seconds: { maxValue: 59 },
+									},
+								});
 							}
-						} catch (e) {}
-					}
+						}
+					} catch (e) {}
 				}
 			}
 		} else {
